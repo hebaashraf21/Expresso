@@ -4,10 +4,10 @@
 void yyerror(const char*);
 %}
 
-%token IF ELSE WHILE FOR DO SWITCH CASE DEFAULT RETURN CONTINUE BREAK
-%token INTEGER FLOAT CHAR BOOL VOID 
+%token IF ELSE WHILE FOR DO SWITCH CASE DEFAULT RETURN CONTINUE BREAK CONST
+%token INTEGER FLOAT CHAR BOOL VOID ENUM
 %token LEFT_BRACE RIGHT_BRACE LEFT_PAREN RIGHT_PAREN SEMICOLON COLON COMMA LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET
-%token DIGIT IDENTIFIER STRING_IDENTIFIER BOOL_IDENTIFIER QUESTION_MARK  
+%token IDENTIFIER INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT BOOL_CONSTANT CHAR_CONSTANT QUESTION_MARK  
 %token PLUS MINUS MUL DIV POWER MOD
 %token  EQUALS NOT_EQUALS LESS_THAN LESS_THAN_OR_EQUALS GREATER_THAN GREATER_THAN_OR_EQUALS
 %token LOGICAL_AND LOGICAL_OR LOGICAL_NOT ASSIGN
@@ -28,18 +28,18 @@ statement : expression SEMICOLON
           | BREAK SEMICOLON
           ;
 
-cases : /* empty */ | cases CASE DIGIT COLON statement ;
+cases : /* empty */ | cases CASE INTEGER_CONSTANT COLON statement ;
 
 expression : IDENTIFIER
-           | DIGIT
+           | INTEGER_CONSTANT
            | expression PLUS expression
            | expression MINUS expression
            | expression MUL expression
            | expression DIV expression
            | expression POWER expression
            | LEFT_PAREN expression RIGHT_PAREN
-           | STRING_IDENTIFIER
-           | BOOL_IDENTIFIER
+           | STRING_CONSTANT
+           | BOOL_CONSTANT
            | expression QUESTION_MARK expression COLON expression
            | LEFT_SQUARE_BRACKET expression RIGHT_SQUARE_BRACKET
            ;

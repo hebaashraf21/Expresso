@@ -4,7 +4,6 @@
 void yyerror(const char*);
 %}
 
-
 %%
 
 "if"                { return IF; }
@@ -20,9 +19,11 @@ void yyerror(const char*);
 "char"              { return CHAR; }
 "bool"              { return BOOL; }
 "void"              { return VOID; }
+"enum"              { return ENUM; }
 "return"            { return RETURN; }
 "continue"          { return CONTINUE; }
 "break"             { return BREAK; }
+"const"             { return CONST;}
 
 "=="                { return EQUALS; }
 "!="                { return NOT_EQUALS; }
@@ -36,9 +37,6 @@ void yyerror(const char*);
 
 "="                 { return ASSIGN; }
 
-
-
-
 "{"                 { return LEFT_BRACE; }
 "}"                 { return RIGHT_BRACE; }
 "("                 { return LEFT_PAREN; }
@@ -49,32 +47,26 @@ void yyerror(const char*);
 ","                 { return COMMA; }
 "?"                 { return QUESTION_MARK; }
 
-
-
 "+"                 { return PLUS; }
 "-"                 { return MINUS; }
 "*"                 { return MUL; }
 "/"                 { return DIV; }
 "^"                 { return POWER; }
-"%"                 { return MOD;}
+"%"                 { return MOD; }
 
-[0-9]+              {  return DIGIT; }
+[0-9]+"."[0-9]*      { return FLOAT_CONSTANT; }
+[0-9]+               { return INTEGER_CONSTANT; }
+'[^\\']'             { return CHAR_CONSTANT; }
+"\"([^\"\\]|\\.)*\"" { return STRING_CONSTANT; }
+"true"|"false"       { return BOOL_CONSTANT; }
+
 [a-zA-Z_][a-zA-Z0-9_]* { return IDENTIFIER; }
-\"([^"\\]|\\.)*\"   {  return STRING_IDENTIFIER; }
-"true|false"        {  return BOOL_IDENTIFIER; }
 
 [ \t\n]             ; // Skip whitespace and newlines
 
-
-
 %%
-
-
-
-
 
 int yywrap()
 {
     return 1;
 }
-

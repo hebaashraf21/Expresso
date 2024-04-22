@@ -4,6 +4,8 @@
 void yyerror(const char*);
 %}
 
+%option noyywrap
+
 %%
 
 "if"                { printf("IF: %s\n", yytext);       return IF; }
@@ -67,7 +69,11 @@ void yyerror(const char*);
 
 %%
 
-int yywrap()
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
+
+int my_wrap()
 {
     return 1;
 }

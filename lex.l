@@ -60,7 +60,7 @@ void yyerror(const char*);
 [0-9]+"."[0-9]*      { printf("FLOAT_CONSTANT: %s\n", yytext);     return FLOAT_CONSTANT; }
 [0-9]+               { printf("INTEGER_CONSTANT: %s\n", yytext);   return INTEGER_CONSTANT; }
 '[^\\']'             { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_CONSTANT; }
-"\"([^\"\\]|\\.)*\"" { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_CONSTANT; }
+\"([^\"\\]|\\.)*\" { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_CONSTANT; }
 "true"|"false"       { printf("BOOL_CONSTANT: %s\n", yytext);      return BOOL_CONSTANT; }
 
 [a-zA-Z_][a-zA-Z0-9_]* {printf("IDENTIFIER: %s\n", yytext); return IDENTIFIER; }

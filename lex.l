@@ -12,8 +12,12 @@ void yyerror(const char*);
 "else"              { printf("ELSE: %s\n", yytext);     return ELSE; }
 
 "while"             { printf("WHILE: %s\n", yytext);    return WHILE; }
-"for"               { printf("FOR: %s\n", yytext);      return FOR; }
 "do"                { printf("DO: %s\n", yytext);       return DO; }
+
+"repeat"            { printf("REPEAT: %s\n", yytext);   return REPEAT; }
+"until"             { printf("UNTIL: %s\n", yytext);    return UNTIL; }
+
+"for"               { printf("FOR: %s\n", yytext);      return FOR; }
 
 "switch"            { printf("SWITCH: %s\n", yytext);   return SWITCH; }
 "case"              { printf("CASE: %s\n", yytext);     return CASE; }
@@ -49,18 +53,18 @@ void yyerror(const char*);
 "||"                { printf("LOGICAL_OR: %s\n", yytext);              return LOGICAL_OR; }
 "!"                 { printf("LOGICAL_NOT: %s\n", yytext);             return LOGICAL_NOT; }
 
-"="                 { printf("ASSIGN: %s\n", yytext);return ASSIGN; }
+"="                 { printf("ASSIGN: %s\n", yytext);		 return *yytext; }
 
-"{"                 { printf("LEFT_BRACE: %s\n", yytext);             return LEFT_BRACE; }
-"}"                 { printf("RIGHT_BRACE: %s\n", yytext);            return RIGHT_BRACE; }
-"("                 { printf("LEFT_PAREN: %s\n", yytext);             return LEFT_PAREN; }
-")"                 { printf("RIGHT_PAREN: %s\n", yytext);            return RIGHT_PAREN; }
-"["                 { printf("LEFT_SQUARE_BRACKET: %s\n", yytext);    return LEFT_SQUARE_BRACKET; }
-"]"                 { printf("RIGHT_SQUARE_BRACKET: %s\n", yytext);   return RIGHT_SQUARE_BRACKET; }
+"{"                 { printf("LEFT_BRACE: %s\n", yytext);             return *yytext; }
+"}"                 { printf("RIGHT_BRACE: %s\n", yytext);            return *yytext; }
+"("                 { printf("LEFT_PAREN: %s\n", yytext);             return *yytext; }
+")"                 { printf("RIGHT_PAREN: %s\n", yytext);            return *yytext; }
+"["                 { printf("LEFT_SQUARE_BRACKET: %s\n", yytext);    return *yytext; }
+"]"                 { printf("RIGHT_SQUARE_BRACKET: %s\n", yytext);   return *yytext; }
 
-";"                 { printf("SEMICOLON: %s\n", yytext);              return SEMICOLON; }
-","                 { printf("COMMA: %s\n", yytext);                  return COMMA; }
-"?"                 { printf("QUESTION_MARK: %s\n", yytext);          return QUESTION_MARK; }
+";"                 { printf("SEMICOLON: %s\n", yytext);              return *yytext; }
+","                 { printf("COMMA: %s\n", yytext);                  return *yytext; }
+"?"                 { printf("QUESTION_MARK: %s\n", yytext);          return *yytext; }
 
 "+"                 { printf("PLUS: %s\n", yytext);   return PLUS; }
 "-"                 { printf("MINUS: %s\n", yytext);  return MINUS; }
@@ -69,11 +73,13 @@ void yyerror(const char*);
 "^"                 { printf("POWER: %s\n", yytext);  return POWER; }
 "%"                 { printf("MOD: %s\n", yytext);    return MOD; }
 
-[0-9]*"."[0-9]*      { printf("FLOAT_CONSTANT: %s\n", yytext);     return FLOAT_CONSTANT; }
-[0-9]+               { printf("INTEGER_CONSTANT: %s\n", yytext);   return INTEGER_CONSTANT; }
-'[^\\']'             { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_CONSTANT; }
-\"([^\"\\]|\\.)*\"   { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_CONSTANT; }
-"true"|"false"       { printf("BOOL_CONSTANT: %s\n", yytext);      return BOOL_CONSTANT; }
+[0-9]*"."[0-9]*     { printf("FLOAT_CONSTANT: %s\n", yytext);     return FLOAT_VAL; }
+0  	            { printf("INTEGER_VAL: %s\n", yytext);   return INTEGER_VAL; }
+[1-9][0-9]*         { printf("INTEGER_VAL: %s\n", yytext);   return INTEGER_VAL; }
+'[^\\']'            { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_VAL; }
+\"([^\"\\]|\\.)*\"  { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_VAL; }
+"true"		     { printf("BOOL_CONSTANT: %s\n", yytext);      return TRUE_VAL; }
+"false"             { printf("BOOL_CONSTANT: %s\n", yytext);      return FALSE_VAL; }
 
 [a-zA-Z_][a-zA-Z0-9_]* {printf("IDENTIFIER: %s\n", yytext); return IDENTIFIER; }
 

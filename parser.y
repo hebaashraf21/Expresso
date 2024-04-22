@@ -1,36 +1,48 @@
 %{
 #include <stdio.h>
-int yylex();
-void yyerror(char *);
-
-int result = 0;
+#include "parser.tab.h"
+void yyerror(const char*);
 %}
 
-%token IF ELSE WHILE FOR DO SWITCH CASE DEFAULT INTEGER FLOAT CHAR BOOL VOID RETURN LEFT_BRACE RIGHT_BRACE LEFT_PAREN RIGHT_PAREN SEMICOLON COMMA
-%left '+' '-'
-%left '*' '/'
+%token IF ELSE WHILE FOR DO SWITCH CASE DEFAULT INTEGER FLOAT CHAR BOOL VOID RETURN CONTINUE BREAK
+%token LEFT_BRACE RIGHT_BRACE LEFT_PAREN RIGHT_PAREN SEMICOLON COLON COMMA DIGIT IDENTIFIER STRING_IDENTIFIER BOOL_IDENTIFIER QUESTION_MARK LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET PLUS MINUS MUL DIV POWER
 
 %%
 
-stmt_list : /* empty */
-          | stmt_list stmt { printf("Result: %d\n", result); }
+program : /* empty */ | program statement ;
+
+statement : expression SEMICOLON
+          | IF LEFT_PAREN expression RIGHT_PAREN statement
+          | IF LEFT_PAREN expression RIGHT_PAREN statement ELSE statement
+          | WHILE LEFT_PAREN expression RIGHT_PAREN statement
+          | FOR LEFT_PAREN expression SEMICOLON expression SEMICOLON expression RIGHT_PAREN statement
+          | DO statement WHILE LEFT_PAREN expression RIGHT_PAREN SEMICOLON
+          | SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE cases RIGHT_BRACE
+          | RETURN expression SEMICOLON
+          | CONTINUE SEMICOLON
+          | BREAK SEMICOLON
           ;
 
-stmt      : expr { result = $1; }
-          ;
+cases : /* empty */ | cases CASE DIGIT COLON statement ;
 
-expr      : INTEGER
-          | expr '+' expr { $$ = $1 + $3; }
-          | expr '-' expr { $$ = $1 - $3; }
-          | expr '*' expr { $$ = $1 * $3; }
-          | expr '/' expr { $$ = $1 / $3; }
-          | '(' expr ')'   { $$ = $2; }
-          ;
+expression : IDENTIFIER
+           | DIGIT
+           | expression PLUS expression
+           | expression MINUS expression
+           | expression MUL expression
+           | expression DIV expression
+           | expression POWER expression
+           | LEFT_PAREN expression RIGHT_PAREN
+           | STRING_IDENTIFIER
+           | BOOL_IDENTIFIER
+           | expression QUESTION_MARK expression COLON expression
+           | LEFT_SQUARE_BRACKET expression RIGHT_SQUARE_BRACKET
+           ;
 
 %%
 
-void yyerror(char *s) {
-    fprintf(stderr, "error: %s\n", s);
+void yyerror(const char* s) {
+    fprintf(stderr, "%s\n", s);
 }
 
 int main() {

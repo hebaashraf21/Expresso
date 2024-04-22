@@ -53,12 +53,27 @@
      BOOL = 269,
      VOID = 270,
      RETURN = 271,
-     LEFT_BRACE = 272,
-     RIGHT_BRACE = 273,
-     LEFT_PAREN = 274,
-     RIGHT_PAREN = 275,
-     SEMICOLON = 276,
-     COMMA = 277
+     CONTINUE = 272,
+     BREAK = 273,
+     LEFT_BRACE = 274,
+     RIGHT_BRACE = 275,
+     LEFT_PAREN = 276,
+     RIGHT_PAREN = 277,
+     SEMICOLON = 278,
+     COLON = 279,
+     COMMA = 280,
+     DIGIT = 281,
+     IDENTIFIER = 282,
+     STRING_IDENTIFIER = 283,
+     BOOL_IDENTIFIER = 284,
+     QUESTION_MARK = 285,
+     LEFT_SQUARE_BRACKET = 286,
+     RIGHT_SQUARE_BRACKET = 287,
+     PLUS = 288,
+     MINUS = 289,
+     MUL = 290,
+     DIV = 291,
+     POWER = 292
    };
 #endif
 

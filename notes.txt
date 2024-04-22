@@ -1,0 +1,8 @@
+<<
+>>
+[&^~|]
+
+Regex to be revised:
+'[^\\']'             { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_CONSTANT; }
+\"([^\"\\]|\\.)*\"   { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_CONSTANT; }
+\/\*([^*]|\*+[^/])*\*+\/ { printf("multi lines comment\n"); } // Skip multi lines comments 

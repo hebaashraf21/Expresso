@@ -26,6 +26,7 @@ void yyerror(const char*);
 "continue"          { printf("CONTINUE: %s\n", yytext); return CONTINUE; }
 "break"             { printf("BREAK: %s\n", yytext);    return BREAK; }
 "const"             { printf("CONST: %s\n", yytext);    return CONST;}
+"print"             { printf("PRINT: %s\n", yytext);    return PRINT;}
 
 
 "=="                { printf("EQUALS: %s\n", yytext);                  return EQUALS; }

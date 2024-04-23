@@ -38,8 +38,14 @@
 %%
 
 program:
-        program stmt '\n'
+        statements '\n'
         | /* NULL */
+        ;
+
+
+statements:
+        stmt
+        | statements stmt
         ;
 
         
@@ -62,19 +68,19 @@ stmt:
             
         
         /*Conditional Statements*/
-        | IF '(' expr ')' '{' stmt '}' ELSE '{' stmt '}'
+        | IF '(' expr ')' '{' stmt '}' ELSE '{' statements '}'
         | IF '(' expr ')' '{' stmt '}'
         
         /*Loops*/
         | WHILE '(' expr ')' '{' stmt '}'
-        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' stmt '}'
-        | REPEAT '{' stmt '}' UNTIL '(' expr ')' ';'
+        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' statements '}'
+        | REPEAT '{' statements '}' UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
         | SWITCH '(' IDENTIFIER ')' '{' case_list default_case '}'
         
         /*Block Strusture*/
-        | '{' stmt_list '}'
+        | '{' statements '}'
         
         
         /*Functions*/   
@@ -105,12 +111,6 @@ parameters_list:
 		| var_declaration
 		| parameters_list ',' var_declaration
 		;
-
-
-stmt_list:
-          stmt
-         | stmt_list stmt
-	 ;
               
 
 case_list:

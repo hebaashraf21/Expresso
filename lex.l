@@ -1,7 +1,6 @@
 %{
 #include <stdio.h>
 #include "parser.tab.h"
-void yyerror(const char*);
 %}
 
 %option noyywrap
@@ -89,10 +88,6 @@ void yyerror(const char*);
 [ \t\n]             ; // Skip whitespace and newlines
 
 %%
-
-void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
-}
 
 int my_wrap()
 {

@@ -5,6 +5,7 @@
 
 %option noyywrap
 
+
 %%
 
 "if"                { printf("IF: %s\n", yytext);       return IF; }
@@ -61,10 +62,6 @@
 "["                 { printf("LEFT_SQUARE_BRACKET: %s\n", yytext);    return *yytext; }
 "]"                 { printf("RIGHT_SQUARE_BRACKET: %s\n", yytext);   return *yytext; }
 
-";"                 { printf("SEMICOLON: %s\n", yytext);              return *yytext; }
-","                 { printf("COMMA: %s\n", yytext);                  return *yytext; }
-"?"                 { printf("QUESTION_MARK: %s\n", yytext);          return *yytext; }
-
 "+"                 { printf("PLUS: %s\n", yytext);   return PLUS; }
 "-"                 { printf("MINUS: %s\n", yytext);  return MINUS; }
 "*"                 { printf("MUL: %s\n", yytext);    return MUL; }
@@ -76,10 +73,14 @@
 0  	            { printf("INTEGER_VAL: %s\n", yytext);   return INTEGER_VAL; }
 [1-9][0-9]*         { printf("INTEGER_VAL: %s\n", yytext);   return INTEGER_VAL; }
 '[^\\']'            { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_VAL; }
-\"([^\"\\]|\\.)*\"  { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_VAL; }
+\"([^\"\\;]|\\.)*\"  { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_VAL; }
 "true"		     { printf("BOOL_CONSTANT: %s\n", yytext);      return TRUE_VAL; }
 "false"             { printf("BOOL_CONSTANT: %s\n", yytext);      return FALSE_VAL; }
 
+";"                 { printf("SEMICOLON: %s\n", yytext);              return *yytext; }
+","                 { printf("COMMA: %s\n", yytext);                  return *yytext; }
+"?"                 { printf("QUESTION_MARK: %s\n", yytext);          return *yytext; }
+":"		     { printf("COLON: %s\n", yytext);          return *yytext; }
 [a-zA-Z_][a-zA-Z0-9_]* {printf("IDENTIFIER: %s\n", yytext); return IDENTIFIER; }
 
 \/\/.*		    { printf("inline comment");} // Skip inline comments

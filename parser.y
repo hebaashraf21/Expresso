@@ -19,7 +19,7 @@
 %token INTEGER FLOAT CHAR BOOL STRING
 %token CONST 
 %token '(' ')' '{' '}' '[' ']' 
-%token SEMICOLON COMMA QUESTION_MARK
+%token ';' ',' '?' ":"
 %token FLOAT_VAL INTEGER_VAL CHAR_VAL STRING_VAL TRUE_VAL FALSE_VAL 
 %token IDENTIFIER
 
@@ -58,7 +58,7 @@ stmt:
         | IDENTIFIER '=' expr ';'		{ sym[$1] = $3; }
         
         /*Print Statement*/
-        | PRINT expr ';'                 
+        | PRINT '(' expr ')' ';'                 
             
         
         /*Conditional Statements*/
@@ -67,7 +67,8 @@ stmt:
         
         /*Loops*/
         | WHILE '(' expr ')' '{' stmt '}'
-        | FOR '(' assignment ';' expr ';' expr ')' '{' stmt '}'
+        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' stmt '}'
+        | REPEAT '{' stmt '}' UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
         | SWITCH '(' IDENTIFIER ')' '{' case_list default_case '}'
@@ -79,8 +80,8 @@ stmt:
         /*Functions*/   
         | VOID IDENTIFIER '(' parameters_list ')' '{' stmt '}'
         | type IDENTIFIER '(' parameters_list ')' '{' stmt '}'
-        ;
-
+        ;	
+	
 	
 type:   INTEGER
       | FLOAT
@@ -162,6 +163,7 @@ expr :
      | expr LESS_THAN_OR_EQUALS expr
      | expr GREATER_THAN expr
      | expr GREATER_THAN_OR_EQUALS expr 
+     
      
      ;
 %%

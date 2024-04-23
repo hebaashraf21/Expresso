@@ -5,7 +5,7 @@ How to run:
 
 1- bison -d parser.y
 2- flex lex.l
-3- gcc lex.yy.c parser.tab.c -o test
+3- gcc -o parser parser.tab.c lex.yy.c -lm
 4- test
 
 

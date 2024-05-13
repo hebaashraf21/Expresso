@@ -1,8 +1,10 @@
 %{
 	#include <stdio.h>
 	#include <math.h>
-	void yyerror(const char *);
-	int yylex(void);
+	void yyerror();
+	extern int yylex(void);
+	extern FILE *yyin;
+    	extern int lineno;
 	int sym[26];
 %}
 
@@ -22,6 +24,7 @@
 %token ';' ',' '?' ':'
 %token FLOAT_VAL INTEGER_VAL CHAR_VAL STRING_VAL TRUE_VAL FALSE_VAL 
 %token IDENTIFIER
+%token INCR DECR
 
 %right '='
 %left LOGICAL_OR
@@ -30,12 +33,16 @@
 %left EQUALS NOT_EQUALS
 %left LESS_THAN LESS_THAN_OR_EQUALS GREATER_THAN GREATER_THAN_OR_EQUALS
 
-%left PLUS MINUS
+%left '+' '-'
 
 
-%left MUL DIV MOD
-%left POWER
+%left '*' '/' '%'
+%left '^'
 %right LOGICAL_NOT
+%nonassoc UMINUS
+%left INCR DECR
+
+%start program
 %%
 
 program:
@@ -53,7 +60,6 @@ statements:
 stmt:
 	 ';'  
 	 /*Variables declaration*/
-        | assignment ';'
         | type IDENTIFIER ';'
         
         /*Constant declaration*/
@@ -91,6 +97,9 @@ stmt:
         
         /*Functions Call*/   
         | IDENTIFIER '(' parameters_list ')' ';'
+        | BREAK
+        | RETURN
+        | CONTINUE
         ;	
 	
 	
@@ -148,13 +157,17 @@ expr :
      | '(' expr ')'				{ $$ = $2; }
      
      /* Mthematical expressions */
-     | MINUS expr				{ $$ = - $2; }
-     | expr PLUS expr				{ $$ = $1 + $3; }
-     | expr MINUS expr				{ $$ = $1 - $3; }
-     | expr MUL expr				{ $$ = $1 * $3; }
-     | expr DIV expr				{ $$ = $1 / $3; }
-     | expr POWER expr				{ $$ = pow($1, $3); }
-     | expr MOD expr				{ $$ = $1 % $3; }
+     | '-' expr	
+     | INCR expr                 		{ $$ = $2 + 1; }       /* Increment */
+     | expr INCR                 		{ $$ = $1 + 1; }       /* Increment */
+     | DECR expr                 		{ $$ = $2 - 1; }       /* Decrement */
+     | expr DECR                 		{ $$ = $1 - 1; }       /* Decrement */
+     | expr '+' expr				{ $$ = $1 + $3; }
+     | expr '-' expr				{ $$ = $1 - $3; }
+     | expr '*' expr				{ $$ = $1 * $3; }
+     | expr '/' expr				{ $$ = $1 / $3; }
+     | expr '^' expr				{ $$ = pow($1, $3); }
+     | expr '%' expr				{ $$ = $1 % $3; }
      
      /* logical expressions */
      | expr LOGICAL_AND expr			{ $$ = $1 && $3; }
@@ -173,12 +186,18 @@ expr :
      ;
 %%
 
-int main()
-{
-    yyparse();
-    return 0;
+int main (int argc, char *argv[]){
+
+    // parsing
+    int flag;
+    yyin = fopen(argv[1], "r");
+    flag = yyparse();
+    fclose(yyin);
+    
+    return flag;
 }
 
-void yyerror(const char *s) {
-    fprintf(stderr, "%s\n", s);
+void yyerror ()
+{
+  fprintf(stderr, "Syntax error at line %d\n", lineno);
 }

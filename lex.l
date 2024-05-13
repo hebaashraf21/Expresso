@@ -1,6 +1,10 @@
 %{
 #include <stdio.h>
-#include "parser.tab.h"
+#include "y.tab.h"
+void yyerror();
+extern FILE *yyin;
+extern FILE *yyout;
+int lineno = 1; // initialize to 1
 %}
 
 %option noyywrap
@@ -62,16 +66,18 @@
 "["                 { printf("LEFT_SQUARE_BRACKET: %s\n", yytext);    return *yytext; }
 "]"                 { printf("RIGHT_SQUARE_BRACKET: %s\n", yytext);   return *yytext; }
 
-"+"                 { printf("PLUS: %s\n", yytext);   return PLUS; }
-"-"                 { printf("MINUS: %s\n", yytext);  return MINUS; }
-"*"                 { printf("MUL: %s\n", yytext);    return MUL; }
-"/"                 { printf("DIV: %s\n", yytext);    return DIV; }
-"^"                 { printf("POWER: %s\n", yytext);  return POWER; }
-"%"                 { printf("MOD: %s\n", yytext);    return MOD; }
+"++"		     { printf("MOD: %s\n", yytext);    return INCR; }
+"--"		     { printf("MOD: %s\n", yytext);    return DECR; }
+"+"                 { printf("PLUS: %s\n", yytext);   return *yytext; }
+"-"                 { printf("MINUS: %s\n", yytext);  return *yytext; }
+"*"                 { printf("MUL: %s\n", yytext);    return *yytext; }
+"/"                 { printf("DIV: %s\n", yytext);    return *yytext; }
+"^"                 { printf("POWER: %s\n", yytext);  return *yytext; }
+"%"                 { printf("MOD: %s\n", yytext);    return *yytext; }
 
-[0-9]*"."[0-9]*     { 
+[0-9]*"."[0-9]+     { 
 			printf("FLOAT_CONSTANT: %s\n", yytext);
-		     	yylval = atoi(yytext);	
+		     	yylval = atof(yytext);	
 		     	return FLOAT_VAL; 
 		     }
 		     
@@ -87,8 +93,16 @@
 			return INTEGER_VAL; 
 		    }
 		    
-'[^\\']'            { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_VAL; }
-\"([^\"\\;]|\\.)*\"  { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_VAL; }
+'[^\\']'            { 
+			printf("CHAR_CONSTANT: %s\n", yytext);
+		       return CHAR_VAL; 
+		    }
+		      
+\"([^\"\\;]|\\.)*\"  { 
+			printf("STRING_CONSTANT: %s\n", yytext);
+		       return STRING_VAL; 
+		      }
+		      
 "true"		     { printf("BOOL_CONSTANT: %s\n", yytext);      return TRUE_VAL; }
 "false"             { printf("BOOL_CONSTANT: %s\n", yytext);      return FALSE_VAL; }
 
@@ -100,9 +114,9 @@
 
 \/\/.*		    { printf("inline comment");} // Skip inline comments
 \/\*([^*]|\*+[^/])*\*+\/ { printf("multi lines comment\n"); } // Skip multi lines comments 
-
-[ \t\n]             ; // Skip whitespace and newlines
-
+"\n"            	{ lineno += 1; }
+[ \t]             ; // Skip whitespace and newlines
+. 			yyerror("invalid token");
 %%
 
 int my_wrap()

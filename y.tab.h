@@ -79,21 +79,18 @@ extern int yydebug;
     TRUE_VAL = 285,
     FALSE_VAL = 286,
     IDENTIFIER = 287,
-    LOGICAL_AND = 288,
-    LOGICAL_OR = 289,
-    EQUALS = 290,
-    NOT_EQUALS = 291,
-    LESS_THAN = 292,
-    LESS_THAN_OR_EQUALS = 293,
-    GREATER_THAN = 294,
-    GREATER_THAN_OR_EQUALS = 295,
-    PLUS = 296,
-    MINUS = 297,
+    INCR = 288,
+    DECR = 289,
+    LOGICAL_OR = 290,
+    LOGICAL_AND = 291,
+    EQUALS = 292,
+    NOT_EQUALS = 293,
+    LESS_THAN = 294,
+    LESS_THAN_OR_EQUALS = 295,
+    GREATER_THAN = 296,
+    GREATER_THAN_OR_EQUALS = 297,
     LOGICAL_NOT = 298,
-    MUL = 299,
-    DIV = 300,
-    MOD = 301,
-    POWER = 302
+    UMINUS = 299
   };
 #endif
 /* Tokens.  */
@@ -127,21 +124,18 @@ extern int yydebug;
 #define TRUE_VAL 285
 #define FALSE_VAL 286
 #define IDENTIFIER 287
-#define LOGICAL_AND 288
-#define LOGICAL_OR 289
-#define EQUALS 290
-#define NOT_EQUALS 291
-#define LESS_THAN 292
-#define LESS_THAN_OR_EQUALS 293
-#define GREATER_THAN 294
-#define GREATER_THAN_OR_EQUALS 295
-#define PLUS 296
-#define MINUS 297
+#define INCR 288
+#define DECR 289
+#define LOGICAL_OR 290
+#define LOGICAL_AND 291
+#define EQUALS 292
+#define NOT_EQUALS 293
+#define LESS_THAN 294
+#define LESS_THAN_OR_EQUALS 295
+#define GREATER_THAN 296
+#define GREATER_THAN_OR_EQUALS 297
 #define LOGICAL_NOT 298
-#define MUL 299
-#define DIV 300
-#define MOD 301
-#define POWER 302
+#define UMINUS 299
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

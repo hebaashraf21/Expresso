@@ -19,7 +19,7 @@
 %token INTEGER FLOAT CHAR BOOL STRING
 %token CONST 
 %token '(' ')' '{' '}' '[' ']' 
-%token ';' ',' '?' ":"
+%token ';' ',' '?' ':'
 %token FLOAT_VAL INTEGER_VAL CHAR_VAL STRING_VAL TRUE_VAL FALSE_VAL 
 %token IDENTIFIER
 
@@ -53,12 +53,13 @@ stmt:
 	 ';'  
 	 /*Variables declaration*/
         | assignment ';'
+        | type IDENTIFIER ';'
         
         /*Constant declaration*/
-        | CONST type IDENTIFIER '=' expr ';'
+        | CONST type IDENTIFIER '=' expr ';'	{ sym[$3] = $5; }
 	
 	/*expressions*/                          
-        | expr ';' 				{ printf("%d\n", $1); }
+        | expr ';' 				
         
         /*Assignment statements*/
         | IDENTIFIER '=' expr ';'		{ sym[$1] = $3; }
@@ -68,11 +69,11 @@ stmt:
             
         
         /*Conditional Statements*/
-        | IF '(' expr ')' '{' stmt '}' ELSE '{' statements '}'
-        | IF '(' expr ')' '{' stmt '}'
+        | IF '(' expr ')' '{' statements '}' ELSE '{' statements '}'
+        | IF '(' expr ')' '{' statements '}'
         
         /*Loops*/
-        | WHILE '(' expr ')' '{' stmt '}'
+        | WHILE '(' expr ')' '{' statements '}'
         | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' statements '}'
         | REPEAT '{' statements '}' UNTIL '(' expr ')' ';'
         
@@ -83,9 +84,12 @@ stmt:
         | '{' statements '}'
         
         
-        /*Functions*/   
-        | VOID IDENTIFIER '(' parameters_list ')' '{' stmt '}'
-        | type IDENTIFIER '(' parameters_list ')' '{' stmt '}'
+        /*Functions Definition*/   
+        | VOID IDENTIFIER '(' parameters_list ')' '{' statements '}'
+        | type IDENTIFIER '(' parameters_list ')' '{' statements '}'
+        
+        /*Functions Call*/   
+        | IDENTIFIER '(' parameters_list ')' ';'
         ;	
 	
 	
@@ -98,7 +102,7 @@ type:   INTEGER
 
 
 assignment:
-	type IDENTIFIER '=' expr 
+	type IDENTIFIER '=' expr 	{ sym[$2] = $4; }
 
 
 var_declaration: 
@@ -120,17 +124,17 @@ case_list:
 
 
 default_case:
-    DEFAULT ':' stmt
+    DEFAULT ':' stmt ';'
     
     
 case_stmt:
-    CASE expr ':' stmt
+    CASE expr ':' stmt ';'
     ;  
 
 
 expr :
-       TRUE_VAL
-     | FALSE_VAL
+       TRUE_VAL				{ $$ = sym[$1]; }
+     | FALSE_VAL				{ $$ = sym[$1]; }
 
      | IDENTIFIER				{ $$ = sym[$1]; }
 
@@ -152,17 +156,17 @@ expr :
      | expr MOD expr				{ $$ = $1 % $3; }
      
      /* logical expressions */
-     | expr LOGICAL_AND expr
-     | expr LOGICAL_OR expr
-     | LOGICAL_NOT expr
+     | expr LOGICAL_AND expr			{ $$ = $1 && $3; }
+     | expr LOGICAL_OR expr			{ $$ = $1 || $3; }
+     | LOGICAL_NOT expr			{ $$ = !$2; }
      
      /* comparison expressions */
-     | expr EQUALS expr
-     | expr NOT_EQUALS expr
-     | expr LESS_THAN expr
-     | expr LESS_THAN_OR_EQUALS expr
-     | expr GREATER_THAN expr
-     | expr GREATER_THAN_OR_EQUALS expr 
+     | expr EQUALS expr			{ $$ = ($1 == $3); }
+     | expr NOT_EQUALS expr			{ $$ = ($1 != $3); }
+     | expr LESS_THAN expr			{ $$ = ($1 < $3); }
+     | expr LESS_THAN_OR_EQUALS expr		{ $$ = ($1 <= $3); }
+     | expr GREATER_THAN expr			{ $$ = ($1 > $3); }
+     | expr GREATER_THAN_OR_EQUALS expr 	{ $$ = ($1 >= $3); }
      
      
      ;

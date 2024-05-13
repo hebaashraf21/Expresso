@@ -69,9 +69,24 @@
 "^"                 { printf("POWER: %s\n", yytext);  return POWER; }
 "%"                 { printf("MOD: %s\n", yytext);    return MOD; }
 
-[0-9]*"."[0-9]*     { printf("FLOAT_CONSTANT: %s\n", yytext);     return FLOAT_VAL; }
-0  	            { printf("INTEGER_VAL: %s\n", yytext);   return INTEGER_VAL; }
-[1-9][0-9]*         { printf("INTEGER_VAL: %s\n", yytext);   return INTEGER_VAL; }
+[0-9]*"."[0-9]*     { 
+			printf("FLOAT_CONSTANT: %s\n", yytext);
+		     	yylval = atoi(yytext);	
+		     	return FLOAT_VAL; 
+		     }
+		     
+0  	             {
+			 printf("INTEGER_VAL: %s\n", yytext);
+			 yylval = atoi(yytext);	
+		   	return INTEGER_VAL; 
+		     }
+		     
+[1-9][0-9]*         { 
+			printf("INTEGER_VAL: %s\n", yytext); 
+			yylval = atoi(yytext);  
+			return INTEGER_VAL; 
+		    }
+		    
 '[^\\']'            { printf("CHAR_CONSTANT: %s\n", yytext);      return CHAR_VAL; }
 \"([^\"\\;]|\\.)*\"  { printf("STRING_CONSTANT: %s\n", yytext);    return STRING_VAL; }
 "true"		     { printf("BOOL_CONSTANT: %s\n", yytext);      return TRUE_VAL; }

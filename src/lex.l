@@ -36,15 +36,12 @@ int lineno = 1; // initialize to 1
 "bool"              { printf("BOOL: %s\n", yytext);     return BOOL; }
 
 "void"              { printf("VOID: %s\n", yytext);     return VOID; }
-"return"            { printf("RETURN: %s\n", yytext);   return RETURN; }
 "continue"          { printf("CONTINUE: %s\n", yytext); return CONTINUE; }
 "break"             { printf("BREAK: %s\n", yytext);    return BREAK; }
 
 "const"             { printf("CONST: %s\n", yytext);    return CONST;}
 
 "print"             { printf("PRINT: %s\n", yytext);    return PRINT;}
-
-"assert"            { printf("ASSERT: %s\n", yytext);    return ASSERT;}
 
 "enum"              { printf("ENUM: %s\n", yytext);     return ENUM; }
 
@@ -79,43 +76,43 @@ int lineno = 1; // initialize to 1
 
 [0-9]*"."[0-9]+     { 
 						printf("FLOAT_CONSTANT: %s\n", yytext);
-						yylval.float_val = atof(yytext);	
+						yylval.float_value = atof(yytext);	
 						return FLOAT_VAL; 
 		    		}
 		     
 0  	             	{
 						printf("INTEGER_VAL: %s\n", yytext);
-						yylval.int_val = atoi(yytext);	
+						yylval.int_value = atoi(yytext);	
 						return INTEGER_VAL; 
 		     		}
 		     
 [1-9][0-9]*         { 
 						printf("INTEGER_VAL: %s\n", yytext); 
-						yylval.int_val = atoi(yytext);  
+						yylval.int_value = atoi(yytext);  
 						return INTEGER_VAL; 
 		    		}
 		    
 '[^\\']'            { 
 						printf("CHAR_CONSTANT: %s\n", yytext);
-						yylval.char_val = yytext[0];
+						yylval.char_value = yytext[0];
 		       			return CHAR_VAL; 
 		   			}
 		      
 \"([^\"\\;]|\\.)*\" { 
 						printf("STRING_CONSTANT: %s\n", yytext);
-						yylval.str_val = strdup(yytext);
+						yylval.str_value = strdup(yytext);
 		       			return STRING_VAL; 
 		      		}
 		      
 "true"		     	{ 
 						printf("BOOL_CONSTANT: %s\n", yytext);
-						yylval.bool_val = 1;      
+						yylval.bool_value = 1;      
 						return TRUE_VAL; 
 					}
 
 "false"             { 
 						printf("BOOL_CONSTANT: %s\n", yytext);
-						yylval.bool_val = 0;
+						yylval.bool_value = 0;
 						return FALSE_VAL; 
 					}
 
@@ -132,6 +129,8 @@ int lineno = 1; // initialize to 1
 
 \/\/.*		    	{ printf("inline comment");} // Skip inline comments
 \/\*([^*]|\*+[^/])*\*+\/ { printf("multi lines comment\n"); } // Skip multi lines comments 
+
+
 "\n"            	{ lineno += 1; }
 [ \t]             ; // Skip whitespace and newlines
 . 			yyerror("invalid token");
@@ -141,3 +140,4 @@ int my_wrap()
 {
     return 1;
 }
+

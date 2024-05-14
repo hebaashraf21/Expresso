@@ -50,92 +50,88 @@ extern int yydebug;
   enum yytokentype
   {
     PRINT = 258,
-    ASSERT = 259,
-    IF = 260,
-    ELSE = 261,
-    WHILE = 262,
-    FOR = 263,
-    DO = 264,
-    CONTINUE = 265,
-    BREAK = 266,
-    SWITCH = 267,
-    CASE = 268,
-    DEFAULT = 269,
-    REPEAT = 270,
-    UNTIL = 271,
-    VOID = 272,
-    ENUM = 273,
-    RETURN = 274,
-    INTEGER = 275,
-    FLOAT = 276,
-    CHAR = 277,
-    BOOL = 278,
-    STRING = 279,
-    CONST = 280,
-    FLOAT_VAL = 281,
-    INTEGER_VAL = 282,
-    CHAR_VAL = 283,
-    STRING_VAL = 284,
-    TRUE_VAL = 285,
-    FALSE_VAL = 286,
-    IDENTIFIER = 287,
-    INCR = 288,
-    DECR = 289,
-    LOGICAL_OR = 290,
-    LOGICAL_AND = 291,
-    EQUALS = 292,
-    NOT_EQUALS = 293,
-    LESS_THAN = 294,
-    LESS_THAN_OR_EQUALS = 295,
-    GREATER_THAN = 296,
-    GREATER_THAN_OR_EQUALS = 297,
-    LOGICAL_NOT = 298,
-    UMINUS = 299
+    IF = 259,
+    ELSE = 260,
+    WHILE = 261,
+    FOR = 262,
+    DO = 263,
+    CONTINUE = 264,
+    BREAK = 265,
+    SWITCH = 266,
+    CASE = 267,
+    DEFAULT = 268,
+    REPEAT = 269,
+    UNTIL = 270,
+    VOID = 271,
+    ENUM = 272,
+    INTEGER = 273,
+    FLOAT = 274,
+    CHAR = 275,
+    BOOL = 276,
+    STRING = 277,
+    CONST = 278,
+    FLOAT_VAL = 279,
+    INTEGER_VAL = 280,
+    CHAR_VAL = 281,
+    STRING_VAL = 282,
+    TRUE_VAL = 283,
+    FALSE_VAL = 284,
+    IDENTIFIER = 285,
+    INCR = 286,
+    DECR = 287,
+    LOGICAL_OR = 288,
+    LOGICAL_AND = 289,
+    EQUALS = 290,
+    NOT_EQUALS = 291,
+    LESS_THAN = 292,
+    LESS_THAN_OR_EQUALS = 293,
+    GREATER_THAN = 294,
+    GREATER_THAN_OR_EQUALS = 295,
+    LOGICAL_NOT = 296,
+    UMINUS = 297
   };
 #endif
 /* Tokens.  */
 #define PRINT 258
-#define ASSERT 259
-#define IF 260
-#define ELSE 261
-#define WHILE 262
-#define FOR 263
-#define DO 264
-#define CONTINUE 265
-#define BREAK 266
-#define SWITCH 267
-#define CASE 268
-#define DEFAULT 269
-#define REPEAT 270
-#define UNTIL 271
-#define VOID 272
-#define ENUM 273
-#define RETURN 274
-#define INTEGER 275
-#define FLOAT 276
-#define CHAR 277
-#define BOOL 278
-#define STRING 279
-#define CONST 280
-#define FLOAT_VAL 281
-#define INTEGER_VAL 282
-#define CHAR_VAL 283
-#define STRING_VAL 284
-#define TRUE_VAL 285
-#define FALSE_VAL 286
-#define IDENTIFIER 287
-#define INCR 288
-#define DECR 289
-#define LOGICAL_OR 290
-#define LOGICAL_AND 291
-#define EQUALS 292
-#define NOT_EQUALS 293
-#define LESS_THAN 294
-#define LESS_THAN_OR_EQUALS 295
-#define GREATER_THAN 296
-#define GREATER_THAN_OR_EQUALS 297
-#define LOGICAL_NOT 298
-#define UMINUS 299
+#define IF 259
+#define ELSE 260
+#define WHILE 261
+#define FOR 262
+#define DO 263
+#define CONTINUE 264
+#define BREAK 265
+#define SWITCH 266
+#define CASE 267
+#define DEFAULT 268
+#define REPEAT 269
+#define UNTIL 270
+#define VOID 271
+#define ENUM 272
+#define INTEGER 273
+#define FLOAT 274
+#define CHAR 275
+#define BOOL 276
+#define STRING 277
+#define CONST 278
+#define FLOAT_VAL 279
+#define INTEGER_VAL 280
+#define CHAR_VAL 281
+#define STRING_VAL 282
+#define TRUE_VAL 283
+#define FALSE_VAL 284
+#define IDENTIFIER 285
+#define INCR 286
+#define DECR 287
+#define LOGICAL_OR 288
+#define LOGICAL_AND 289
+#define EQUALS 290
+#define NOT_EQUALS 291
+#define LESS_THAN 292
+#define LESS_THAN_OR_EQUALS 293
+#define GREATER_THAN 294
+#define GREATER_THAN_OR_EQUALS 295
+#define LOGICAL_NOT 296
+#define UMINUS 297
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -143,14 +139,14 @@ union YYSTYPE
 {
 #line 13 "parser.y"
  
-    int int_val;          /* integer value */ 
-    char* str_val;        /* string value */
-    char char_val;      /* char value */
-    float float_val;  /* float value */
-    bool bool_val;    /* boolean value */
+    int int_value;          /* integer value */ 
+    char* str_value;        /* string value */
+    char char_value;      /* char value */
+    float float_value;  /* float value */
+    bool bool_value;    /* boolean value */
     char* identifier; /* IDENTIFIER */
 
-#line 154 "y.tab.h"
+#line 150 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

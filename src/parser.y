@@ -11,14 +11,14 @@
 %}
 
 %union { 
-    int int_val;          /* integer value */ 
-    char* str_val;        /* string value */
-    char char_val;      /* char value */
-    float float_val;  /* float value */
-    bool bool_val;    /* boolean value */
-    char* identifier; /* IDENTIFIER */
+    int int_value;        
+    char* str_value;        
+    char char_value;      
+    float float_value;  
+    bool bool_value;    
+    char* identifier;
 }
-%token PRINT ASSERT
+%token PRINT
 
 
 %token IF ELSE 
@@ -26,14 +26,21 @@
 %token SWITCH CASE DEFAULT 
 %token REPEAT UNTIL
 
-%token VOID ENUM RETURN
+%token VOID ENUM
 
 %token INTEGER FLOAT CHAR BOOL STRING
 %token CONST 
 %token '(' ')' '{' '}' '[' ']' 
 %token ';' ',' '?' ':'
-%token FLOAT_VAL INTEGER_VAL CHAR_VAL STRING_VAL TRUE_VAL FALSE_VAL 
-%token IDENTIFIER
+
+%token <float_value> FLOAT_VAL 
+%token <int_value> INTEGER_VAL 
+%token <char_value> CHAR_VAL 
+%token <str_value> STRING_VAL 
+%token <bool_value> TRUE_VAL 
+%token <bool_value> FALSE_VAL 
+%token <identifier>  IDENTIFIER
+
 %token INCR DECR
 
 %right '='
@@ -71,6 +78,7 @@ stmt:
 	 ';'  
 	 /*Variables declaration*/
         | type IDENTIFIER ';'
+        | type IDENTIFIER '=' expr ';'
         
         /*Constant declaration*/
         | CONST type IDENTIFIER '=' expr ';'
@@ -108,7 +116,6 @@ stmt:
         /*Functions Call*/   
         | IDENTIFIER '(' parameters_list ')' ';'
         | BREAK
-        | RETURN
         | CONTINUE
         ;	
 	
@@ -151,49 +158,48 @@ case_stmt:
     CASE expr ':' stmt ';'
     ;  
 
-
 expr :
-       TRUE_VAL				
-     | FALSE_VAL				
+    TRUE_VAL				
+    | FALSE_VAL				
 
-     | IDENTIFIER
+    | IDENTIFIER
 
-     | INTEGER_VAL				
-     | FLOAT_VAL				
-     | CHAR_VAL				
-     | STRING_VAL				
+    | INTEGER_VAL				
+    | FLOAT_VAL				
+    | CHAR_VAL				
+    | STRING_VAL				
 	
      /* (expressions) */
-     | '(' expr ')'				
+    | '(' expr ')'				
      
      /* Mthematical expressions */
-     | '-' expr	
-     | INCR expr                 		
-     | expr INCR                 		
-     | DECR expr                 		
-     | expr DECR                 		
-     | expr '+' expr				
-     | expr '-' expr				
-     | expr '*' expr				
-     | expr '/' expr				
-     | expr '^' expr				
-     | expr '%' expr				
+    | '-' expr	
+    | INCR expr                 		
+    | expr INCR                 		
+    | DECR expr                 		
+    | expr DECR                 		
+    | expr '+' expr				
+    | expr '-' expr				
+    | expr '*' expr				
+    | expr '/' expr				
+    | expr '^' expr				
+    | expr '%' expr				
      
      /* logical expressions */
-     | expr LOGICAL_AND expr			
-     | expr LOGICAL_OR expr			
-     | LOGICAL_NOT expr			
+    | expr LOGICAL_AND expr			
+    | expr LOGICAL_OR expr			
+    | LOGICAL_NOT expr			
      
      /* comparison expressions */
-     | expr EQUALS expr			
-     | expr NOT_EQUALS expr			
-     | expr LESS_THAN expr			
-     | expr LESS_THAN_OR_EQUALS expr		
-     | expr GREATER_THAN expr			
-     | expr GREATER_THAN_OR_EQUALS expr 	
+    | expr EQUALS expr			
+    | expr NOT_EQUALS expr			
+    | expr LESS_THAN expr			
+    | expr LESS_THAN_OR_EQUALS expr		
+    | expr GREATER_THAN expr			
+    | expr GREATER_THAN_OR_EQUALS expr 	
      
      
-     ;
+    ;
 %%
 
 int main (int argc, char *argv[]){

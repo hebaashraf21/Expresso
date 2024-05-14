@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "symbol_table.h": "c",
+    "stdbool.h": "c"
+  }
+}

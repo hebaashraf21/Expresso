@@ -1,14 +1,23 @@
 %{
 	#include <stdio.h>
 	#include <math.h>
+    #include <stdbool.h> 
 	#include "symbol_table.c" 
 	void yyerror();
 	extern int yylex(void);
 	extern FILE *yyin;
-    	extern int lineno;
+    extern int lineno;
 	int sym[26];
 %}
 
+%union { 
+    int int_val;          /* integer value */ 
+    char* str_val;        /* string value */
+    char char_val;      /* char value */
+    float float_val;  /* float value */
+    bool bool_val;    /* boolean value */
+    char* identifier; /* IDENTIFIER */
+}
 %token PRINT ASSERT
 
 
@@ -64,13 +73,13 @@ stmt:
         | type IDENTIFIER ';'
         
         /*Constant declaration*/
-        | CONST type IDENTIFIER '=' expr ';'	{ sym[$3] = $5; }
+        | CONST type IDENTIFIER '=' expr ';'
 	
 	/*expressions*/                          
         | expr ';' 				
         
         /*Assignment statements*/
-        | IDENTIFIER '=' expr ';'		{ sym[$1] = $3; }
+        | IDENTIFIER '=' expr ';'		
         
         /*Print Statement*/
         | PRINT '(' expr ')' ';'                 
@@ -113,7 +122,7 @@ type:   INTEGER
 
 
 assignment:
-	type IDENTIFIER '=' expr 	{ sym[$2] = $4; }
+	type IDENTIFIER '=' expr 
 
 
 var_declaration: 
@@ -144,44 +153,44 @@ case_stmt:
 
 
 expr :
-       TRUE_VAL				{ $$ = sym[$1]; }
-     | FALSE_VAL				{ $$ = sym[$1]; }
+       TRUE_VAL				
+     | FALSE_VAL				
 
-     | IDENTIFIER				{ $$ = sym[$1]; }
+     | IDENTIFIER
 
-     | INTEGER_VAL				{ $$ = sym[$1]; }
-     | FLOAT_VAL				{ $$ = sym[$1]; }
-     | CHAR_VAL				{ $$ = sym[$1]; }
-     | STRING_VAL				{ $$ = sym[$1]; }
+     | INTEGER_VAL				
+     | FLOAT_VAL				
+     | CHAR_VAL				
+     | STRING_VAL				
 	
      /* (expressions) */
-     | '(' expr ')'				{ $$ = $2; }
+     | '(' expr ')'				
      
      /* Mthematical expressions */
      | '-' expr	
-     | INCR expr                 		{ $$ = $2 + 1; }       /* Increment */
-     | expr INCR                 		{ $$ = $1 + 1; }       /* Increment */
-     | DECR expr                 		{ $$ = $2 - 1; }       /* Decrement */
-     | expr DECR                 		{ $$ = $1 - 1; }       /* Decrement */
-     | expr '+' expr				{ $$ = $1 + $3; }
-     | expr '-' expr				{ $$ = $1 - $3; }
-     | expr '*' expr				{ $$ = $1 * $3; }
-     | expr '/' expr				{ $$ = $1 / $3; }
-     | expr '^' expr				{ $$ = pow($1, $3); }
-     | expr '%' expr				{ $$ = $1 % $3; }
+     | INCR expr                 		
+     | expr INCR                 		
+     | DECR expr                 		
+     | expr DECR                 		
+     | expr '+' expr				
+     | expr '-' expr				
+     | expr '*' expr				
+     | expr '/' expr				
+     | expr '^' expr				
+     | expr '%' expr				
      
      /* logical expressions */
-     | expr LOGICAL_AND expr			{ $$ = $1 && $3; }
-     | expr LOGICAL_OR expr			{ $$ = $1 || $3; }
-     | LOGICAL_NOT expr			{ $$ = !$2; }
+     | expr LOGICAL_AND expr			
+     | expr LOGICAL_OR expr			
+     | LOGICAL_NOT expr			
      
      /* comparison expressions */
-     | expr EQUALS expr			{ $$ = ($1 == $3); }
-     | expr NOT_EQUALS expr			{ $$ = ($1 != $3); }
-     | expr LESS_THAN expr			{ $$ = ($1 < $3); }
-     | expr LESS_THAN_OR_EQUALS expr		{ $$ = ($1 <= $3); }
-     | expr GREATER_THAN expr			{ $$ = ($1 > $3); }
-     | expr GREATER_THAN_OR_EQUALS expr 	{ $$ = ($1 >= $3); }
+     | expr EQUALS expr			
+     | expr NOT_EQUALS expr			
+     | expr LESS_THAN expr			
+     | expr LESS_THAN_OR_EQUALS expr		
+     | expr GREATER_THAN expr			
+     | expr GREATER_THAN_OR_EQUALS expr 	
      
      
      ;

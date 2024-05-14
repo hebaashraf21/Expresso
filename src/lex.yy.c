@@ -366,23 +366,23 @@ struct yy_trans_info
 static const flex_int16_t yy_accept[167] =
     {   0,
         0,    0,   66,   64,   63,   62,   32,   64,   47,   64,
-       64,   36,   37,   44,   42,   56,   43,   64,   45,   49,
-       50,   58,   55,   26,   33,   28,   57,   59,   38,   39,
-       46,   59,   59,   59,   59,   59,   59,   59,   59,   59,
-       59,   59,   59,   59,   59,   34,   64,   35,   25,    0,
+       64,   36,   37,   44,   42,   57,   43,   64,   45,   49,
+       50,   59,   56,   26,   33,   28,   58,   55,   38,   39,
+       46,   55,   55,   55,   55,   55,   55,   55,   55,   55,
+       55,   55,   55,   55,   55,   34,   64,   35,   25,    0,
        52,    0,   30,    0,   40,   41,   48,    0,   60,    0,
-        0,   50,   27,   24,   29,   59,   59,   59,   59,   59,
-       59,   59,   59,    4,   59,   59,   59,   59,   59,    1,
-       59,   59,   59,   59,   59,   59,   59,   59,   59,   31,
-       51,    0,    0,   60,   59,   59,   59,   59,   59,   59,
+        0,   50,   27,   24,   29,   55,   55,   55,   55,   55,
+       55,   55,   55,    4,   55,   55,   55,   55,   55,    1,
+       55,   55,   55,   55,   55,   55,   55,   55,   55,   31,
+       51,    0,    0,   60,   55,   55,   55,   55,   55,   55,
 
-       59,   59,   59,   59,   59,    7,   11,   59,   59,   59,
-       59,   59,   59,   59,   59,   59,    0,   61,   59,   15,
-       59,    9,   13,   59,   59,   59,    2,   23,   59,   59,
-       59,   59,   59,   59,   59,   53,   59,   16,   59,    0,
-       61,   59,   19,   20,   59,   59,   54,   12,   21,   59,
-       59,   59,   59,    6,    3,   22,   59,   59,    5,   17,
-       14,    8,   59,   10,   18,    0
+       55,   55,   55,   55,   55,    7,   11,   55,   55,   55,
+       55,   55,   55,   55,   55,   55,    0,   61,   55,   15,
+       55,    9,   13,   55,   55,   55,    2,   23,   55,   55,
+       55,   55,   55,   55,   55,   53,   55,   16,   55,    0,
+       61,   55,   19,   20,   55,   55,   54,   12,   21,   55,
+       55,   55,   55,    6,    3,   22,   55,   55,    5,   17,
+       14,    8,   55,   10,   18,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -556,8 +556,8 @@ char *yytext;
 #line 1 "lex.l"
 #line 3 "lex.l"
 #include <stdio.h>
-#include "y.tab.h"
-#include "symbol_table/symbol_table.c" 
+#include <stdbool.h> 
+#include "y.tab.h" 
 void yyerror();
 extern FILE *yyin;
 extern FILE *yyout;
@@ -1079,115 +1079,129 @@ case 48:
 YY_RULE_SETUP
 #line 80 "lex.l"
 { 
-			printf("FLOAT_CONSTANT: %s\n", yytext);
-		     	yylval = atof(yytext);	
-		     	return FLOAT_VAL; 
-		     }
+						printf("FLOAT_CONSTANT: %s\n", yytext);
+						yylval.float_val = atof(yytext);	
+						return FLOAT_VAL; 
+		    		}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 86 "lex.l"
 {
-			 printf("INTEGER_VAL: %s\n", yytext);
-			 yylval = atoi(yytext);	
-		   	return INTEGER_VAL; 
-		     }
+						printf("INTEGER_VAL: %s\n", yytext);
+						yylval.int_val = atoi(yytext);	
+						return INTEGER_VAL; 
+		     		}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 92 "lex.l"
 { 
-			printf("INTEGER_VAL: %s\n", yytext); 
-			yylval = atoi(yytext);  
-			return INTEGER_VAL; 
-		    }
+						printf("INTEGER_VAL: %s\n", yytext); 
+						yylval.int_val = atoi(yytext);  
+						return INTEGER_VAL; 
+		    		}
 	YY_BREAK
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
 #line 98 "lex.l"
 { 
-			printf("CHAR_CONSTANT: %s\n", yytext);
-		       return CHAR_VAL; 
-		    }
+						printf("CHAR_CONSTANT: %s\n", yytext);
+						yylval.char_val = yytext[0];
+		       			return CHAR_VAL; 
+		   			}
 	YY_BREAK
 case 52:
 /* rule 52 can match eol */
 YY_RULE_SETUP
-#line 103 "lex.l"
+#line 104 "lex.l"
 { 
-			printf("STRING_CONSTANT: %s\n", yytext);
-		       return STRING_VAL; 
-		      }
+						printf("STRING_CONSTANT: %s\n", yytext);
+						yylval.str_val = strdup(yytext);
+		       			return STRING_VAL; 
+		      		}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 108 "lex.l"
-{ printf("BOOL_CONSTANT: %s\n", yytext);      return TRUE_VAL; }
+#line 110 "lex.l"
+{ 
+						printf("BOOL_CONSTANT: %s\n", yytext);
+						yylval.bool_val = 1;      
+						return TRUE_VAL; 
+					}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 109 "lex.l"
-{ printf("BOOL_CONSTANT: %s\n", yytext);      return FALSE_VAL; }
+#line 116 "lex.l"
+{ 
+						printf("BOOL_CONSTANT: %s\n", yytext);
+						yylval.bool_val = 0;
+						return FALSE_VAL; 
+					}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 111 "lex.l"
-{ printf("SEMICOLON: %s\n", yytext);              return *yytext; }
+#line 122 "lex.l"
+{
+						printf("IDENTIFIER: %s\n", yytext);
+						yylval.identifier = strdup(yytext);
+						return IDENTIFIER; 
+					}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 112 "lex.l"
-{ printf("COMMA: %s\n", yytext);                  return *yytext; }
+#line 128 "lex.l"
+{ printf("SEMICOLON: %s\n", yytext);              return *yytext; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 113 "lex.l"
-{ printf("QUESTION_MARK: %s\n", yytext);          return *yytext; }
+#line 129 "lex.l"
+{ printf("COMMA: %s\n", yytext);                  return *yytext; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 114 "lex.l"
-{ printf("COLON: %s\n", yytext);          return *yytext; }
+#line 130 "lex.l"
+{ printf("QUESTION_MARK: %s\n", yytext);          return *yytext; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 115 "lex.l"
-{printf("IDENTIFIER: %s\n", yytext); return IDENTIFIER; }
+#line 131 "lex.l"
+{ printf("COLON: %s\n", yytext);          return *yytext; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 117 "lex.l"
+#line 133 "lex.l"
 { printf("inline comment");} // Skip inline comments
 	YY_BREAK
 case 61:
 /* rule 61 can match eol */
 YY_RULE_SETUP
-#line 118 "lex.l"
+#line 134 "lex.l"
 { printf("multi lines comment\n"); } // Skip multi lines comments 
 	YY_BREAK
 case 62:
 /* rule 62 can match eol */
 YY_RULE_SETUP
-#line 119 "lex.l"
+#line 135 "lex.l"
 { lineno += 1; }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 120 "lex.l"
+#line 136 "lex.l"
 ; // Skip whitespace and newlines
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 121 "lex.l"
+#line 137 "lex.l"
 yyerror("invalid token");
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 122 "lex.l"
+#line 138 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1191 "lex.yy.c"
+#line 1205 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2192,11 +2206,10 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 122 "lex.l"
+#line 138 "lex.l"
 
 
 int my_wrap()
 {
     return 1;
 }
-

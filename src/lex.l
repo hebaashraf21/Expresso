@@ -1,8 +1,8 @@
 %option noyywrap
 %{
 #include <stdio.h>
-#include "y.tab.h"
-#include "symbol_table.c" 
+#include <stdbool.h> 
+#include "y.tab.h" 
 void yyerror();
 extern FILE *yyin;
 extern FILE *yyout;
@@ -68,8 +68,8 @@ int lineno = 1; // initialize to 1
 "["                 { printf("LEFT_SQUARE_BRACKET: %s\n", yytext);    return *yytext; }
 "]"                 { printf("RIGHT_SQUARE_BRACKET: %s\n", yytext);   return *yytext; }
 
-"++"		     { printf("MOD: %s\n", yytext);    return INCR; }
-"--"		     { printf("MOD: %s\n", yytext);    return DECR; }
+"++"		     	{ printf("MOD: %s\n", yytext);    return INCR; }
+"--"		     	{ printf("MOD: %s\n", yytext);    return DECR; }
 "+"                 { printf("PLUS: %s\n", yytext);   return *yytext; }
 "-"                 { printf("MINUS: %s\n", yytext);  return *yytext; }
 "*"                 { printf("MUL: %s\n", yytext);    return *yytext; }
@@ -78,43 +78,59 @@ int lineno = 1; // initialize to 1
 "%"                 { printf("MOD: %s\n", yytext);    return *yytext; }
 
 [0-9]*"."[0-9]+     { 
-			printf("FLOAT_CONSTANT: %s\n", yytext);
-		     	yylval = atof(yytext);	
-		     	return FLOAT_VAL; 
-		     }
+						printf("FLOAT_CONSTANT: %s\n", yytext);
+						yylval.float_val = atof(yytext);	
+						return FLOAT_VAL; 
+		    		}
 		     
-0  	             {
-			 printf("INTEGER_VAL: %s\n", yytext);
-			 yylval = atoi(yytext);	
-		   	return INTEGER_VAL; 
-		     }
+0  	             	{
+						printf("INTEGER_VAL: %s\n", yytext);
+						yylval.int_val = atoi(yytext);	
+						return INTEGER_VAL; 
+		     		}
 		     
 [1-9][0-9]*         { 
-			printf("INTEGER_VAL: %s\n", yytext); 
-			yylval = atoi(yytext);  
-			return INTEGER_VAL; 
-		    }
+						printf("INTEGER_VAL: %s\n", yytext); 
+						yylval.int_val = atoi(yytext);  
+						return INTEGER_VAL; 
+		    		}
 		    
 '[^\\']'            { 
-			printf("CHAR_CONSTANT: %s\n", yytext);
-		       return CHAR_VAL; 
-		    }
+						printf("CHAR_CONSTANT: %s\n", yytext);
+						yylval.char_val = yytext[0];
+		       			return CHAR_VAL; 
+		   			}
 		      
-\"([^\"\\;]|\\.)*\"  { 
-			printf("STRING_CONSTANT: %s\n", yytext);
-		       return STRING_VAL; 
-		      }
+\"([^\"\\;]|\\.)*\" { 
+						printf("STRING_CONSTANT: %s\n", yytext);
+						yylval.str_val = strdup(yytext);
+		       			return STRING_VAL; 
+		      		}
 		      
-"true"		     { printf("BOOL_CONSTANT: %s\n", yytext);      return TRUE_VAL; }
-"false"             { printf("BOOL_CONSTANT: %s\n", yytext);      return FALSE_VAL; }
+"true"		     	{ 
+						printf("BOOL_CONSTANT: %s\n", yytext);
+						yylval.bool_val = 1;      
+						return TRUE_VAL; 
+					}
+
+"false"             { 
+						printf("BOOL_CONSTANT: %s\n", yytext);
+						yylval.bool_val = 0;
+						return FALSE_VAL; 
+					}
+
+[a-zA-Z_][a-zA-Z0-9_]* {
+						printf("IDENTIFIER: %s\n", yytext);
+						yylval.identifier = strdup(yytext);
+						return IDENTIFIER; 
+					}
 
 ";"                 { printf("SEMICOLON: %s\n", yytext);              return *yytext; }
 ","                 { printf("COMMA: %s\n", yytext);                  return *yytext; }
 "?"                 { printf("QUESTION_MARK: %s\n", yytext);          return *yytext; }
-":"		     { printf("COLON: %s\n", yytext);          return *yytext; }
-[a-zA-Z_][a-zA-Z0-9_]* {printf("IDENTIFIER: %s\n", yytext); return IDENTIFIER; }
+":"		    		{ printf("COLON: %s\n", yytext);          return *yytext; }
 
-\/\/.*		    { printf("inline comment");} // Skip inline comments
+\/\/.*		    	{ printf("inline comment");} // Skip inline comments
 \/\*([^*]|\*+[^/])*\*+\/ { printf("multi lines comment\n"); } // Skip multi lines comments 
 "\n"            	{ lineno += 1; }
 [ \t]             ; // Skip whitespace and newlines

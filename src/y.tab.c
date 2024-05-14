@@ -70,13 +70,15 @@
 
 	#include <stdio.h>
 	#include <math.h>
+    #include <stdbool.h> 
+	#include "symbol_table.c" 
 	void yyerror();
 	extern int yylex(void);
 	extern FILE *yyin;
-    	extern int lineno;
+    extern int lineno;
 	int sym[26];
 
-#line 80 "y.tab.c"
+#line 82 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -214,7 +216,21 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 13 "parser.y"
+ 
+    int int_val;          /* integer value */ 
+    char* str_val;        /* string value */
+    char char_val;      /* char value */
+    float float_val;  /* float value */
+    bool bool_val;    /* boolean value */
+    char* identifier; /* IDENTIFIER */
+
+#line 231 "y.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -590,13 +606,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    50,    55,    56,    61,    63,    66,    69,
-      72,    75,    79,    80,    83,    84,    85,    88,    91,    95,
-      96,    99,   100,   101,   102,   106,   107,   108,   109,   110,
-     115,   119,   123,   125,   126,   130,   132,   137,   141,   146,
-     147,   149,   151,   152,   153,   154,   157,   160,   161,   162,
-     163,   164,   165,   166,   167,   168,   169,   170,   173,   174,
-     175,   178,   179,   180,   181,   182,   183
+       0,    59,    59,    60,    65,    66,    71,    73,    76,    79,
+      82,    85,    89,    90,    93,    94,    95,    98,   101,   105,
+     106,   109,   110,   111,   112,   116,   117,   118,   119,   120,
+     125,   129,   133,   135,   136,   140,   142,   147,   151,   156,
+     157,   159,   161,   162,   163,   164,   167,   170,   171,   172,
+     173,   174,   175,   176,   177,   178,   179,   180,   183,   184,
+     185,   188,   189,   190,   191,   192,   193
 };
 #endif
 
@@ -1639,188 +1655,8 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 8:
-#line 66 "parser.y"
-                                                { sym[yyvsp[-3]] = yyvsp[-1]; }
-#line 1646 "y.tab.c"
-    break;
 
-  case 10:
-#line 72 "parser.y"
-                                                { sym[yyvsp[-3]] = yyvsp[-1]; }
-#line 1652 "y.tab.c"
-    break;
-
-  case 30:
-#line 115 "parser.y"
-                                        { sym[yyvsp[-2]] = yyvsp[0]; }
-#line 1658 "y.tab.c"
-    break;
-
-  case 39:
-#line 146 "parser.y"
-                                        { yyval = sym[yyvsp[0]]; }
-#line 1664 "y.tab.c"
-    break;
-
-  case 40:
-#line 147 "parser.y"
-                                                { yyval = sym[yyvsp[0]]; }
-#line 1670 "y.tab.c"
-    break;
-
-  case 41:
-#line 149 "parser.y"
-                                                { yyval = sym[yyvsp[0]]; }
-#line 1676 "y.tab.c"
-    break;
-
-  case 42:
-#line 151 "parser.y"
-                                                { yyval = sym[yyvsp[0]]; }
-#line 1682 "y.tab.c"
-    break;
-
-  case 43:
-#line 152 "parser.y"
-                                                { yyval = sym[yyvsp[0]]; }
-#line 1688 "y.tab.c"
-    break;
-
-  case 44:
-#line 153 "parser.y"
-                                        { yyval = sym[yyvsp[0]]; }
-#line 1694 "y.tab.c"
-    break;
-
-  case 45:
-#line 154 "parser.y"
-                                                { yyval = sym[yyvsp[0]]; }
-#line 1700 "y.tab.c"
-    break;
-
-  case 46:
-#line 157 "parser.y"
-                                                { yyval = yyvsp[-1]; }
-#line 1706 "y.tab.c"
-    break;
-
-  case 48:
-#line 161 "parser.y"
-                                                { yyval = yyvsp[0] + 1; }
-#line 1712 "y.tab.c"
-    break;
-
-  case 49:
-#line 162 "parser.y"
-                                                { yyval = yyvsp[-1] + 1; }
-#line 1718 "y.tab.c"
-    break;
-
-  case 50:
-#line 163 "parser.y"
-                                                { yyval = yyvsp[0] - 1; }
-#line 1724 "y.tab.c"
-    break;
-
-  case 51:
-#line 164 "parser.y"
-                                                { yyval = yyvsp[-1] - 1; }
-#line 1730 "y.tab.c"
-    break;
-
-  case 52:
-#line 165 "parser.y"
-                                                { yyval = yyvsp[-2] + yyvsp[0]; }
-#line 1736 "y.tab.c"
-    break;
-
-  case 53:
-#line 166 "parser.y"
-                                                { yyval = yyvsp[-2] - yyvsp[0]; }
-#line 1742 "y.tab.c"
-    break;
-
-  case 54:
-#line 167 "parser.y"
-                                                { yyval = yyvsp[-2] * yyvsp[0]; }
-#line 1748 "y.tab.c"
-    break;
-
-  case 55:
-#line 168 "parser.y"
-                                                { yyval = yyvsp[-2] / yyvsp[0]; }
-#line 1754 "y.tab.c"
-    break;
-
-  case 56:
-#line 169 "parser.y"
-                                                { yyval = pow(yyvsp[-2], yyvsp[0]); }
-#line 1760 "y.tab.c"
-    break;
-
-  case 57:
-#line 170 "parser.y"
-                                                { yyval = yyvsp[-2] % yyvsp[0]; }
-#line 1766 "y.tab.c"
-    break;
-
-  case 58:
-#line 173 "parser.y"
-                                                { yyval = yyvsp[-2] && yyvsp[0]; }
-#line 1772 "y.tab.c"
-    break;
-
-  case 59:
-#line 174 "parser.y"
-                                                { yyval = yyvsp[-2] || yyvsp[0]; }
-#line 1778 "y.tab.c"
-    break;
-
-  case 60:
-#line 175 "parser.y"
-                                        { yyval = !yyvsp[0]; }
-#line 1784 "y.tab.c"
-    break;
-
-  case 61:
-#line 178 "parser.y"
-                                        { yyval = (yyvsp[-2] == yyvsp[0]); }
-#line 1790 "y.tab.c"
-    break;
-
-  case 62:
-#line 179 "parser.y"
-                                                { yyval = (yyvsp[-2] != yyvsp[0]); }
-#line 1796 "y.tab.c"
-    break;
-
-  case 63:
-#line 180 "parser.y"
-                                                { yyval = (yyvsp[-2] < yyvsp[0]); }
-#line 1802 "y.tab.c"
-    break;
-
-  case 64:
-#line 181 "parser.y"
-                                                { yyval = (yyvsp[-2] <= yyvsp[0]); }
-#line 1808 "y.tab.c"
-    break;
-
-  case 65:
-#line 182 "parser.y"
-                                                { yyval = (yyvsp[-2] > yyvsp[0]); }
-#line 1814 "y.tab.c"
-    break;
-
-  case 66:
-#line 183 "parser.y"
-                                                { yyval = (yyvsp[-2] >= yyvsp[0]); }
-#line 1820 "y.tab.c"
-    break;
-
-
-#line 1824 "y.tab.c"
+#line 1660 "y.tab.c"
 
       default: break;
     }
@@ -2052,7 +1888,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 187 "parser.y"
+#line 197 "parser.y"
 
 
 int main (int argc, char *argv[]){

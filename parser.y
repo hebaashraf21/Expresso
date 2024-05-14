@@ -1,6 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <math.h>
+	#include "symbol_table.c" 
 	void yyerror();
 	extern int yylex(void);
 	extern FILE *yyin;

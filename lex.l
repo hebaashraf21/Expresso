@@ -1,6 +1,8 @@
+%option noyywrap
 %{
 #include <stdio.h>
 #include "y.tab.h"
+#include "symbol_table.c" 
 void yyerror();
 extern FILE *yyin;
 extern FILE *yyout;

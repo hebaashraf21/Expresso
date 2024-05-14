@@ -1,0 +1,20 @@
+Because it's an LR parser (actually LALR(1) approximation of LR) it analyzes bottom-up and uses a stack to store the elements of the language/program.
+
+The following actions take place on the stack:
+- shift -> insert the next input element to the stack.
+- reduce -> applied to the head of the stack when the right-side of a rule has been found by replacing the right-side with the left-side.
+- accept and abort that tell us if the analysis was successful or not (grammar error or not)
+
+Symbol tables store information about identifiers that occur in the (source) program.
+
+A symbol table gets implemented as a hashtable.
+
+The basic operations that a ST needs to have are:
+- adding identifiers (insert)
+- searching identifiers (lookup)
+- "removing" (hiding) identifiers or groups of them (for the scope management)
+
+So, to sum it up we have the following operations:
+- Insert() -> When recognizing a new identifier we create a new entry for the symbol table if it doesn't already exist.  If it already exists then we check the scope to see if it's the same variable, by adding it to the reference list if it's the same variable or creating a whole new entry if it's a new scope for a subroutine for example.
+- Lookup() -> Search for an identifier in the current (or any) scope and return it's ST entry, when using it in the syntax or semantic analysis.
+- Hide() -> "Deactivate" the variables of a specific scope (mostly the current one) when leaving a specific structural block or subroutine.

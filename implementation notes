@@ -1,0 +1,36 @@
+To DO:
+- rules
+- yyerror
+- Design a suitable and extensible format for the symbol table.
+- Design suitable action rules to produce the output quadruples
+- Implement a proper syntax error handler.
+- Build a simple semantic analyzer that checks for the following:
+	- Variable declaration conflicts. i.e. multiple declarations of the same variable.
+	- Improper usage of variables regarding their type.
+	- Variables used before being initialised and unused variables.
+
+[a-z]       {
+                yylval = *yytext - 'a';
+                return VARIABLE;
+                }
+                
+[a-z]       { 
+                yylval.sIndex = *yytext - 'a';
+                return VARIABLE;
+            }
+
+0           {
+                yylval.iValue = atoi(yytext);
+                return INTEGER;
+            }
+
+[1-9][0-9]* {
+                yylval.iValue = atoi(yytext);
+                return INTEGER;
+            }
+            
+            
+CONTINUE -> go to the next iteration of a loop
+BREAK -> break out of a loop
+RETURN -> return to function that called (maybe even with return-value) or to the operating system 
+

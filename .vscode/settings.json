@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "symbol_table.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "typeinfo": "c"
   }
 }

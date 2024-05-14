@@ -71,10 +71,10 @@
 	#include <stdio.h>
 	#include <math.h>
     #include <stdbool.h> 
-	#include "symbol_table.c" 
 	void yyerror();
 	extern int yylex(void);
 	extern FILE *yyin;
+    extern FILE *yyout;
     extern int lineno;
 	int sym[26];
 
@@ -216,12 +216,12 @@ union YYSTYPE
 {
 #line 13 "parser.y"
  
-    int int_value;          /* integer value */ 
-    char* str_value;        /* string value */
-    char char_value;      /* char value */
-    float float_value;  /* float value */
-    bool bool_value;    /* boolean value */
-    char* identifier; /* IDENTIFIER */
+    int int_value;        
+    char* str_value;        
+    char char_value;      
+    float float_value;  
+    bool bool_value;    
+    char* identifier;
 
 #line 227 "y.tab.c"
 
@@ -1898,7 +1898,7 @@ int main (int argc, char *argv[]){
     yyin = fopen(argv[1], "r");
     flag = yyparse();
     fclose(yyin);
-    
+
     return flag;
 }
 

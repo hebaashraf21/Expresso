@@ -139,12 +139,12 @@ union YYSTYPE
 {
 #line 13 "parser.y"
  
-    int int_value;          /* integer value */ 
-    char* str_value;        /* string value */
-    char char_value;      /* char value */
-    float float_value;  /* float value */
-    bool bool_value;    /* boolean value */
-    char* identifier; /* IDENTIFIER */
+    int int_value;        
+    char* str_value;        
+    char char_value;      
+    float float_value;  
+    bool bool_value;    
+    char* identifier;
 
 #line 150 "y.tab.h"
 

@@ -2,10 +2,10 @@
 	#include <stdio.h>
 	#include <math.h>
     #include <stdbool.h> 
-	#include "symbol_table.c" 
 	void yyerror();
 	extern int yylex(void);
 	extern FILE *yyin;
+    extern FILE *yyout;
     extern int lineno;
 	int sym[26];
 %}
@@ -209,7 +209,7 @@ int main (int argc, char *argv[]){
     yyin = fopen(argv[1], "r");
     flag = yyparse();
     fclose(yyin);
-    
+
     return flag;
 }
 

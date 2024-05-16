@@ -78,7 +78,7 @@
     extern int lineno;
 	int sym[26];
 
-    #define HASH_TABLE_SIZE 503
+    #define Symbol_TABLE_SIZE 1000
     typedef struct Value{
         int int_value;         
         char* str_value; 
@@ -87,21 +87,25 @@
         bool bool_value;
     }Value;
 
+    typedef struct Node{
+        char *type;
+    }Node;
+
     typedef struct Symbol{
         char *name;
         char *type;
         Value value;
-        bool isConst;
-        struct Symbol* next;
+        bool is_const;
     }Symbol;
 
-    Symbol *symbol_table [HASH_TABLE_SIZE];
-
+    Symbol *symbol_table [Symbol_TABLE_SIZE];
+    int symbol_table_idx = -1;
     int hash_function(char *key);
     void insert_symbol(char *name, char *type, bool is_const);
+    Node* insert_node(char *type);
 
 
-#line 105 "y.tab.c"
+#line 109 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -237,7 +241,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 36 "parser.y"
+#line 40 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -245,8 +249,10 @@ union YYSTYPE
     float float_value;  
     bool bool_value;    
     char* identifier;
+    struct Node *node_value;
+;
 
-#line 250 "y.tab.c"
+#line 256 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -625,13 +631,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    89,    89,    90,    95,    96,   101,   103,   104,   107,
-     110,   113,   116,   120,   121,   124,   125,   126,   129,   132,
-     136,   137,   140,   141,   142,   146,   147,   148,   149,   150,
-     155,   159,   163,   165,   166,   170,   172,   177,   181,   185,
-     186,   188,   190,   191,   192,   193,   196,   199,   200,   201,
-     202,   203,   204,   205,   206,   207,   208,   209,   212,   213,
-     214,   217,   218,   219,   220,   221,   222
+       0,   100,   100,   101,   106,   107,   112,   114,   115,   118,
+     121,   124,   127,   131,   132,   135,   136,   137,   140,   143,
+     147,   148,   151,   152,   153,   157,   158,   159,   160,   161,
+     166,   170,   174,   176,   177,   181,   183,   188,   192,   196,
+     197,   199,   201,   202,   203,   204,   207,   210,   211,   212,
+     213,   214,   215,   216,   217,   218,   219,   220,   223,   224,
+     225,   228,   229,   230,   231,   232,   233
 };
 #endif
 
@@ -649,8 +655,9 @@ static const char *const yytname[] =
   "LOGICAL_AND", "EQUALS", "NOT_EQUALS", "LESS_THAN",
   "LESS_THAN_OR_EQUALS", "GREATER_THAN", "GREATER_THAN_OR_EQUALS", "'+'",
   "'-'", "'*'", "'/'", "'%'", "'^'", "LOGICAL_NOT", "UMINUS", "$accept",
-  "program", "statements", "stmt", "type", "assignment", "var_declaration",
-  "parameters_list", "case_list", "default_case", "case_stmt", "expr", YY_NULLPTR
+  "program", "statements", "stmt", "datatype", "assignment",
+  "var_declaration", "parameters_list", "case_list", "default_case",
+  "case_stmt", "expr", YY_NULLPTR
 };
 #endif
 
@@ -1670,8 +1677,38 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 25:
+#line 157 "parser.y"
+                            {(yyval.node_value) = insert_node("INT");}
+#line 1684 "y.tab.c"
+    break;
 
-#line 1675 "y.tab.c"
+  case 26:
+#line 158 "parser.y"
+                            {(yyval.node_value) = insert_node("FLOAT");}
+#line 1690 "y.tab.c"
+    break;
+
+  case 27:
+#line 159 "parser.y"
+                            {(yyval.node_value) = insert_node("CHAR");}
+#line 1696 "y.tab.c"
+    break;
+
+  case 28:
+#line 160 "parser.y"
+                            {(yyval.node_value) = insert_node("STRING");}
+#line 1702 "y.tab.c"
+    break;
+
+  case 29:
+#line 161 "parser.y"
+                            {(yyval.node_value) = insert_node("BOOL");}
+#line 1708 "y.tab.c"
+    break;
+
+
+#line 1712 "y.tab.c"
 
       default: break;
     }
@@ -1903,34 +1940,21 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 226 "parser.y"
+#line 237 "parser.y"
 
-
-int hash_function(char *key){
-	int hash_index = 0;
-	// Loop through all the characters of the string
-	while(*key!='\0'){
-		// Update the hash value using a simple multiplicative hash function
-		// It has good distribution properties and is easy to implement.
-        hash_index = (hash_index * 31) + *key;
-        key++;
-	} 
-	return hash_index % HASH_TABLE_SIZE;
-}
 
 void insert_symbol(char *name, char *type, bool is_const){
-    int hash_index = hash_function(name);
-    Symbol *table_entry = symbol_table[hash_index];
-    // insert at the end of the bucket
-    while(table_entry ->next){
-		table_entry = table_entry ->next;
-	}
-    Symbol* new_entry = (Symbol*) malloc(sizeof(Symbol));
-    new_entry -> name = name;
-    new_entry -> type = type;
-    new_entry -> isConst = is_const;
-    new_entry -> next = NULL;
-    table_entry -> next = new_entry;
+    symbol_table_idx ++;
+    Symbol *new_symbol =  malloc(sizeof(Symbol));
+    new_symbol -> name = name;
+    new_symbol -> type = type;
+    new_symbol -> is_const = is_const;
+}
+
+Node* insert_node(char *type){
+    Node* new_node = (Node*) malloc(sizeof(Node));
+    new_node -> type = type;
+    return new_node;
 }
 
 int main (int argc, char *argv[]){

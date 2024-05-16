@@ -9,7 +9,7 @@
     extern int lineno;
 	int sym[26];
 
-    #define HASH_TABLE_SIZE 503
+    #define Symbol_TABLE_SIZE 1000
     typedef struct Value{
         int int_value;         
         char* str_value; 
@@ -18,18 +18,22 @@
         bool bool_value;
     }Value;
 
+    typedef struct Node{
+        char *type;
+    }Node;
+
     typedef struct Symbol{
         char *name;
         char *type;
         Value value;
-        bool isConst;
-        struct Symbol* next;
+        bool is_const;
     }Symbol;
 
-    Symbol *symbol_table [HASH_TABLE_SIZE];
-
+    Symbol *symbol_table [Symbol_TABLE_SIZE];
+    int symbol_table_idx = -1;
     int hash_function(char *key);
     void insert_symbol(char *name, char *type, bool is_const);
+    Node* insert_node(char *type);
 
 %}
 
@@ -40,7 +44,8 @@
     float float_value;  
     bool bool_value;    
     char* identifier;
-}
+    struct Node *node_value;
+;}
 
 %token PRINT
 
@@ -52,6 +57,7 @@
 %token VOID ENUM
 
 %token INTEGER FLOAT CHAR BOOL STRING
+
 %token CONST 
 %token '(' ')' '{' '}' '[' ']' 
 %token ';' ',' '?' ':'
@@ -66,6 +72,7 @@
 
 %token INCR DECR
 
+// association rules and operators precedence
 %right '='
 %left LOGICAL_OR
 %left LOGICAL_AND
@@ -82,6 +89,10 @@
 %nonassoc UMINUS
 %left INCR DECR
 
+// types of non terminals
+%type <node_value> datatype
+
+// starting point of parsing
 %start program
 %%
 
@@ -100,11 +111,11 @@ statements:
 stmt:
 	 ';'  
 	 /*Variables declaration*/
-        | type IDENTIFIER ';'
-        | type IDENTIFIER '=' expr ';'
+        | datatype IDENTIFIER ';'
+        | datatype IDENTIFIER '=' expr ';'
         
         /*Constant declaration*/
-        | CONST type IDENTIFIER '=' expr ';'
+        | CONST datatype IDENTIFIER '=' expr ';'
 	
 	/*expressions*/                          
         | expr ';' 				
@@ -134,7 +145,7 @@ stmt:
         
         /*Functions Definition*/   
         | VOID IDENTIFIER '(' parameters_list ')' '{' statements '}'
-        | type IDENTIFIER '(' parameters_list ')' '{' statements '}'
+        | datatype IDENTIFIER '(' parameters_list ')' '{' statements '}'
         
         /*Functions Call*/   
         | IDENTIFIER '(' parameters_list ')' ';'
@@ -143,20 +154,20 @@ stmt:
         ;	
 	
 	
-type:   INTEGER
-      | FLOAT
-      | CHAR
-      | STRING
-      | BOOL
+datatype:   INTEGER         {$$ = insert_node("INT");}
+      | FLOAT               {$$ = insert_node("FLOAT");}
+      | CHAR                {$$ = insert_node("CHAR");}
+      | STRING              {$$ = insert_node("STRING");}
+      | BOOL                {$$ = insert_node("BOOL");}
       ;
 
 
 assignment:
-	type IDENTIFIER '=' expr 
+	datatype IDENTIFIER '=' expr 
 
 
 var_declaration: 
-		type IDENTIFIER
+		datatype IDENTIFIER
 		;
 
 
@@ -225,31 +236,18 @@ expr :
     ;
 %%
 
-int hash_function(char *key){
-	int hash_index = 0;
-	// Loop through all the characters of the string
-	while(*key!='\0'){
-		// Update the hash value using a simple multiplicative hash function
-		// It has good distribution properties and is easy to implement.
-        hash_index = (hash_index * 31) + *key;
-        key++;
-	} 
-	return hash_index % HASH_TABLE_SIZE;
+void insert_symbol(char *name, char *type, bool is_const){
+    symbol_table_idx ++;
+    Symbol *new_symbol =  malloc(sizeof(Symbol));
+    new_symbol -> name = name;
+    new_symbol -> type = type;
+    new_symbol -> is_const = is_const;
 }
 
-void insert_symbol(char *name, char *type, bool is_const){
-    int hash_index = hash_function(name);
-    Symbol *table_entry = symbol_table[hash_index];
-    // insert at the end of the bucket
-    while(table_entry ->next){
-		table_entry = table_entry ->next;
-	}
-    Symbol* new_entry = (Symbol*) malloc(sizeof(Symbol));
-    new_entry -> name = name;
-    new_entry -> type = type;
-    new_entry -> isConst = is_const;
-    new_entry -> next = NULL;
-    table_entry -> next = new_entry;
+Node* insert_node(char *type){
+    Node* new_node = (Node*) malloc(sizeof(Node));
+    new_node -> type = type;
+    return new_node;
 }
 
 int main (int argc, char *argv[]){

@@ -137,7 +137,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 36 "parser.y"
+#line 40 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -145,8 +145,10 @@ union YYSTYPE
     float float_value;  
     bool bool_value;    
     char* identifier;
+    struct Node *node_value;
+;
 
-#line 150 "y.tab.h"
+#line 152 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

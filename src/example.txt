@@ -1,6 +1,6 @@
 const int i = 5;
 char a = 'a';
 bool b = false;
-int j;
-int x;
-j = x;
+int j = i;
+char x = a;
+bool z = b;

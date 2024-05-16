@@ -92,6 +92,7 @@
 
     typedef struct Node{
         char *type;
+        Value value;
     }Node;
 
     typedef struct Symbol{
@@ -101,6 +102,7 @@
         bool is_const;
         int scope;
         bool is_initialized;
+        bool is_used;
     }Symbol;
 
     Symbol *symbol_table [Symbol_TABLE_SIZE];
@@ -108,7 +110,7 @@
     int current_scope = 0;
     int get_symbol_index(char *name);
     void insert_symbol(char *name, char *type, bool is_const, int scope);
-    Node* insert_node(char *type);
+    Node* insert_node(char *type, Value value);
     // to check peoper use
     int is_correct_scope(char *name, int scope);
     // to prevent redeclaration
@@ -121,8 +123,12 @@
     void set_initialized(char* name, int scope);
     // check if a variable is initialized before using
     bool is_initialized(char* name, int scope);
+    // shen use varuiable ==> set that
+    void set_used(char* name, int scope);
+    // check all variables are used
+    bool is_all_used();
 
-#line 126 "y.tab.c"
+#line 132 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -258,7 +264,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 57 "parser.y"
+#line 63 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -269,7 +275,7 @@ union YYSTYPE
     struct Node *node_value;
 ;
 
-#line 273 "y.tab.c"
+#line 279 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -648,13 +654,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   119,   119,   120,   125,   126,   131,   133,   140,   152,
-     164,   176,   180,   181,   184,   185,   186,   189,   192,   196,
-     197,   200,   201,   202,   207,   208,   209,   210,   211,   216,
-     228,   237,   239,   240,   244,   246,   251,   255,   259,   260,
-     262,   270,   271,   272,   273,   277,   280,   283,   284,   285,
-     286,   287,   288,   289,   290,   291,   292,   293,   296,   297,
-     298,   301,   302,   303,   304,   305,   306
+       0,   125,   125,   126,   131,   132,   137,   139,   146,   158,
+     170,   182,   186,   187,   190,   191,   192,   195,   198,   202,
+     203,   206,   207,   208,   213,   216,   220,   224,   228,   236,
+     248,   257,   259,   260,   264,   266,   271,   275,   279,   284,
+     290,   299,   304,   309,   314,   322,   325,   328,   329,   330,
+     331,   332,   333,   334,   335,   336,   337,   338,   341,   342,
+     343,   346,   347,   348,   349,   350,   351
 };
 #endif
 
@@ -1659,18 +1665,18 @@ yyreduce:
   switch (yyn)
     {
   case 7:
-#line 133 "parser.y"
+#line 139 "parser.y"
                                                 {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-1].identifier),current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[-1].identifier), (yyvsp[-2].node_value)->type, false, current_scope);
                                                 }
-#line 1670 "y.tab.c"
+#line 1676 "y.tab.c"
     break;
 
   case 8:
-#line 140 "parser.y"
+#line 146 "parser.y"
                                                 {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-3].identifier),current_scope);
@@ -1681,26 +1687,26 @@ yyreduce:
                                                 // set initialized
                                                 set_initialized((yyvsp[-3].identifier), current_scope);
                                                 }
-#line 1685 "y.tab.c"
+#line 1691 "y.tab.c"
     break;
 
   case 9:
-#line 152 "parser.y"
+#line 158 "parser.y"
                                                  {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-3].identifier),current_scope);
                                                 // check type matching
                                                 is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value));
-                                                // set initialized ($1)
+                                                // set initialized
                                                 set_initialized((yyvsp[-3].identifier), current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[-3].identifier), (yyvsp[-4].node_value)->type, true, current_scope);
                                                 }
-#line 1700 "y.tab.c"
+#line 1706 "y.tab.c"
     break;
 
   case 10:
-#line 164 "parser.y"
+#line 170 "parser.y"
                                                     {
                                             // check declared or not ($1)
                                             is_correct_scope((yyvsp[-3].identifier), current_scope);
@@ -1711,41 +1717,55 @@ yyreduce:
                                             // set initialized ($1)
                                             set_initialized((yyvsp[-3].identifier), current_scope);
                                             }
-#line 1715 "y.tab.c"
-    break;
-
-  case 24:
-#line 207 "parser.y"
-                            {(yyval.node_value) = insert_node("INT");}
 #line 1721 "y.tab.c"
     break;
 
+  case 24:
+#line 213 "parser.y"
+                            {
+                            struct Value value;
+                            (yyval.node_value) = insert_node("INT", value);}
+#line 1729 "y.tab.c"
+    break;
+
   case 25:
-#line 208 "parser.y"
-                            {(yyval.node_value) = insert_node("FLOAT");}
-#line 1727 "y.tab.c"
+#line 216 "parser.y"
+                            {
+                            struct Value value;
+                            (yyval.node_value) = insert_node("FLOAT", value);
+                            }
+#line 1738 "y.tab.c"
     break;
 
   case 26:
-#line 209 "parser.y"
-                            {(yyval.node_value) = insert_node("CHAR");}
-#line 1733 "y.tab.c"
+#line 220 "parser.y"
+                            {
+                            struct Value value;
+                            (yyval.node_value) = insert_node("CHAR", value);
+                            }
+#line 1747 "y.tab.c"
     break;
 
   case 27:
-#line 210 "parser.y"
-                            {(yyval.node_value) = insert_node("STRING");}
-#line 1739 "y.tab.c"
+#line 224 "parser.y"
+                            {
+                            struct Value value;
+                            (yyval.node_value) = insert_node("STRING", value);
+                            }
+#line 1756 "y.tab.c"
     break;
 
   case 28:
-#line 211 "parser.y"
-                            {(yyval.node_value) = insert_node("BOOL");}
-#line 1745 "y.tab.c"
+#line 228 "parser.y"
+                            {
+                            struct Value value;
+                            (yyval.node_value) = insert_node("BOOL", value);
+                            }
+#line 1765 "y.tab.c"
     break;
 
   case 29:
-#line 216 "parser.y"
+#line 236 "parser.y"
                                                     {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-2].identifier),current_scope);
@@ -1756,70 +1776,95 @@ yyreduce:
                                                 // set initialized
                                                 set_initialized((yyvsp[-2].identifier), current_scope);
                                                 }
-#line 1760 "y.tab.c"
+#line 1780 "y.tab.c"
     break;
 
   case 30:
-#line 228 "parser.y"
+#line 248 "parser.y"
                                                         {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[0].identifier),current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[0].identifier), (yyvsp[-1].node_value)->type, false, current_scope);
                                                 }
-#line 1771 "y.tab.c"
+#line 1791 "y.tab.c"
     break;
 
   case 38:
-#line 259 "parser.y"
-                            {(yyval.node_value) = insert_node("BOOL");}
-#line 1777 "y.tab.c"
+#line 279 "parser.y"
+                            {
+                            Value value;
+                            value.bool_value = true;
+                            (yyval.node_value) = insert_node("BOOL", value);
+                            }
+#line 1801 "y.tab.c"
     break;
 
   case 39:
-#line 260 "parser.y"
-                            {(yyval.node_value) = insert_node("BOOL");}
-#line 1783 "y.tab.c"
+#line 284 "parser.y"
+                            {
+                            Value value;
+                            value.bool_value = false;
+                            (yyval.node_value) = insert_node("BOOL", value);
+                            }
+#line 1811 "y.tab.c"
     break;
 
   case 40:
-#line 262 "parser.y"
+#line 290 "parser.y"
                             {
                             // check declared
                             is_correct_scope((yyvsp[0].identifier), current_scope);
                             // check initialized
                             is_initialized((yyvsp[0].identifier), current_scope);
                             // set used
+                            set_used((yyvsp[0].identifier), current_scope);
                             }
-#line 1795 "y.tab.c"
+#line 1824 "y.tab.c"
     break;
 
   case 41:
-#line 270 "parser.y"
-                                {(yyval.node_value) = insert_node("INT");}
-#line 1801 "y.tab.c"
+#line 299 "parser.y"
+                                {
+                            Value value;
+                            value.int_value = (yyvsp[0].int_value);
+                            (yyval.node_value) = insert_node("INT", value);
+                            }
+#line 1834 "y.tab.c"
     break;
 
   case 42:
-#line 271 "parser.y"
-                                {(yyval.node_value) = insert_node("FLOAT");}
-#line 1807 "y.tab.c"
+#line 304 "parser.y"
+                                {
+                            Value value;
+                            value.float_value = (yyvsp[0].float_value);
+                            (yyval.node_value) = insert_node("FLOAT", value);
+                            }
+#line 1844 "y.tab.c"
     break;
 
   case 43:
-#line 272 "parser.y"
-                                        {(yyval.node_value) = insert_node("CHAR");}
-#line 1813 "y.tab.c"
+#line 309 "parser.y"
+                                        {
+                            Value value;
+                            value.char_value = (yyvsp[0].char_value);
+                            (yyval.node_value) = insert_node("CHAR", value);
+                            }
+#line 1854 "y.tab.c"
     break;
 
   case 44:
-#line 273 "parser.y"
-                            {(yyval.node_value) = insert_node("STRING");}
-#line 1819 "y.tab.c"
+#line 314 "parser.y"
+                            {
+                            Value value;
+                            value.str_value = (yyvsp[0].str_value);
+                            (yyval.node_value) = insert_node("STRING", value);
+                            }
+#line 1864 "y.tab.c"
     break;
 
 
-#line 1823 "y.tab.c"
+#line 1868 "y.tab.c"
 
       default: break;
     }
@@ -2051,7 +2096,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 308 "parser.y"
+#line 353 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, int scope){
@@ -2060,13 +2105,16 @@ void insert_symbol(char *name, char *type, bool is_const, int scope){
     new_symbol -> name = name;
     new_symbol -> type = type;
     new_symbol -> is_const = is_const;
+    new_symbol -> is_initialized = false;
+    new_symbol -> is_used = false;
     new_symbol -> scope = scope;
     symbol_table[symbol_table_idx] = new_symbol;
 }
 
-Node* insert_node(char *type){
+Node* insert_node(char *type, Value value){
     Node* new_node = (Node*) malloc(sizeof(Node));
     new_node -> type = type;
+    new_node -> value = value;
     return new_node;
 }
 
@@ -2151,6 +2199,7 @@ void set_initialized(char* name, int scope){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
             symbol_table[i]-> is_initialized = true;
+            printf("%s  %c", name, symbol_table[i]-> is_initialized);
         }
     }
 }
@@ -2169,12 +2218,32 @@ bool is_initialized(char* name, int scope){
     }
 }
 
+void set_used(char* name, int scope){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
+            symbol_table[i]-> is_used = true;
+        }
+    }
+}
+
+bool is_all_used(){
+    for (int i =0; i<=symbol_table_idx; i++){
+        if(symbol_table[i]-> is_used == false){
+            return false;
+        }
+    }
+    return true;
+}
+
 int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");
     yyparse();
     fclose(yyin);
-
+    if(!is_all_used()){
+        printf("Not all variables used\n");
+    }
     return 0;
 }
 

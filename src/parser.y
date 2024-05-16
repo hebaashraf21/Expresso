@@ -23,6 +23,7 @@
 
     typedef struct Node{
         char *type;
+        Value value;
     }Node;
 
     typedef struct Symbol{
@@ -32,6 +33,7 @@
         bool is_const;
         int scope;
         bool is_initialized;
+        bool is_used;
     }Symbol;
 
     Symbol *symbol_table [Symbol_TABLE_SIZE];
@@ -39,7 +41,7 @@
     int current_scope = 0;
     int get_symbol_index(char *name);
     void insert_symbol(char *name, char *type, bool is_const, int scope);
-    Node* insert_node(char *type);
+    Node* insert_node(char *type, Value value);
     // to check peoper use
     int is_correct_scope(char *name, int scope);
     // to prevent redeclaration
@@ -52,6 +54,10 @@
     void set_initialized(char* name, int scope);
     // check if a variable is initialized before using
     bool is_initialized(char* name, int scope);
+    // shen use varuiable ==> set that
+    void set_used(char* name, int scope);
+    // check all variables are used
+    bool is_all_used();
 %}
 
 %union { 
@@ -154,7 +160,7 @@ stmt:
                                                 is_redeclared($3,current_scope);
                                                 // check type matching
                                                 is_same_type($3, current_scope, $5);
-                                                // set initialized ($1)
+                                                // set initialized
                                                 set_initialized($3, current_scope);
                                                 // insert the symbol
                                                 insert_symbol($3, $2->type, true, current_scope);
@@ -204,11 +210,25 @@ stmt:
 	
 	
 datatype:   
-        INTEGER             {$$ = insert_node("INT");}
-      | FLOAT               {$$ = insert_node("FLOAT");}
-      | CHAR                {$$ = insert_node("CHAR");}
-      | STRING              {$$ = insert_node("STRING");}
-      | BOOL                {$$ = insert_node("BOOL");}
+        INTEGER             {
+                            struct Value value;
+                            $$ = insert_node("INT", value);}
+      | FLOAT               {
+                            struct Value value;
+                            $$ = insert_node("FLOAT", value);
+                            }
+      | CHAR                {
+                            struct Value value;
+                            $$ = insert_node("CHAR", value);
+                            }
+      | STRING              {
+                            struct Value value;
+                            $$ = insert_node("STRING", value);
+                            }
+      | BOOL                {
+                            struct Value value;
+                            $$ = insert_node("BOOL", value);
+                            }
       ;
 
 
@@ -256,8 +276,16 @@ case_stmt:
     ;  
 
 terminals: 
-      TRUE_VAL	            {$$ = insert_node("BOOL");}			
-    | FALSE_VAL	            {$$ = insert_node("BOOL");}			
+      TRUE_VAL	            {
+                            Value value;
+                            value.bool_value = true;
+                            $$ = insert_node("BOOL", value);
+                            }			
+    | FALSE_VAL	            {
+                            Value value;
+                            value.bool_value = false;
+                            $$ = insert_node("BOOL", value);
+                            }			
 
     | IDENTIFIER            {
                             // check declared
@@ -265,12 +293,29 @@ terminals:
                             // check initialized
                             is_initialized($1, current_scope);
                             // set used
+                            set_used($1, current_scope);
                             }          
 
-    | INTEGER_VAL	        {$$ = insert_node("INT");}			
-    | FLOAT_VAL		        {$$ = insert_node("FLOAT");}		
-    | CHAR_VAL				{$$ = insert_node("CHAR");}
-    | STRING_VAL            {$$ = insert_node("STRING");}
+    | INTEGER_VAL	        {
+                            Value value;
+                            value.int_value = $1;
+                            $$ = insert_node("INT", value);
+                            }			
+    | FLOAT_VAL		        {
+                            Value value;
+                            value.float_value = $1;
+                            $$ = insert_node("FLOAT", value);
+                            }		
+    | CHAR_VAL				{
+                            Value value;
+                            value.char_value = $1;
+                            $$ = insert_node("CHAR", value);
+                            }
+    | STRING_VAL            {
+                            Value value;
+                            value.str_value = $1;
+                            $$ = insert_node("STRING", value);
+                            }
     ;
     
 expr:
@@ -313,13 +358,16 @@ void insert_symbol(char *name, char *type, bool is_const, int scope){
     new_symbol -> name = name;
     new_symbol -> type = type;
     new_symbol -> is_const = is_const;
+    new_symbol -> is_initialized = false;
+    new_symbol -> is_used = false;
     new_symbol -> scope = scope;
     symbol_table[symbol_table_idx] = new_symbol;
 }
 
-Node* insert_node(char *type){
+Node* insert_node(char *type, Value value){
     Node* new_node = (Node*) malloc(sizeof(Node));
     new_node -> type = type;
+    new_node -> value = value;
     return new_node;
 }
 
@@ -404,6 +452,7 @@ void set_initialized(char* name, int scope){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
             symbol_table[i]-> is_initialized = true;
+            printf("%s  %c", name, symbol_table[i]-> is_initialized);
         }
     }
 }
@@ -422,12 +471,32 @@ bool is_initialized(char* name, int scope){
     }
 }
 
+void set_used(char* name, int scope){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
+            symbol_table[i]-> is_used = true;
+        }
+    }
+}
+
+bool is_all_used(){
+    for (int i =0; i<=symbol_table_idx; i++){
+        if(symbol_table[i]-> is_used == false){
+            return false;
+        }
+    }
+    return true;
+}
+
 int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");
     yyparse();
     fclose(yyin);
-
+    if(!is_all_used()){
+        printf("Not all variables used\n");
+    }
     return 0;
 }
 

@@ -610,8 +610,8 @@ static const yytype_uint16 yyrline[] =
      215,   218,   219,   220,   225,   228,   232,   236,   240,   248,
      260,   269,   271,   272,   276,   278,   283,   287,   291,   296,
      302,   311,   316,   321,   326,   334,   337,   340,   341,   342,
-     343,   344,   345,   366,   367,   368,   369,   370,   373,   374,
-     375,   378,   379,   380,   381,   382,   383
+     343,   344,   345,   365,   366,   367,   368,   369,   372,   373,
+     374,   377,   378,   379,   380,   381,   382
 };
 #endif
 
@@ -1946,25 +1946,25 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 345 "parser.y"
     {
-    // Generate quadruple for addition
-    quad_idx++;
-    quadruples[quad_idx].operation = "+";
-    quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
-    sprintf(quadruples[quad_idx].operand1, "%d", (yyvsp[(1) - (3)].node_value)->value.int_value);
-    quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
-    sprintf(quadruples[quad_idx].operand2, "%d", (yyvsp[(3) - (3)].node_value)->value.int_value);
-    quadruples[quad_idx].result = (yyvsp[(1) - (3)].node_value)->type == "INT" ? (yyvsp[(1) - (3)].node_value)->value.str_value : (yyvsp[(3) - (3)].node_value)->value.str_value; // Use the identifier of the INT node as result
-    Value temp_value;
-    temp_value.str_value = quadruples[quad_idx].result;
-    (yyval.node_value) = insert_node("TEMP", temp_value);
-    // Output the quadruple to a file
-    FILE *quad_file = fopen("quads.txt", "a");
-    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
-    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
-    fprintf(quad_file, "ADD\n");
-    fprintf(quad_file, "pop %s\n", quadruples[quad_idx].result);
-    fclose(quad_file);
-}
+                            // Generate quadruple for addition
+                            quad_idx++;
+                            quadruples[quad_idx].operation = "+";
+                            quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
+                            sprintf(quadruples[quad_idx].operand1, "%d", (yyvsp[(1) - (3)].node_value)->value.int_value);
+                            quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
+                            sprintf(quadruples[quad_idx].operand2, "%d", (yyvsp[(3) - (3)].node_value)->value.int_value);
+                            quadruples[quad_idx].result = "t1"; // Assuming temporary variable t1 is used
+                            Value temp_value;
+                            temp_value.str_value = "t1"; // Assuming temporary variable t1 is used
+                            (yyval.node_value) = insert_node("TEMP", temp_value);
+                            // Output the quadruple to a file
+                            FILE *quad_file = fopen("quads.txt", "a");
+                            fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+                            fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+                            fprintf(quad_file, "ADD\n");
+                            fprintf(quad_file, "pop %s\n", quadruples[quad_idx].result);
+                            fclose(quad_file);
+                        }
     break;
 
 
@@ -2182,7 +2182,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 385 "parser.y"
+#line 384 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, int scope){
@@ -2337,3 +2337,4 @@ void yyerror(char const *s)
 {
     fprintf(stderr, "%s at line %d\n", s, lineno);
 }
+

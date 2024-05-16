@@ -8,6 +8,29 @@
     extern FILE *yyout;
     extern int lineno;
 	int sym[26];
+
+    #define HASH_TABLE_SIZE 503
+    typedef struct Value{
+        int int_value;         
+        char* str_value; 
+        char char_value;
+        float float_value;
+        bool bool_value;
+    }Value;
+
+    typedef struct Symbol{
+        char *name;
+        char *type;
+        Value value;
+        bool isConst;
+        struct Symbol* next;
+    }Symbol;
+
+    Symbol *symbol_table [HASH_TABLE_SIZE];
+
+    int hash_function(char *key);
+    void insert_symbol(char *name, char *type, bool is_const);
+
 %}
 
 %union { 
@@ -18,8 +41,8 @@
     bool bool_value;    
     char* identifier;
 }
-%token PRINT
 
+%token PRINT
 
 %token IF ELSE 
 %token WHILE FOR DO CONTINUE BREAK
@@ -201,6 +224,33 @@ expr :
      
     ;
 %%
+
+int hash_function(char *key){
+	int hash_index = 0;
+	// Loop through all the characters of the string
+	while(*key!='\0'){
+		// Update the hash value using a simple multiplicative hash function
+		// It has good distribution properties and is easy to implement.
+        hash_index = (hash_index * 31) + *key;
+        key++;
+	} 
+	return hash_index % HASH_TABLE_SIZE;
+}
+
+void insert_symbol(char *name, char *type, bool is_const){
+    int hash_index = hash_function(name);
+    Symbol *table_entry = symbol_table[hash_index];
+    // insert at the end of the bucket
+    while(table_entry ->next){
+		table_entry = table_entry ->next;
+	}
+    Symbol* new_entry = (Symbol*) malloc(sizeof(Symbol));
+    new_entry -> name = name;
+    new_entry -> type = type;
+    new_entry -> isConst = is_const;
+    new_entry -> next = NULL;
+    table_entry -> next = new_entry;
+}
 
 int main (int argc, char *argv[]){
 

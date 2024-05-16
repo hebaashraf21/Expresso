@@ -78,7 +78,30 @@
     extern int lineno;
 	int sym[26];
 
-#line 82 "y.tab.c"
+    #define HASH_TABLE_SIZE 503
+    typedef struct Value{
+        int int_value;         
+        char* str_value; 
+        char char_value;
+        float float_value;
+        bool bool_value;
+    }Value;
+
+    typedef struct Symbol{
+        char *name;
+        char *type;
+        Value value;
+        bool isConst;
+        struct Symbol* next;
+    }Symbol;
+
+    Symbol *symbol_table [HASH_TABLE_SIZE];
+
+    int hash_function(char *key);
+    void insert_symbol(char *name, char *type, bool is_const);
+
+
+#line 105 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -214,7 +237,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 13 "parser.y"
+#line 36 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -223,7 +246,7 @@ union YYSTYPE
     bool bool_value;    
     char* identifier;
 
-#line 227 "y.tab.c"
+#line 250 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -602,13 +625,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    66,    66,    67,    72,    73,    78,    80,    81,    84,
-      87,    90,    93,    97,    98,   101,   102,   103,   106,   109,
-     113,   114,   117,   118,   119,   123,   124,   125,   126,   127,
-     132,   136,   140,   142,   143,   147,   149,   154,   158,   162,
-     163,   165,   167,   168,   169,   170,   173,   176,   177,   178,
-     179,   180,   181,   182,   183,   184,   185,   186,   189,   190,
-     191,   194,   195,   196,   197,   198,   199
+       0,    89,    89,    90,    95,    96,   101,   103,   104,   107,
+     110,   113,   116,   120,   121,   124,   125,   126,   129,   132,
+     136,   137,   140,   141,   142,   146,   147,   148,   149,   150,
+     155,   159,   163,   165,   166,   170,   172,   177,   181,   185,
+     186,   188,   190,   191,   192,   193,   196,   199,   200,   201,
+     202,   203,   204,   205,   206,   207,   208,   209,   212,   213,
+     214,   217,   218,   219,   220,   221,   222
 };
 #endif
 
@@ -1648,7 +1671,7 @@ yyreduce:
   switch (yyn)
     {
 
-#line 1652 "y.tab.c"
+#line 1675 "y.tab.c"
 
       default: break;
     }
@@ -1880,8 +1903,35 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 203 "parser.y"
+#line 226 "parser.y"
 
+
+int hash_function(char *key){
+	int hash_index = 0;
+	// Loop through all the characters of the string
+	while(*key!='\0'){
+		// Update the hash value using a simple multiplicative hash function
+		// It has good distribution properties and is easy to implement.
+        hash_index = (hash_index * 31) + *key;
+        key++;
+	} 
+	return hash_index % HASH_TABLE_SIZE;
+}
+
+void insert_symbol(char *name, char *type, bool is_const){
+    int hash_index = hash_function(name);
+    Symbol *table_entry = symbol_table[hash_index];
+    // insert at the end of the bucket
+    while(table_entry ->next){
+		table_entry = table_entry ->next;
+	}
+    Symbol* new_entry = (Symbol*) malloc(sizeof(Symbol));
+    new_entry -> name = name;
+    new_entry -> type = type;
+    new_entry -> isConst = is_const;
+    new_entry -> next = NULL;
+    table_entry -> next = new_entry;
+}
 
 int main (int argc, char *argv[]){
 

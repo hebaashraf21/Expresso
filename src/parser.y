@@ -19,6 +19,7 @@
         char char_value;
         float float_value;
         bool bool_value;
+        char* id_value;
     }Value;
 
     typedef struct Node{
@@ -39,7 +40,6 @@
     Symbol *symbol_table [Symbol_TABLE_SIZE];
     int symbol_table_idx = -1;
     int current_scope = 0;
-    int get_symbol_index(char *name);
     void insert_symbol(char *name, char *type, bool is_const, int scope);
     Node* insert_node(char *type, Value value);
     // to check peoper use
@@ -158,12 +158,12 @@ stmt:
         | CONST datatype IDENTIFIER '=' expr ';' {
                                                 // check multiple declaration
                                                 is_redeclared($3,current_scope);
+                                                // insert the symbol
+                                                insert_symbol($3, $2->type, true, current_scope);
                                                 // check type matching
                                                 is_same_type($3, current_scope, $5);
                                                 // set initialized
                                                 set_initialized($3, current_scope);
-                                                // insert the symbol
-                                                insert_symbol($3, $2->type, true, current_scope);
                                                 }				
         
         /*Assignment statements*/
@@ -174,7 +174,7 @@ stmt:
                                             is_const($1, current_scope);
                                             // check type matching ($1)
                                             is_same_type($1, current_scope, $3);
-                                            // set initialized ($1)
+                                            //set initialized ($1)
                                             set_initialized($1, current_scope);
                                             }
         
@@ -212,7 +212,8 @@ stmt:
 datatype:   
         INTEGER             {
                             struct Value value;
-                            $$ = insert_node("INT", value);}
+                            $$ = insert_node("INT", value);
+                            }
       | FLOAT               {
                             struct Value value;
                             $$ = insert_node("FLOAT", value);
@@ -236,10 +237,10 @@ assignment:
 	datatype IDENTIFIER '=' expr                {
                                                 // check multiple declaration
                                                 is_redeclared($2,current_scope);
-                                                // check type matching
-                                                is_same_type($2, current_scope, $4);
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
+                                                // check type matching
+                                                is_same_type($2, current_scope, $4);
                                                 // set initialized
                                                 set_initialized($2, current_scope);
                                                 }
@@ -294,6 +295,10 @@ terminals:
                             is_initialized($1, current_scope);
                             // set used
                             set_used($1, current_scope);
+
+                            Value value;
+                            value.id_value = $1;
+                            $$ = insert_node("ID", value);
                             }          
 
     | INTEGER_VAL	        {
@@ -353,33 +358,44 @@ expr:
 %%
 
 void insert_symbol(char *name, char *type, bool is_const, int scope){
-    symbol_table_idx ++;
-    Symbol *new_symbol =  malloc(sizeof(Symbol));
-    new_symbol -> name = name;
-    new_symbol -> type = type;
-    new_symbol -> is_const = is_const;
-    new_symbol -> is_initialized = false;
-    new_symbol -> is_used = false;
-    new_symbol -> scope = scope;
+    symbol_table_idx++;
+    Symbol *new_symbol = malloc(sizeof(Symbol));
+    // Allocate memory for name and type
+    new_symbol->name = strdup(name);
+    new_symbol->type = strdup(type);
+    
+    // Initialize other fields
+    new_symbol->is_const = is_const;
+    new_symbol->scope = scope;
+    new_symbol->is_initialized = false;
+    new_symbol->is_used = false;
+
+    // Initialize Value field based on type
+    if (strcmp(type, "INT") == 0) {
+        new_symbol->value.int_value = 0; // Initialize to default value for int
+    } else if (strcmp(type, "FLOAT") == 0) {
+        new_symbol->value.float_value = 0.0; // Initialize to default value for float
+    } else if (strcmp(type, "CHAR") == 0) {
+        new_symbol->value.char_value = '\0'; // Initialize to default value for char
+    } else if (strcmp(type, "BOOL") == 0) {
+        new_symbol->value.bool_value = false; // Initialize to default value for bool
+    } else {
+        // Handle invalid type
+        fprintf(stderr, "Invalid type: %s\n", type);
+        //exit(EXIT_FAILURE);
+    }
+
+    // Insert symbol into symbol table
     symbol_table[symbol_table_idx] = new_symbol;
 }
 
+
 Node* insert_node(char *type, Value value){
     Node* new_node = (Node*) malloc(sizeof(Node));
-    new_node -> type = type;
+
+    new_node->type = strdup(type);
     new_node -> value = value;
     return new_node;
-}
-
-int get_symbol_index(char *name){
-    int index = -1;
-    for (int i =0; i<=symbol_table_idx; i++){
-        if(strcmp(symbol_table[i]-> name, name)==0){
-            index = i;
-            break;
-        }
-    }
-    return index;
 }
 
 int is_correct_scope(char* name, int scope){
@@ -421,14 +437,31 @@ bool is_same_type(char *name, int scope, Node* id_node){
     for (int i =0; i<=symbol_table_idx; i++){
         // get the variable in this scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            // check the type
             if(strcmp(symbol_table[i]-> type, id_node -> type)==0){
                 return true;
             }
             else{
-                printf("type mismatch: %s at line %d\n", name, lineno);
-                return false;
+                // IDs type is ID
+                // we want to check the ID type
+                if(strcmp(id_node-> type, "ID")==0){
+                    // get the type of the ID from the symbol table
+                    for (int j =0; j<=symbol_table_idx; j++){
+                        // get the variable in this scope
+                        if(strcmp(symbol_table[j]-> name, id_node -> value.id_value)==0){
+                            if(strcmp(symbol_table[i]-> type, symbol_table[j]-> type)==0){
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else{
+                    printf("type mismatch: %s at line %d\n", name, lineno);
+                    return false;
+                }
+                
             }
+        }
+        else{
         }
     }
 }
@@ -452,7 +485,6 @@ void set_initialized(char* name, int scope){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
             symbol_table[i]-> is_initialized = true;
-            printf("%s  %c", name, symbol_table[i]-> is_initialized);
         }
     }
 }
@@ -464,9 +496,11 @@ bool is_initialized(char* name, int scope){
             if(symbol_table[i]-> is_initialized){
                 return true;
             }
-            // used before initializing (ERROR)
-            printf("trying to use variable before initializing %s at line %d\n\n",name, lineno);
-            return false;
+            else{
+                // used before initializing (ERROR)
+                printf("trying to use variable before initializing %s at line %d\n",name, lineno);
+                return false;
+            }
         }
     }
 }
@@ -482,7 +516,7 @@ void set_used(char* name, int scope){
 
 bool is_all_used(){
     for (int i =0; i<=symbol_table_idx; i++){
-        if(symbol_table[i]-> is_used == false){
+        if(symbol_table[i] && symbol_table[i]-> is_used == false){
             return false;
         }
     }
@@ -495,7 +529,7 @@ int main (int argc, char *argv[]){
     yyparse();
     fclose(yyin);
     if(!is_all_used()){
-        printf("Not all variables used\n");
+      printf("Not all variables used\n");
     }
     return 0;
 }

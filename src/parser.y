@@ -45,6 +45,8 @@
     bool is_redeclared(char *name, int scope);
     // to prevent type mismatch
     bool is_same_type(char *name, int scope, Node* id_node);
+    // check if we are assigning a value to const
+    bool is_const(char *name, int scope);
 %}
 
 %union { 
@@ -147,7 +149,7 @@ stmt:
                                                 is_same_type($3, current_scope, $5);
                                                 // set initialized ($1)
                                                 // insert the symbol
-                                                insert_symbol($3, $2->type, false, current_scope);
+                                                insert_symbol($3, $2->type, true, current_scope);
                                                 }				
         
         /*Assignment statements*/
@@ -155,6 +157,7 @@ stmt:
                                             // check declared or not ($1)
                                             is_correct_scope($1, current_scope);
                                             // check if constant
+                                            is_const($1, current_scope);
                                             // check type matching ($1)
                                             is_same_type($1, current_scope, $3);
                                             // set initialized ($1)
@@ -369,6 +372,21 @@ bool is_same_type(char *name, int scope, Node* id_node){
         }
     }
 }
+
+bool is_const(char *name, int scope){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
+            if(symbol_table[i]-> is_const){
+                // const (ERROR)
+                printf("trying to modify const variable %s",name);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");

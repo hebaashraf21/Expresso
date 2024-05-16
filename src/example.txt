@@ -1,4 +1,4 @@
-int i ;
-i = 5 ;
+const int i = 5;
 char a = 'a';
 bool b = false;
+i = 5 ;

@@ -350,24 +350,24 @@ expr:
     | DECR expr                 		
     | expr DECR   
     | expr '+' expr	{ generate_quadruple_push_operation("ADD", $1, $3);}
-    | expr '-' expr				
-    | expr '*' expr				
-    | expr '/' expr				
-    | expr '^' expr				
-    | expr '%' expr				
+    | expr '-' expr	{ generate_quadruple_push_operation("SUB", $1, $3);}			
+    | expr '*' expr { generate_quadruple_push_operation("MUL", $1, $3);}				
+    | expr '/' expr	{ generate_quadruple_push_operation("DIV", $1, $3);}			
+    | expr '^' expr	{ generate_quadruple_push_operation("POW", $1, $3);}			
+    | expr '%' expr	{ generate_quadruple_push_operation("MOD", $1, $3);}			
      
      /* logical expressions */
     | expr LOGICAL_AND expr			
     | expr LOGICAL_OR expr			
-    | LOGICAL_NOT expr			
+    | LOGICAL_NOT expr		
      
      /* comparison expressions */
-    | expr EQUALS expr			
-    | expr NOT_EQUALS expr			
-    | expr LESS_THAN expr			
-    | expr LESS_THAN_OR_EQUALS expr		
-    | expr GREATER_THAN expr			
-    | expr GREATER_THAN_OR_EQUALS expr 	 
+    | expr EQUALS expr		          
+    | expr NOT_EQUALS expr	            		
+    | expr LESS_THAN expr	           	
+    | expr LESS_THAN_OR_EQUALS expr	   	
+    | expr GREATER_THAN expr		    
+    | expr GREATER_THAN_OR_EQUALS expr 	
     ;
 %%
 

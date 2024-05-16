@@ -1,3 +1,11 @@
-int a;
+float a;
 a=2.5+3.0;
+int b = 5 - 6;
+int h = 4*5;
+int i=6/3;
+int j=25%5;
+int k=2^2;
+
+
+
 

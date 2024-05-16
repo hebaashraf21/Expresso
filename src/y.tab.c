@@ -1955,10 +1955,45 @@ yyreduce:
     { generate_quadruple_push_operation("ADD", (yyvsp[(1) - (3)].node_value), (yyvsp[(3) - (3)].node_value));}
     break;
 
+  case 53:
+
+/* Line 1455 of yacc.c  */
+#line 353 "parser.y"
+    { generate_quadruple_push_operation("SUB", (yyvsp[(1) - (3)].node_value), (yyvsp[(3) - (3)].node_value));}
+    break;
+
+  case 54:
+
+/* Line 1455 of yacc.c  */
+#line 354 "parser.y"
+    { generate_quadruple_push_operation("MUL", (yyvsp[(1) - (3)].node_value), (yyvsp[(3) - (3)].node_value));}
+    break;
+
+  case 55:
+
+/* Line 1455 of yacc.c  */
+#line 355 "parser.y"
+    { generate_quadruple_push_operation("DIV", (yyvsp[(1) - (3)].node_value), (yyvsp[(3) - (3)].node_value));}
+    break;
+
+  case 56:
+
+/* Line 1455 of yacc.c  */
+#line 356 "parser.y"
+    { generate_quadruple_push_operation("POW", (yyvsp[(1) - (3)].node_value), (yyvsp[(3) - (3)].node_value));}
+    break;
+
+  case 57:
+
+/* Line 1455 of yacc.c  */
+#line 357 "parser.y"
+    { generate_quadruple_push_operation("MOD", (yyvsp[(1) - (3)].node_value), (yyvsp[(3) - (3)].node_value));}
+    break;
+
 
 
 /* Line 1455 of yacc.c  */
-#line 1962 "y.tab.c"
+#line 1997 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2329,13 +2364,7 @@ void generate_quadruple_push_operation(char* operation, Node* operand1, Node* op
     } else if (strcmp(operand1->type, "FLOAT") == 0) {
         sprintf(quadruples[quad_idx].operand1, "%f", operand1->value.float_value);
         sprintf(quadruples[quad_idx].operand2, "%f", operand2->value.float_value);
-    } else if (strcmp(operand1->type, "CHAR") == 0) {
-        // Handle char operations as per your requirement
-    } else if (strcmp(operand1->type, "BOOL") == 0) {
-        // Handle bool operations as per your requirement
-    } else if (strcmp(operand1->type, "STRING") == 0) {
-        // Handle string operations as per your requirement
-    }
+    } 
 
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");

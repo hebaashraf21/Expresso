@@ -124,16 +124,16 @@
     // check if a variable is initialized before using
     bool is_initialized(char* name, int scope);
 
+    // Define the quadruple struct
     typedef struct Quadruple {
-    char operator[20];
-    char operand1[20];
-    char operand2[20];
-    char result[20];
+        char* operation;
+        char* operand1;
+        char* operand2;
+        char* result;
     } Quadruple;
 
-
     Quadruple quadruples[1000];
-    int quadIndex = 0;
+    int quad_idx = -1;
 
 
 /* Line 189 of yacc.c  */
@@ -503,7 +503,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  13
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  67
+#define YYNRULES  66
 /* YYNRULES -- Number of states.  */
 #define YYNSTATES  172
 
@@ -559,8 +559,8 @@ static const yytype_uint16 yyprhs[] =
      115,   124,   130,   132,   134,   136,   138,   140,   142,   144,
      149,   152,   153,   155,   159,   160,   163,   168,   174,   176,
      178,   180,   182,   184,   186,   188,   190,   194,   197,   200,
-     203,   206,   209,   210,   214,   218,   222,   226,   230,   234,
-     238,   242,   245,   249,   253,   257,   261,   265
+     203,   206,   209,   213,   217,   221,   225,   229,   233,   237,
+     241,   244,   248,   252,   256,   260,   264
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
@@ -586,13 +586,13 @@ static const yytype_int8 yyrhs[] =
       33,    63,    30,    -1,    38,    -1,    39,    -1,    40,    -1,
       35,    -1,    34,    -1,    36,    -1,    37,    -1,    71,    -1,
       24,    72,    25,    -1,    53,    72,    -1,    41,    72,    -1,
-      72,    41,    -1,    42,    72,    -1,    72,    42,    -1,    -1,
-      72,    52,    72,    -1,    72,    53,    72,    -1,    72,    54,
-      72,    -1,    72,    55,    72,    -1,    72,    57,    72,    -1,
-      72,    56,    72,    -1,    72,    45,    72,    -1,    72,    44,
-      72,    -1,    58,    72,    -1,    72,    47,    72,    -1,    72,
-      46,    72,    -1,    72,    51,    72,    -1,    72,    50,    72,
-      -1,    72,    49,    72,    -1,    72,    48,    72,    -1
+      72,    41,    -1,    42,    72,    -1,    72,    42,    -1,    72,
+      52,    72,    -1,    72,    53,    72,    -1,    72,    54,    72,
+      -1,    72,    55,    72,    -1,    72,    57,    72,    -1,    72,
+      56,    72,    -1,    72,    45,    72,    -1,    72,    44,    72,
+      -1,    58,    72,    -1,    72,    47,    72,    -1,    72,    46,
+      72,    -1,    72,    51,    72,    -1,    72,    50,    72,    -1,
+      72,    49,    72,    -1,    72,    48,    72,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
@@ -603,8 +603,8 @@ static const yytype_uint16 yyrline[] =
      208,   211,   212,   213,   218,   219,   220,   221,   222,   227,
      239,   248,   250,   251,   255,   257,   262,   266,   270,   271,
      273,   281,   282,   283,   284,   288,   291,   294,   295,   296,
-     297,   298,   299,   299,   312,   313,   314,   315,   316,   319,
-     320,   321,   324,   325,   326,   327,   328,   329
+     297,   298,   299,   316,   317,   318,   319,   320,   323,   324,
+     325,   328,   329,   330,   331,   332,   333
 };
 #endif
 
@@ -651,7 +651,7 @@ static const yytype_uint8 yyr1[] =
       66,    67,    67,    67,    68,    68,    69,    70,    71,    71,
       71,    71,    71,    71,    71,    72,    72,    72,    72,    72,
       72,    72,    72,    72,    72,    72,    72,    72,    72,    72,
-      72,    72,    72,    72,    72,    72,    72,    72
+      72,    72,    72,    72,    72,    72,    72
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -662,8 +662,8 @@ static const yytype_uint8 yyr2[] =
        8,     5,     1,     1,     1,     1,     1,     1,     1,     4,
        2,     0,     1,     3,     0,     2,     4,     5,     1,     1,
        1,     1,     1,     1,     1,     1,     3,     2,     2,     2,
-       2,     2,     0,     3,     3,     3,     3,     3,     3,     3,
-       3,     2,     3,     3,     3,     3,     3,     3
+       2,     2,     3,     3,     3,     3,     3,     3,     3,     3,
+       2,     3,     3,     3,     3,     3,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -673,20 +673,20 @@ static const yytype_uint8 yydefact[] =
 {
        3,     0,     0,     0,     0,    23,    22,     0,     0,     0,
       24,    25,    26,    28,    27,     0,     0,     6,     0,     0,
-       2,     4,     0,    52,    52,    52,     0,     0,     0,     0,
-       0,     0,    31,    52,     1,     5,     0,    52,    42,    41,
-      43,    44,    38,    39,    40,    52,    52,    52,    52,    45,
+       2,     4,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    31,     0,     1,     5,     0,     0,    42,    41,
+      43,    44,    38,    39,    40,     0,     0,     0,     0,    45,
        0,     0,     0,     0,     0,     0,     0,    31,     0,    18,
-       0,    32,     0,     0,    31,     7,    52,     0,    48,    50,
-      47,    61,     0,    49,    51,    52,    52,    52,    52,    52,
-      52,    52,    52,    52,    52,    52,    52,    52,    52,     0,
-       0,     0,    52,     0,     0,     0,    52,    30,     0,     0,
-      10,     0,     0,    46,    11,    60,    59,    63,    62,    67,
-      66,    65,    64,    53,    54,    55,    56,    58,    57,     0,
-       0,    52,     0,    34,     0,     0,     0,    21,    33,     0,
-       8,     0,     0,    29,     0,     0,    52,     0,     9,     0,
-      13,    14,     0,    52,     0,     0,    35,     0,     0,     0,
-       0,    52,     0,     0,    17,     0,    19,    20,     0,     0,
+       0,    32,     0,     0,    31,     7,     0,     0,    48,    50,
+      47,    60,     0,    49,    51,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    30,     0,     0,
+      10,     0,     0,    46,    11,    59,    58,    62,    61,    66,
+      65,    64,    63,    52,    53,    54,    55,    57,    56,     0,
+       0,     0,     0,    34,     0,     0,     0,    21,    33,     0,
+       8,     0,     0,    29,     0,     0,     0,     0,     9,     0,
+      13,    14,     0,     0,     0,     0,    35,     0,     0,     0,
+       0,     0,     0,     0,    17,     0,    19,    20,     0,     0,
        0,     0,    16,     0,     0,     0,    36,    12,     0,    37,
        0,    15
 };
@@ -1895,29 +1895,32 @@ yyreduce:
     {(yyval.node_value) = insert_node("STRING");}
     break;
 
-  case 53:
+  case 52:
 
 /* Line 1455 of yacc.c  */
 #line 299 "parser.y"
     {
-    // Generate quadruple
-    Quadruple quad;
-    strcpy(quad.operator, "+");
-    strcpy(quad.operand1, (yyvsp[(1) - (3)].node_value)->node_value->result); // Modified line
-    strcpy(quad.operand2, (yyvsp[(3) - (3)].node_value)->node_value->result); // Modified line
-    sprintf(quad.result, "t%d", quadIndex++);
-    quadruples[quadIndex] = quad;
-    
-    // Update $$ with the result of the operation
-    (yyval.node_value)->node_value = insert_node("EXPR"); // Make sure $$ is initialized with a node
-    strcpy((yyval.node_value)->node_value->result, quad.result); // Modified line
+    // Generate quadruple for addition
+    quad_idx++;
+    quadruples[quad_idx].operation = "+";
+    quadruples[quad_idx].operand1 = (yyvsp[(1) - (3)].node_value)->type;
+    quadruples[quad_idx].operand2 = (yyvsp[(3) - (3)].node_value)->type;
+    quadruples[quad_idx].result = "t1"; // Assuming temporary variable t1 is used
+    (yyval.node_value) = insert_node("TEMP"); // Update the current node value
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+    fprintf(quad_file, "ADD\n");
+    fprintf(quad_file, "pop %s\n", quadruples[quad_idx].result);
+    fclose(quad_file);
 }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1921 "y.tab.c"
+#line 1924 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2129,7 +2132,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 331 "parser.y"
+#line 335 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, int scope){
@@ -2246,27 +2249,12 @@ bool is_initialized(char* name, int scope){
         }
     }
 }
-void writeQuadruplesToFile(const char* filename) {
-    FILE* file = fopen(filename, "w");
-    if (file == NULL) {
-        printf("Error opening file for writing quadruples.\n");
-        return;
-    }
-    
-    for (int i = 0; i < quadIndex; i++) {
-        Quadruple quad = quadruples[i];
-        fprintf(file, "%s, %s, %s, %s\n", quad.operator, quad.operand1, quad.operand2, quad.result);
-    }
-    
-    fclose(file);
-}
 
 int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");
     yyparse();
     fclose(yyin);
-    writeQuadruplesToFile("quadruples.txt");
 
     return 0;
 }

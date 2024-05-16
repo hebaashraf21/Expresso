@@ -52,6 +52,17 @@
     void set_initialized(char* name, int scope);
     // check if a variable is initialized before using
     bool is_initialized(char* name, int scope);
+
+    // Define the quadruple struct
+    typedef struct Quadruple {
+        char* operation;
+        char* operand1;
+        char* operand2;
+        char* result;
+    } Quadruple;
+
+    Quadruple quadruples[1000];
+    int quad_idx = -1;
 %}
 
 %union { 
@@ -285,7 +296,23 @@ expr:
     | expr INCR                 		
     | DECR expr                 		
     | expr DECR                 		
-    | expr '+' expr				
+    | expr '+' expr {
+    // Generate quadruple for addition
+    quad_idx++;
+    quadruples[quad_idx].operation = "+";
+    quadruples[quad_idx].operand1 = $1->type;
+    quadruples[quad_idx].operand2 = $3->type;
+    quadruples[quad_idx].result = "t1"; // Assuming temporary variable t1 is used
+    $$ = insert_node("TEMP"); // Update the current node value
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+    fprintf(quad_file, "ADD\n");
+    fprintf(quad_file, "pop %s\n", quadruples[quad_idx].result);
+    fclose(quad_file);
+}  
+  			
     | expr '-' expr				
     | expr '*' expr				
     | expr '/' expr				

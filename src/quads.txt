@@ -1,0 +1,4 @@
+push INT
+push INT
+ADD
+pop t1

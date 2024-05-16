@@ -164,6 +164,18 @@ stmt:
                                                 is_same_type($2, current_scope, $4);
                                                 // set initialized
                                                 set_initialized($2, current_scope);
+
+                                                // Generate quadruple for assignment
+                                                quad_idx++;
+                                                quadruples[quad_idx].operation = "pop";
+                                                quadruples[quad_idx].operand1 = $2; // Assuming $1 is the identifier (variable name)
+                                                quadruples[quad_idx].operand2 = NULL;
+                                                quadruples[quad_idx].result = NULL;
+
+                                                // Output the quadruple to a file
+                                                FILE *quad_file = fopen("quads.txt", "a");
+                                                fprintf(quad_file, "pop %s\n", $2);
+                                                fclose(quad_file);
                                                 }
         
         /*Constant declaration*/
@@ -176,6 +188,18 @@ stmt:
                                                 set_initialized($3, current_scope);
                                                 // insert the symbol
                                                 insert_symbol($3, $2->type, true, current_scope);
+
+                                                // Generate quadruple for assignment
+                                                quad_idx++;
+                                                quadruples[quad_idx].operation = "pop";
+                                                quadruples[quad_idx].operand1 = $3; // Assuming $1 is the identifier (variable name)
+                                                quadruples[quad_idx].operand2 = NULL;
+                                                quadruples[quad_idx].result = NULL;
+
+                                                // Output the quadruple to a file
+                                                FILE *quad_file = fopen("quads.txt", "a");
+                                                fprintf(quad_file, "pop %s\n", $3);
+                                                fclose(quad_file);
                                                 }				
         
         /*Assignment statements*/
@@ -188,6 +212,18 @@ stmt:
                                             is_same_type($1, current_scope, $3);
                                             // set initialized ($1)
                                             set_initialized($1, current_scope);
+
+                                            // Generate quadruple for assignment
+                                            quad_idx++;
+                                            quadruples[quad_idx].operation = "pop";
+                                            quadruples[quad_idx].operand1 = $1; // Assuming $1 is the identifier (variable name)
+                                            quadruples[quad_idx].operand2 = NULL;
+                                            quadruples[quad_idx].result = NULL;
+
+                                            // Output the quadruple to a file
+                                            FILE *quad_file = fopen("quads.txt", "a");
+                                            fprintf(quad_file, "pop %s\n", $1);
+                                            fclose(quad_file);
                                             }
         
         /*Print Statement*/
@@ -350,16 +386,12 @@ expr:
                             sprintf(quadruples[quad_idx].operand1, "%d", $1->value.int_value);
                             quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
                             sprintf(quadruples[quad_idx].operand2, "%d", $3->value.int_value);
-                            quadruples[quad_idx].result = "t1"; // Assuming temporary variable t1 is used
-                            Value temp_value;
-                            temp_value.str_value = "t1"; // Assuming temporary variable t1 is used
-                            $$ = insert_node("TEMP", temp_value);
+            
                             // Output the quadruple to a file
                             FILE *quad_file = fopen("quads.txt", "a");
                             fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
                             fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
                             fprintf(quad_file, "ADD\n");
-                            fprintf(quad_file, "pop %s\n", quadruples[quad_idx].result);
                             fclose(quad_file);
                         }
     | expr '-' expr				

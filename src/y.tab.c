@@ -605,13 +605,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   137,   137,   138,   143,   144,   149,   151,   158,   170,
-     182,   194,   198,   199,   202,   203,   204,   207,   210,   214,
-     215,   218,   219,   220,   225,   228,   232,   236,   240,   248,
-     260,   269,   271,   272,   276,   278,   283,   287,   291,   296,
-     302,   311,   316,   321,   326,   334,   337,   340,   341,   342,
-     343,   344,   345,   365,   366,   367,   368,   369,   372,   373,
-     374,   377,   378,   379,   380,   381,   382
+       0,   137,   137,   138,   143,   144,   149,   151,   158,   182,
+     206,   230,   234,   235,   238,   239,   240,   243,   246,   250,
+     251,   254,   255,   256,   261,   264,   268,   272,   276,   284,
+     296,   305,   307,   308,   312,   314,   319,   323,   327,   332,
+     338,   347,   352,   357,   362,   370,   373,   376,   377,   378,
+     379,   380,   381,   397,   398,   399,   400,   401,   404,   405,
+     406,   409,   410,   411,   412,   413,   414
 };
 #endif
 
@@ -1749,13 +1749,25 @@ yyreduce:
                                                 is_same_type((yyvsp[(2) - (5)].identifier), current_scope, (yyvsp[(4) - (5)].node_value));
                                                 // set initialized
                                                 set_initialized((yyvsp[(2) - (5)].identifier), current_scope);
+
+                                                // Generate quadruple for assignment
+                                                quad_idx++;
+                                                quadruples[quad_idx].operation = "pop";
+                                                quadruples[quad_idx].operand1 = (yyvsp[(2) - (5)].identifier); // Assuming $1 is the identifier (variable name)
+                                                quadruples[quad_idx].operand2 = NULL;
+                                                quadruples[quad_idx].result = NULL;
+
+                                                // Output the quadruple to a file
+                                                FILE *quad_file = fopen("quads.txt", "a");
+                                                fprintf(quad_file, "pop %s\n", (yyvsp[(2) - (5)].identifier));
+                                                fclose(quad_file);
                                                 }
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 170 "parser.y"
+#line 182 "parser.y"
     {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[(3) - (6)].identifier),current_scope);
@@ -1765,13 +1777,25 @@ yyreduce:
                                                 set_initialized((yyvsp[(3) - (6)].identifier), current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[(3) - (6)].identifier), (yyvsp[(2) - (6)].node_value)->type, true, current_scope);
+
+                                                // Generate quadruple for assignment
+                                                quad_idx++;
+                                                quadruples[quad_idx].operation = "pop";
+                                                quadruples[quad_idx].operand1 = (yyvsp[(3) - (6)].identifier); // Assuming $1 is the identifier (variable name)
+                                                quadruples[quad_idx].operand2 = NULL;
+                                                quadruples[quad_idx].result = NULL;
+
+                                                // Output the quadruple to a file
+                                                FILE *quad_file = fopen("quads.txt", "a");
+                                                fprintf(quad_file, "pop %s\n", (yyvsp[(3) - (6)].identifier));
+                                                fclose(quad_file);
                                                 }
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 182 "parser.y"
+#line 206 "parser.y"
     {
                                             // check declared or not ($1)
                                             is_correct_scope((yyvsp[(1) - (4)].identifier), current_scope);
@@ -1781,13 +1805,25 @@ yyreduce:
                                             is_same_type((yyvsp[(1) - (4)].identifier), current_scope, (yyvsp[(3) - (4)].node_value));
                                             // set initialized ($1)
                                             set_initialized((yyvsp[(1) - (4)].identifier), current_scope);
+
+                                            // Generate quadruple for assignment
+                                            quad_idx++;
+                                            quadruples[quad_idx].operation = "pop";
+                                            quadruples[quad_idx].operand1 = (yyvsp[(1) - (4)].identifier); // Assuming $1 is the identifier (variable name)
+                                            quadruples[quad_idx].operand2 = NULL;
+                                            quadruples[quad_idx].result = NULL;
+
+                                            // Output the quadruple to a file
+                                            FILE *quad_file = fopen("quads.txt", "a");
+                                            fprintf(quad_file, "pop %s\n", (yyvsp[(1) - (4)].identifier));
+                                            fclose(quad_file);
                                             }
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 225 "parser.y"
+#line 261 "parser.y"
     {
                             struct Value value;
                             (yyval.node_value) = insert_node("INT", value);}
@@ -1796,7 +1832,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 228 "parser.y"
+#line 264 "parser.y"
     {
                             struct Value value;
                             (yyval.node_value) = insert_node("FLOAT", value);
@@ -1806,7 +1842,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 232 "parser.y"
+#line 268 "parser.y"
     {
                             struct Value value;
                             (yyval.node_value) = insert_node("CHAR", value);
@@ -1816,7 +1852,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 236 "parser.y"
+#line 272 "parser.y"
     {
                             struct Value value;
                             (yyval.node_value) = insert_node("STRING", value);
@@ -1826,7 +1862,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 240 "parser.y"
+#line 276 "parser.y"
     {
                             struct Value value;
                             (yyval.node_value) = insert_node("BOOL", value);
@@ -1836,7 +1872,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 248 "parser.y"
+#line 284 "parser.y"
     {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[(2) - (4)].identifier),current_scope);
@@ -1852,7 +1888,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 260 "parser.y"
+#line 296 "parser.y"
     {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[(2) - (2)].identifier),current_scope);
@@ -1864,7 +1900,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 291 "parser.y"
+#line 327 "parser.y"
     {
                             Value value;
                             value.bool_value = true;
@@ -1875,7 +1911,7 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 296 "parser.y"
+#line 332 "parser.y"
     {
                             Value value;
                             value.bool_value = false;
@@ -1886,7 +1922,7 @@ yyreduce:
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 302 "parser.y"
+#line 338 "parser.y"
     {
                             // check declared
                             is_correct_scope((yyvsp[(1) - (1)].identifier), current_scope);
@@ -1900,7 +1936,7 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 311 "parser.y"
+#line 347 "parser.y"
     {
                             Value value;
                             value.int_value = (yyvsp[(1) - (1)].int_value);
@@ -1911,7 +1947,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 316 "parser.y"
+#line 352 "parser.y"
     {
                             Value value;
                             value.float_value = (yyvsp[(1) - (1)].float_value);
@@ -1922,7 +1958,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 321 "parser.y"
+#line 357 "parser.y"
     {
                             Value value;
                             value.char_value = (yyvsp[(1) - (1)].char_value);
@@ -1933,7 +1969,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 326 "parser.y"
+#line 362 "parser.y"
     {
                             Value value;
                             value.str_value = (yyvsp[(1) - (1)].str_value);
@@ -1944,7 +1980,7 @@ yyreduce:
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 345 "parser.y"
+#line 381 "parser.y"
     {
                             // Generate quadruple for addition
                             quad_idx++;
@@ -1953,16 +1989,12 @@ yyreduce:
                             sprintf(quadruples[quad_idx].operand1, "%d", (yyvsp[(1) - (3)].node_value)->value.int_value);
                             quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
                             sprintf(quadruples[quad_idx].operand2, "%d", (yyvsp[(3) - (3)].node_value)->value.int_value);
-                            quadruples[quad_idx].result = "t1"; // Assuming temporary variable t1 is used
-                            Value temp_value;
-                            temp_value.str_value = "t1"; // Assuming temporary variable t1 is used
-                            (yyval.node_value) = insert_node("TEMP", temp_value);
+            
                             // Output the quadruple to a file
                             FILE *quad_file = fopen("quads.txt", "a");
                             fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
                             fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
                             fprintf(quad_file, "ADD\n");
-                            fprintf(quad_file, "pop %s\n", quadruples[quad_idx].result);
                             fclose(quad_file);
                         }
     break;
@@ -1970,7 +2002,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1974 "y.tab.c"
+#line 2006 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2182,7 +2214,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 384 "parser.y"
+#line 416 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, int scope){

@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	#include <math.h>
     #include <stdbool.h> 
-	void yyerror();
+	void yyerror(const char *);
 	extern int yylex(void);
 	extern FILE *yyin;
     extern FILE *yyout;
@@ -63,7 +63,7 @@
 %%
 
 program:
-        statements '\n'
+        statements
         | /* NULL */
         ;
 
@@ -205,15 +205,14 @@ expr :
 int main (int argc, char *argv[]){
 
     // parsing
-    int flag;
     yyin = fopen(argv[1], "r");
-    flag = yyparse();
+    yyparse();
     fclose(yyin);
 
-    return flag;
+    return 0;
 }
 
-void yyerror ()
+void yyerror(char const *s)
 {
-  fprintf(stderr, "Syntax error at line %d\n", lineno);
+    fprintf(stderr, "%s at line %d\n", s, lineno);
 }

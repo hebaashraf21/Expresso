@@ -1,17 +1,14 @@
-%option noyywrap
 %{
 #include <stdio.h>
 #include <stdbool.h> 
 #include "y.tab.h" 
-#include "symbol_table.c"
-void yyerror();
+// In the event of syntax errors yacc calls the user-supplied function yyerror.
+void yyerror(char *);
 extern FILE *yyin;
 extern FILE *yyout;
 int lineno = 1; // initialize to 1
 %}
-
 %option noyywrap
-
 
 %%
 
@@ -120,7 +117,6 @@ int lineno = 1; // initialize to 1
 [a-zA-Z_][a-zA-Z0-9_]* {
 						printf("IDENTIFIER: %s\n", yytext);
 						yylval.identifier = strdup(yytext);
-						insert(yytext, UNDEFINED, lineno);
 						return IDENTIFIER; 
 					}
 
@@ -138,8 +134,7 @@ int lineno = 1; // initialize to 1
 . 			yyerror("invalid token");
 %%
 
-int my_wrap()
+int mywrap()
 {
     return 1;
 }
-

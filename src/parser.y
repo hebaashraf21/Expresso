@@ -40,6 +40,7 @@
     Symbol *symbol_table [Symbol_TABLE_SIZE];
     int symbol_table_idx = -1;
     int current_scope = 0;
+    int scope_index = 0;
     void insert_symbol(char *name, char *type, bool is_const, int scope);
     Node* insert_node(char *type, Value value);
     // to check peoper use
@@ -58,6 +59,10 @@
     void set_used(char* name, int scope);
     // check all variables are used
     bool is_all_used();
+
+    // to deal with nested blocks
+    void enter_scope();
+    void exit_scope();
 %}
 
 %union { 
@@ -140,14 +145,14 @@ stmt:
                                                 // check multiple declaration
                                                 is_redeclared($2,current_scope);
                                                 // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
+                                                insert_symbol($2, $1->type, false, scope_index);
                                                 }
 
         | datatype IDENTIFIER '=' expr ';'      {
                                                 // check multiple declaration
                                                 is_redeclared($2,current_scope);
                                                 // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
+                                                insert_symbol($2, $1->type, false, scope_index);
                                                 // check type matching
                                                 is_same_type($2, current_scope, $4);
                                                 // set initialized
@@ -159,7 +164,7 @@ stmt:
                                                 // check multiple declaration
                                                 is_redeclared($3,current_scope);
                                                 // insert the symbol
-                                                insert_symbol($3, $2->type, true, current_scope);
+                                                insert_symbol($3, $2->type, true, scope_index);
                                                 // check type matching
                                                 is_same_type($3, current_scope, $5);
                                                 // set initialized
@@ -183,24 +188,24 @@ stmt:
             
         
         /*Conditional Statements*/
-        | IF '(' expr ')' '{' statements '}' ELSE '{' statements '}'
-        | IF '(' expr ')' '{' statements '}'
+        | IF '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();} ELSE '{' {enter_scope();} statements '}' {exit_scope();}
+        | IF '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();} {exit_scope();}
         
         /*Loops*/
-        | WHILE '(' expr ')' '{' statements '}'
-        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' statements '}'
-        | REPEAT '{' statements '}' UNTIL '(' expr ')' ';'
+        | WHILE '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();}
+        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_scope();} statements '}' {exit_scope();}
+        | REPEAT '{' {enter_scope();} statements '}' {exit_scope();} UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
-        | SWITCH '(' IDENTIFIER ')' '{' case_list default_case '}'
+        | SWITCH '(' IDENTIFIER ')' '{' {enter_scope();} case_list default_case '}' {exit_scope();}
         
         /*Block Strusture*/
-        | '{' statements '}'
+        | '{' {enter_scope();} statements '}' {exit_scope();}
         
         
         /*Functions Definition*/   
-        | VOID IDENTIFIER '(' parameters_list ')' '{' statements '}'
-        | datatype IDENTIFIER '(' parameters_list ')' '{' statements '}'
+        | VOID IDENTIFIER '(' parameters_list ')' '{' {enter_scope();} statements '}' {exit_scope();}
+        | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_scope();} statements '}' {exit_scope();}
         
         /*Functions Call*/   
         | IDENTIFIER '(' parameters_list ')' ';'
@@ -238,7 +243,7 @@ assignment:
                                                 // check multiple declaration
                                                 is_redeclared($2,current_scope);
                                                 // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
+                                                insert_symbol($2, $1->type, false, scope_index);
                                                 // check type matching
                                                 is_same_type($2, current_scope, $4);
                                                 // set initialized
@@ -250,7 +255,7 @@ var_declaration:
                                                 // check multiple declaration
                                                 is_redeclared($2,current_scope);
                                                 // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
+                                                insert_symbol($2, $1->type, false, scope_index);
                                                 }
 		;
 
@@ -281,7 +286,8 @@ terminals:
                             Value value;
                             value.bool_value = true;
                             $$ = insert_node("BOOL", value);
-                            }			
+                            }	
+
     | FALSE_VAL	            {
                             Value value;
                             value.bool_value = false;
@@ -305,17 +311,20 @@ terminals:
                             Value value;
                             value.int_value = $1;
                             $$ = insert_node("INT", value);
-                            }			
+                            }	
+
     | FLOAT_VAL		        {
                             Value value;
                             value.float_value = $1;
                             $$ = insert_node("FLOAT", value);
-                            }		
+                            }	
+
     | CHAR_VAL				{
                             Value value;
                             value.char_value = $1;
                             $$ = insert_node("CHAR", value);
                             }
+
     | STRING_VAL            {
                             Value value;
                             value.str_value = $1;
@@ -521,6 +530,17 @@ bool is_all_used(){
         }
     }
     return true;
+}
+
+void enter_scope(){
+    scope_index++;
+    current_scope++;
+    printf("scope_index %d\n", scope_index);
+}
+
+void exit_scope(){
+    current_scope--;
+    printf("current_scope %d\n", current_scope);
 }
 
 int main (int argc, char *argv[]){

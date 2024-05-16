@@ -2,6 +2,8 @@
 	#include <stdio.h>
 	#include <math.h>
     #include <stdbool.h> 
+    #include <string.h>
+
 	void yyerror(const char *);
 	extern int yylex(void);
 	extern FILE *yyin;
@@ -27,14 +29,20 @@
         char *type;
         Value value;
         bool is_const;
+        int scope;
     }Symbol;
 
     Symbol *symbol_table [Symbol_TABLE_SIZE];
     int symbol_table_idx = -1;
-    int hash_function(char *key);
-    void insert_symbol(char *name, char *type, bool is_const);
+    int current_scope = 0;
+    int get_symbol_index(char *name);
+    void insert_symbol(char *name, char *type, bool is_const, int scope);
     Node* insert_node(char *type);
-
+    // to check peoper use
+    int is_correct_scope(char *name, int scope);
+    // to prevent redeclaration
+    bool is_redeclared(char *name, int scope);
+    
 %}
 
 %union { 
@@ -91,6 +99,7 @@
 
 // types of non terminals
 %type <node_value> datatype
+%type <node_value> values
 
 // starting point of parsing
 %start program
@@ -111,17 +120,36 @@ statements:
 stmt:
 	 ';'  
 	 /*Variables declaration*/
-        | datatype IDENTIFIER ';'
-        | datatype IDENTIFIER '=' expr ';'
+        | datatype IDENTIFIER ';'               {
+                                                // check multiple declaration
+                                                // insert the symbol
+                                                insert_symbol($2, $1->type, false, current_scope);
+                                                }
+
+        | datatype IDENTIFIER '=' expr ';'      {
+                                                // check multiple declaration
+                                                // insert the symbol
+                                                insert_symbol($2, $1->type, false, current_scope);
+                                                // check type matching
+                                                }
         
         /*Constant declaration*/
-        | CONST datatype IDENTIFIER '=' expr ';'
-	
-	/*expressions*/                          
-        | expr ';' 				
+        | CONST datatype IDENTIFIER '=' expr ';' {
+                                                // check multiple declaration
+                                                // check type matching
+                                                // set initialized ($1)
+                                                // insert the symbol
+                                                insert_symbol($3, $2->type, false, current_scope);
+                                                }				
         
         /*Assignment statements*/
-        | IDENTIFIER '=' expr ';'		
+        | IDENTIFIER '=' expr ';'		    {
+                                            // check declared or not ($1)
+                                            is_correct_scope($1, current_scope);
+                                            // check if constant
+                                            // check type matching ($1)
+                                            // set initialized ($1)
+                                            }
         
         /*Print Statement*/
         | PRINT '(' expr ')' ';'                 
@@ -154,7 +182,8 @@ stmt:
         ;	
 	
 	
-datatype:   INTEGER         {$$ = insert_node("INT");}
+datatype:   
+        INTEGER             {$$ = insert_node("INT");}
       | FLOAT               {$$ = insert_node("FLOAT");}
       | CHAR                {$$ = insert_node("CHAR");}
       | STRING              {$$ = insert_node("STRING");}
@@ -163,11 +192,19 @@ datatype:   INTEGER         {$$ = insert_node("INT");}
 
 
 assignment:
-	datatype IDENTIFIER '=' expr 
-
+	datatype IDENTIFIER '=' expr                {
+                                                // check multiple declaration
+                                                // check type matching
+                                                // insert the symbol
+                                                insert_symbol($2, $1->type, false, current_scope);
+                                                }
 
 var_declaration: 
-		datatype IDENTIFIER
+		datatype IDENTIFIER                     {
+                                                // check multiple declaration
+                                                // insert the symbol
+                                                insert_symbol($2, $1->type, false, current_scope);
+                                                }
 		;
 
 
@@ -192,16 +229,25 @@ case_stmt:
     CASE expr ':' stmt ';'
     ;  
 
+values: 
+      TRUE_VAL	            {$$ = insert_node("BOOL");}			
+    | FALSE_VAL	            {$$ = insert_node("BOOL");}			
+
+    | IDENTIFIER            {
+                            // check declared
+                            is_correct_scope($1, current_scope);
+                            // check initialized
+                            // set used
+                            }          
+
+    | INTEGER_VAL	        {$$ = insert_node("INT");}			
+    | FLOAT_VAL		        {$$ = insert_node("FLOAT");}		
+    | CHAR_VAL				{$$ = insert_node("CHAR");}
+    | STRING_VAL            {$$ = insert_node("STRING");}
+    ;
+    
 expr :
-    TRUE_VAL				
-    | FALSE_VAL				
-
-    | IDENTIFIER
-
-    | INTEGER_VAL				
-    | FLOAT_VAL				
-    | CHAR_VAL				
-    | STRING_VAL				
+    values				
 	
      /* (expressions) */
     | '(' expr ')'				
@@ -230,18 +276,18 @@ expr :
     | expr LESS_THAN expr			
     | expr LESS_THAN_OR_EQUALS expr		
     | expr GREATER_THAN expr			
-    | expr GREATER_THAN_OR_EQUALS expr 	
-     
-     
+    | expr GREATER_THAN_OR_EQUALS expr 	 
     ;
 %%
 
-void insert_symbol(char *name, char *type, bool is_const){
+void insert_symbol(char *name, char *type, bool is_const, int scope){
     symbol_table_idx ++;
     Symbol *new_symbol =  malloc(sizeof(Symbol));
     new_symbol -> name = name;
     new_symbol -> type = type;
     new_symbol -> is_const = is_const;
+    new_symbol -> scope = scope;
+    symbol_table[symbol_table_idx] = new_symbol;
 }
 
 Node* insert_node(char *type){
@@ -250,8 +296,52 @@ Node* insert_node(char *type){
     return new_node;
 }
 
-int main (int argc, char *argv[]){
+int get_symbol_index(char *name){
+    int index = -1;
+    for (int i =0; i<=symbol_table_idx; i++){
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
 
+int is_correct_scope(char* name, int scope){
+    bool found = false;
+    for (int i =0; i<=symbol_table_idx; i++){
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            found = true;
+            if(symbol_table[i] -> scope == scope){
+                // return 1 if all right!
+                return 1;
+            }
+        }
+    }
+    if(!found){
+        // return -1 if not declared (ERROR)
+        printf("Not Declared: %s\n", name);
+        return -1;
+    }
+    else{
+        // found = true ==> declared but wrong scope (ERROR)
+        return 0; 
+    }
+}
+
+bool is_redeclared(char* name, int scope){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
+            // redeclaration (ERROR)
+            return 0;
+        }
+    }
+    // not redeclaration
+    return 1;
+}
+
+int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");
     yyparse();

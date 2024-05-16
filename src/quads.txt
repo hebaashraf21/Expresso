@@ -1,8 +1,4 @@
-push 2
-push 3
+push 2.500000
+push 3.000000
 ADD
 pop a
-push 1
-push 4
-ADD
-pop b

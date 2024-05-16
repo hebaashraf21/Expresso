@@ -165,17 +165,7 @@ stmt:
                                                 // set initialized
                                                 set_initialized($2, current_scope);
 
-                                                // Generate quadruple for assignment
-                                                quad_idx++;
-                                                quadruples[quad_idx].operation = "pop";
-                                                quadruples[quad_idx].operand1 = $2; // Assuming $1 is the identifier (variable name)
-                                                quadruples[quad_idx].operand2 = NULL;
-                                                quadruples[quad_idx].result = NULL;
-
-                                                // Output the quadruple to a file
-                                                FILE *quad_file = fopen("quads.txt", "a");
-                                                fprintf(quad_file, "pop %s\n", $2);
-                                                fclose(quad_file);
+                                                 generate_quadruple_pop($2);
                                                 }
         
         /*Constant declaration*/
@@ -190,16 +180,7 @@ stmt:
                                                 insert_symbol($3, $2->type, true, current_scope);
 
                                                 // Generate quadruple for assignment
-                                                quad_idx++;
-                                                quadruples[quad_idx].operation = "pop";
-                                                quadruples[quad_idx].operand1 = $3; // Assuming $1 is the identifier (variable name)
-                                                quadruples[quad_idx].operand2 = NULL;
-                                                quadruples[quad_idx].result = NULL;
-
-                                                // Output the quadruple to a file
-                                                FILE *quad_file = fopen("quads.txt", "a");
-                                                fprintf(quad_file, "pop %s\n", $3);
-                                                fclose(quad_file);
+                                                 generate_quadruple_pop($3);
                                                 }				
         
         /*Assignment statements*/
@@ -213,17 +194,7 @@ stmt:
                                             // set initialized ($1)
                                             set_initialized($1, current_scope);
 
-                                            // Generate quadruple for assignment
-                                            quad_idx++;
-                                            quadruples[quad_idx].operation = "pop";
-                                            quadruples[quad_idx].operand1 = $1; // Assuming $1 is the identifier (variable name)
-                                            quadruples[quad_idx].operand2 = NULL;
-                                            quadruples[quad_idx].result = NULL;
-
-                                            // Output the quadruple to a file
-                                            FILE *quad_file = fopen("quads.txt", "a");
-                                            fprintf(quad_file, "pop %s\n", $1);
-                                            fclose(quad_file);
+                                             generate_quadruple_pop($1);
                                             }
         
         /*Print Statement*/
@@ -377,23 +348,8 @@ expr:
     | INCR expr                 		
     | expr INCR                 		
     | DECR expr                 		
-    | expr DECR                 		
-    | expr '+' expr	{
-                            // Generate quadruple for addition
-                            quad_idx++;
-                            quadruples[quad_idx].operation = "+";
-                            quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
-                            sprintf(quadruples[quad_idx].operand1, "%d", $1->value.int_value);
-                            quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
-                            sprintf(quadruples[quad_idx].operand2, "%d", $3->value.int_value);
-            
-                            // Output the quadruple to a file
-                            FILE *quad_file = fopen("quads.txt", "a");
-                            fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
-                            fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
-                            fprintf(quad_file, "ADD\n");
-                            fclose(quad_file);
-                        }
+    | expr DECR   
+    | expr '+' expr	{ generate_quadruple_push_operation("ADD", $1, $3);}
     | expr '-' expr				
     | expr '*' expr				
     | expr '/' expr				
@@ -551,6 +507,51 @@ bool is_all_used(){
     }
     return true;
 }
+
+void generate_quadruple_push_operation(char* operation, Node* operand1, Node* operand2) {
+    // Check if the operands are of the same type
+    if (strcmp(operand1->type, operand2->type) != 0) {
+        printf("Type mismatch in %s operation at line %d\n", operation, lineno);
+        exit(1);
+    }
+
+    // Generate quadruple based on the type
+    quad_idx++;
+    quadruples[quad_idx].operation = operation;
+    quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
+    quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
+
+    if (strcmp(operand1->type, "INT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%d", operand1->value.int_value);
+        sprintf(quadruples[quad_idx].operand2, "%d", operand2->value.int_value);
+    } else if (strcmp(operand1->type, "FLOAT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%f", operand1->value.float_value);
+        sprintf(quadruples[quad_idx].operand2, "%f", operand2->value.float_value);
+    } 
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+    fprintf(quad_file, "%s\n", operation);
+    fclose(quad_file);
+}
+
+void generate_quadruple_pop(char* operand) {
+    // Generate quadruple for pop
+    quad_idx++;
+    quadruples[quad_idx].operation = "pop";
+    quadruples[quad_idx].operand1 = operand; // Assuming operand is a string
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "pop %s\n", operand);
+    fclose(quad_file);
+}
+
+
 
 int main (int argc, char *argv[]){
     // parsing

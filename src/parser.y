@@ -12,6 +12,7 @@
 	int sym[26];
 
     #define Symbol_TABLE_SIZE 1000
+
     typedef struct Value{
         int int_value;         
         char* str_value; 
@@ -122,12 +123,14 @@ stmt:
 	 /*Variables declaration*/
         | datatype IDENTIFIER ';'               {
                                                 // check multiple declaration
+                                                is_redeclared($2,current_scope);
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
                                                 }
 
         | datatype IDENTIFIER '=' expr ';'      {
                                                 // check multiple declaration
+                                                is_redeclared($2,current_scope);
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
                                                 // check type matching
@@ -136,6 +139,7 @@ stmt:
         /*Constant declaration*/
         | CONST datatype IDENTIFIER '=' expr ';' {
                                                 // check multiple declaration
+                                                is_redeclared($3,current_scope);
                                                 // check type matching
                                                 // set initialized ($1)
                                                 // insert the symbol
@@ -194,6 +198,7 @@ datatype:
 assignment:
 	datatype IDENTIFIER '=' expr                {
                                                 // check multiple declaration
+                                                is_redeclared($2,current_scope);
                                                 // check type matching
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
@@ -202,6 +207,7 @@ assignment:
 var_declaration: 
 		datatype IDENTIFIER                     {
                                                 // check multiple declaration
+                                                is_redeclared($2,current_scope);
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
                                                 }
@@ -334,6 +340,7 @@ bool is_redeclared(char* name, int scope){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
             // redeclaration (ERROR)
+            printf("Redeclared: %s\n", name);
             return 0;
         }
     }

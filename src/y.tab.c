@@ -112,9 +112,10 @@
     int is_correct_scope(char *name, int scope);
     // to prevent redeclaration
     bool is_redeclared(char *name, int scope);
-    
+    // to prevent type mismatch
+    bool is_same_type(char *name, int scope, Node* id_node);
 
-#line 118 "y.tab.c"
+#line 119 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -250,7 +251,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 49 "parser.y"
+#line 50 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -261,7 +262,7 @@ union YYSTYPE
     struct Node *node_value;
 ;
 
-#line 265 "y.tab.c"
+#line 266 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -640,13 +641,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   110,   110,   111,   116,   117,   122,   124,   131,   140,
-     150,   159,   163,   164,   167,   168,   169,   172,   175,   179,
-     180,   183,   184,   185,   190,   191,   192,   193,   194,   199,
-     208,   217,   219,   220,   224,   226,   231,   235,   239,   240,
-     242,   249,   250,   251,   252,   256,   259,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   275,   276,
-     277,   280,   281,   282,   283,   284,   285
+       0,   112,   112,   113,   118,   119,   124,   126,   133,   143,
+     154,   164,   168,   169,   172,   173,   174,   177,   180,   184,
+     185,   188,   189,   190,   195,   196,   197,   198,   199,   204,
+     214,   223,   225,   226,   230,   232,   237,   241,   245,   246,
+     248,   255,   256,   257,   258,   262,   265,   268,   269,   270,
+     271,   272,   273,   274,   275,   276,   277,   278,   281,   282,
+     283,   286,   287,   288,   289,   290,   291
 };
 #endif
 
@@ -1651,155 +1652,159 @@ yyreduce:
   switch (yyn)
     {
   case 7:
-#line 124 "parser.y"
+#line 126 "parser.y"
                                                 {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-1].identifier),current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[-1].identifier), (yyvsp[-2].node_value)->type, false, current_scope);
                                                 }
-#line 1662 "y.tab.c"
+#line 1663 "y.tab.c"
     break;
 
   case 8:
-#line 131 "parser.y"
+#line 133 "parser.y"
                                                 {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-3].identifier),current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[-3].identifier), (yyvsp[-4].node_value)->type, false, current_scope);
                                                 // check type matching
+                                                is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value));
                                                 }
-#line 1674 "y.tab.c"
+#line 1676 "y.tab.c"
     break;
 
   case 9:
-#line 140 "parser.y"
+#line 143 "parser.y"
                                                  {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-3].identifier),current_scope);
                                                 // check type matching
+                                                is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value));
                                                 // set initialized ($1)
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[-3].identifier), (yyvsp[-4].node_value)->type, false, current_scope);
                                                 }
-#line 1687 "y.tab.c"
+#line 1690 "y.tab.c"
     break;
 
   case 10:
-#line 150 "parser.y"
+#line 154 "parser.y"
                                                     {
                                             // check declared or not ($1)
                                             is_correct_scope((yyvsp[-3].identifier), current_scope);
                                             // check if constant
                                             // check type matching ($1)
+                                            is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value));
                                             // set initialized ($1)
                                             }
-#line 1699 "y.tab.c"
+#line 1703 "y.tab.c"
     break;
 
   case 24:
-#line 190 "parser.y"
+#line 195 "parser.y"
                             {(yyval.node_value) = insert_node("INT");}
-#line 1705 "y.tab.c"
+#line 1709 "y.tab.c"
     break;
 
   case 25:
-#line 191 "parser.y"
+#line 196 "parser.y"
                             {(yyval.node_value) = insert_node("FLOAT");}
-#line 1711 "y.tab.c"
+#line 1715 "y.tab.c"
     break;
 
   case 26:
-#line 192 "parser.y"
+#line 197 "parser.y"
                             {(yyval.node_value) = insert_node("CHAR");}
-#line 1717 "y.tab.c"
+#line 1721 "y.tab.c"
     break;
 
   case 27:
-#line 193 "parser.y"
+#line 198 "parser.y"
                             {(yyval.node_value) = insert_node("STRING");}
-#line 1723 "y.tab.c"
+#line 1727 "y.tab.c"
     break;
 
   case 28:
-#line 194 "parser.y"
+#line 199 "parser.y"
                             {(yyval.node_value) = insert_node("BOOL");}
-#line 1729 "y.tab.c"
+#line 1733 "y.tab.c"
     break;
 
   case 29:
-#line 199 "parser.y"
+#line 204 "parser.y"
                                                     {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[-2].identifier),current_scope);
                                                 // check type matching
+                                                is_same_type((yyvsp[-2].identifier), current_scope, (yyvsp[0].node_value));
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[-2].identifier), (yyvsp[-3].node_value)->type, false, current_scope);
                                                 }
-#line 1741 "y.tab.c"
+#line 1746 "y.tab.c"
     break;
 
   case 30:
-#line 208 "parser.y"
+#line 214 "parser.y"
                                                         {
                                                 // check multiple declaration
                                                 is_redeclared((yyvsp[0].identifier),current_scope);
                                                 // insert the symbol
                                                 insert_symbol((yyvsp[0].identifier), (yyvsp[-1].node_value)->type, false, current_scope);
                                                 }
-#line 1752 "y.tab.c"
+#line 1757 "y.tab.c"
     break;
 
   case 38:
-#line 239 "parser.y"
+#line 245 "parser.y"
                             {(yyval.node_value) = insert_node("BOOL");}
-#line 1758 "y.tab.c"
+#line 1763 "y.tab.c"
     break;
 
   case 39:
-#line 240 "parser.y"
+#line 246 "parser.y"
                             {(yyval.node_value) = insert_node("BOOL");}
-#line 1764 "y.tab.c"
+#line 1769 "y.tab.c"
     break;
 
   case 40:
-#line 242 "parser.y"
+#line 248 "parser.y"
                             {
                             // check declared
                             is_correct_scope((yyvsp[0].identifier), current_scope);
                             // check initialized
                             // set used
                             }
-#line 1775 "y.tab.c"
+#line 1780 "y.tab.c"
     break;
 
   case 41:
-#line 249 "parser.y"
+#line 255 "parser.y"
                                 {(yyval.node_value) = insert_node("INT");}
-#line 1781 "y.tab.c"
+#line 1786 "y.tab.c"
     break;
 
   case 42:
-#line 250 "parser.y"
+#line 256 "parser.y"
                                 {(yyval.node_value) = insert_node("FLOAT");}
-#line 1787 "y.tab.c"
+#line 1792 "y.tab.c"
     break;
 
   case 43:
-#line 251 "parser.y"
+#line 257 "parser.y"
                                         {(yyval.node_value) = insert_node("CHAR");}
-#line 1793 "y.tab.c"
+#line 1798 "y.tab.c"
     break;
 
   case 44:
-#line 252 "parser.y"
+#line 258 "parser.y"
                             {(yyval.node_value) = insert_node("STRING");}
-#line 1799 "y.tab.c"
+#line 1804 "y.tab.c"
     break;
 
 
-#line 1803 "y.tab.c"
+#line 1808 "y.tab.c"
 
       default: break;
     }
@@ -2031,7 +2036,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 287 "parser.y"
+#line 293 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, int scope){
@@ -2074,7 +2079,7 @@ int is_correct_scope(char* name, int scope){
     }
     if(!found){
         // return -1 if not declared (ERROR)
-        printf("Not Declared: %s\n", name);
+        printf("Not Declared: %s at line %d\n", name, lineno);
         return -1;
     }
     else{
@@ -2088,7 +2093,7 @@ bool is_redeclared(char* name, int scope){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
             // redeclaration (ERROR)
-            printf("Redeclared: %s\n", name);
+            printf("Redeclared: %s at line %d\n", name, lineno);
             return 0;
         }
     }
@@ -2096,6 +2101,21 @@ bool is_redeclared(char* name, int scope){
     return 1;
 }
 
+bool is_same_type(char *name, int scope, Node* id_node){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // get the variable in this scope
+        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
+            // check the type
+            if(strcmp(symbol_table[i]-> type, id_node -> type)==0){
+                return true;
+            }
+            else{
+                printf("type mismatch: %s at line %d\n", name, lineno);
+                return false;
+            }
+        }
+    }
+}
 int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");

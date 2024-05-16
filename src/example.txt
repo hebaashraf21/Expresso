@@ -1,2 +1,4 @@
 int i ;
-int i = 5 ;
+i = 5 ;
+char a = 'a';
+bool b = false;

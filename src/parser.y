@@ -43,7 +43,8 @@
     int is_correct_scope(char *name, int scope);
     // to prevent redeclaration
     bool is_redeclared(char *name, int scope);
-    
+    // to prevent type mismatch
+    bool is_same_type(char *name, int scope, Node* id_node);
 %}
 
 %union { 
@@ -101,6 +102,7 @@
 // types of non terminals
 %type <node_value> datatype
 %type <node_value> values
+%type <node_value> expr
 
 // starting point of parsing
 %start program
@@ -134,6 +136,7 @@ stmt:
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
                                                 // check type matching
+                                                is_same_type($2, current_scope, $4);
                                                 }
         
         /*Constant declaration*/
@@ -141,6 +144,7 @@ stmt:
                                                 // check multiple declaration
                                                 is_redeclared($3,current_scope);
                                                 // check type matching
+                                                is_same_type($3, current_scope, $5);
                                                 // set initialized ($1)
                                                 // insert the symbol
                                                 insert_symbol($3, $2->type, false, current_scope);
@@ -152,6 +156,7 @@ stmt:
                                             is_correct_scope($1, current_scope);
                                             // check if constant
                                             // check type matching ($1)
+                                            is_same_type($1, current_scope, $3);
                                             // set initialized ($1)
                                             }
         
@@ -200,6 +205,7 @@ assignment:
                                                 // check multiple declaration
                                                 is_redeclared($2,current_scope);
                                                 // check type matching
+                                                is_same_type($2, current_scope, $4);
                                                 // insert the symbol
                                                 insert_symbol($2, $1->type, false, current_scope);
                                                 }
@@ -252,7 +258,7 @@ values:
     | STRING_VAL            {$$ = insert_node("STRING");}
     ;
     
-expr :
+expr:
     values				
 	
      /* (expressions) */
@@ -326,7 +332,7 @@ int is_correct_scope(char* name, int scope){
     }
     if(!found){
         // return -1 if not declared (ERROR)
-        printf("Not Declared: %s\n", name);
+        printf("Not Declared: %s at line %d\n", name, lineno);
         return -1;
     }
     else{
@@ -340,7 +346,7 @@ bool is_redeclared(char* name, int scope){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
             // redeclaration (ERROR)
-            printf("Redeclared: %s\n", name);
+            printf("Redeclared: %s at line %d\n", name, lineno);
             return 0;
         }
     }
@@ -348,6 +354,21 @@ bool is_redeclared(char* name, int scope){
     return 1;
 }
 
+bool is_same_type(char *name, int scope, Node* id_node){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // get the variable in this scope
+        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
+            // check the type
+            if(strcmp(symbol_table[i]-> type, id_node -> type)==0){
+                return true;
+            }
+            else{
+                printf("type mismatch: %s at line %d\n", name, lineno);
+                return false;
+            }
+        }
+    }
+}
 int main (int argc, char *argv[]){
     // parsing
     yyin = fopen(argv[1], "r");

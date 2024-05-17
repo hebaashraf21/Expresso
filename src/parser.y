@@ -243,7 +243,7 @@ stmt:
         | REPEAT '{' {enter_scope();} statements '}' {exit_scope();} UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
-        | SWITCH '(' IDENTIFIER ')' '{' {enter_scope();} case_list default_case '}'  {exit_scope();}
+        | SWITCH '(' switch_identifier ')' '{' {enter_scope();} case_list default_case '}'  {exit_scope();}
         
         /*Block Strusture*/
         | '{' {enter_scope();} statements'}' {exit_scope();}
@@ -337,13 +337,27 @@ case_list:
 
 
 default_case:
-    DEFAULT ':' stmt ';'
+    DEFAULT ':' statements ';'
     
     
 case_stmt:
-    CASE expr ':' stmt ';'
+    CASE expr ':' statements ';'
     ;  
 
+switch_identifier: 
+    IDENTIFIER              {
+                            Value value;
+                            value.id_value = $1;
+                            $$ = insert_node("ID", value);
+                            // check declared
+                            if(is_correct_scope($1, current_scope, true) == 1){
+                                // check initialized
+                                if(is_initialized($1, current_scope)){
+                                    // set used
+                                    set_used($1, current_scope);
+                                }
+                            }
+                            }
 terminals: 
       TRUE_VAL	            {
                             Value value;

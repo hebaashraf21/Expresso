@@ -1,3 +1,7 @@
-int a = 5;
-a = 3;
-print(a);
+int a = 3;
+switch (a){
+    case 1: 
+        print(a); 
+    default: 
+        print(a);
+}

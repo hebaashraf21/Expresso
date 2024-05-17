@@ -31,6 +31,12 @@
         struct Scope* parent;
     }Scope;
 
+    typedef struct function_parameter{
+        char *name;
+        char *type;
+        Value value;
+    }function_parameter;
+
     typedef struct Symbol{
         char *name;
         char *type;
@@ -39,6 +45,10 @@
         Scope *scope;
         bool is_initialized;
         bool is_used;
+        // for function name symbols
+        function_parameter * parameters[100];
+        char* return_type;
+        int no_of_parameters;
     }Symbol;
 
 
@@ -46,7 +56,7 @@
 
     Symbol *symbol_table [Symbol_TABLE_SIZE];
     int symbol_table_idx = -1;
-    void insert_symbol(char *name, char *type, bool is_const, Scope * scope);
+    void insert_symbol(char *name, char *type, bool is_const, Scope * scope, char* return_type);
     Node* insert_node(char *type, Value value);
 
     // to check peoper use
@@ -64,12 +74,19 @@
     // shen use varuiable ==> set that
     void set_used(char* name, Scope *scope);
 
+    // for dealing with Functions
+    // check if a symbol is function or variable
+    // second parameter to handle errors
+    bool is_function(char* name, Scope *scope, bool need_to_be_function);
+    // insert the function parameters in the symol table
+    void insert_function_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
+    bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
     // check all variables are used
     bool is_all_used();
 
     // to deal with nested blocks
-    void enter_scope();
-    void exit_scope();
+    void enter_block();
+    void exit_block();
 %}
 
 %union { 
@@ -128,7 +145,8 @@
 %type <node_value> datatype
 %type <node_value> terminals
 %type <node_value> expr
-
+%type <node_value> switch_identifier
+%type <node_value> function_call
 // starting point of parsing
 %start program
 %%
@@ -153,7 +171,7 @@ stmt:
                                                 // check multiple declaration
                                                 if(!is_redeclared($2, current_scope)){
                                                     // insert the symbol
-                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                    insert_symbol($2, $1->type, false, current_scope, NULL);
                                                 }
                                                 }
 
@@ -161,7 +179,7 @@ stmt:
                                                 // check multiple declaration
                                                 if(!is_redeclared($2, current_scope)){
                                                     // insert the symbol
-                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                    insert_symbol($2, $1->type, false, current_scope,"");
                                                     if(strcmp($4 -> type, "ID") == 0){
                                                         if(is_correct_scope($4 -> value.id_value, current_scope, false) == 1){
                                                             // check type matching
@@ -186,7 +204,7 @@ stmt:
                                                 // check multiple declaration
                                                 if(!is_redeclared($3, current_scope)){
                                                     // insert the symbol
-                                                    insert_symbol($3, $2->type, true, current_scope);
+                                                    insert_symbol($3, $2->type, true, current_scope,NULL);
                                                     if(strcmp($5 -> type, "ID") == 0){
                                                         if(is_correct_scope($5 -> value.id_value, current_scope, false) == 1){
                                                             // check type matching
@@ -209,7 +227,7 @@ stmt:
         /*Assignment statements*/
         | IDENTIFIER '=' expr ';'		    {
                                             // check declared or not ($1)
-                                            if(is_correct_scope($1, current_scope, true) == 1){
+                                            if(is_correct_scope($1, current_scope, true) == 1 && !is_function($1, current_scope,false)){
                                                 // check if constant
                                                 if(!is_const($1, current_scope)){
                                                     if(strcmp($3 -> type, "ID") == 0){
@@ -235,34 +253,55 @@ stmt:
             
         
         /*Conditional Statements*/
-        | IF '(' expr ')' '{' {enter_scope();} statements '}'  {exit_scope();} else_stmt
+        | IF '(' expr ')' '{' {enter_block();} statements '}'  {exit_block();} else_stmt
         
         /*Loops*/
-        | WHILE '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();}
-        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_scope();} statements '}'  {exit_scope();}
-        | REPEAT '{' {enter_scope();} statements '}' {exit_scope();} UNTIL '(' expr ')' ';'
+        | WHILE '(' expr ')' '{' {enter_block();} statements '}' {exit_block();}
+        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_block();} statements '}'  {exit_block();}
+        | REPEAT '{' {enter_block();} statements '}' {exit_block();} UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
-        | SWITCH '(' switch_identifier ')' '{' {enter_scope();} case_list default_case '}'  {exit_scope();}
+        | SWITCH '(' switch_identifier ')' '{' {enter_block();} case_list '}' {exit_block();}
         
         /*Block Strusture*/
-        | '{' {enter_scope();} statements'}' {exit_scope();}
+        | '{' {enter_block();} statements'}' {exit_block();}
         
         
         /*Functions Definition*/   
-        | VOID IDENTIFIER '(' parameters_list ')' '{' {enter_scope();} statements '}' {exit_scope();}
-        | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_scope();} statements '}' {exit_scope();}
+        | VOID IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   { 
+                                                                                        exit_block();
+                                                                                        if(!is_redeclared($2, current_scope)){
+                                                                                            insert_symbol($2, "FUNC", true, current_scope, "VOID");
+                                                                                        }  
+                                                                                        }
+                            
+            
+        | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   {   
+                                                                                            exit_block();
+                                                                                            if(!is_redeclared($2, current_scope)){
+                                                                                                insert_symbol($2, "FUNC", true, current_scope, $1 -> type);
+                                                                                            }
+                                                                                            }
         
         /*Functions Call*/   
-        | IDENTIFIER '(' parameters_list ')' ';'
+        | function_call
         | BREAK
         | CONTINUE
         ;	
-	
+function_call: 
+        IDENTIFIER '(' parameters_list_call ')' ';'  {
+                                                    Value value;
+                                                    value.id_value = $1;
+                                                    $$ = insert_node("FUNC", value);
+                                                    if(is_correct_scope($1, current_scope, true) == 1 && is_function($1, current_scope,true)){
+                                                        
+                                                    }
+                                                }
+
 else_stmt:
         /*Empty production*/
         |
-        ELSE '{' {enter_scope();} statements '}'  {exit_scope();}
+        ELSE '{' {enter_block();} statements '}'  {exit_block();}
 datatype:   
         INTEGER             {
                             struct Value value;
@@ -292,7 +331,7 @@ assignment:
                                                 // check multiple declaration
                                                 if(!is_redeclared($2, current_scope)){
                                                     // insert the symbol
-                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                    insert_symbol($2, $1->type, false, current_scope,NULL);
                                                     // check type matching
                                                     if(strcmp($4 -> type, "ID") == 0){
                                                         if(is_correct_scope($4 -> value.id_value, current_scope, false) == 1){
@@ -317,7 +356,7 @@ var_declaration:
                                                 // check multiple declaration
                                                 if(!is_redeclared($2, current_scope)){
                                                     // insert the symbol
-                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                    insert_symbol($2, $1->type, false, current_scope, NULL);
                                                 }
                                                 }
 		;
@@ -329,20 +368,25 @@ parameters_list:
 		| parameters_list ',' var_declaration
 		;
               
-
+parameters_list_call:
+        /* Empty production */
+		| IDENTIFIER
+		| parameters_list_call ',' IDENTIFIER
+        ;
+        
 case_list:
-    /* Empty production */
+      case_stmt
     | case_list case_stmt
+    | case_list default_case
     ;
-
+    
+case_stmt:
+      CASE expr ':' statements ';'
+    ;  
 
 default_case:
     DEFAULT ':' statements ';'
-    
-    
-case_stmt:
-    CASE expr ':' statements ';'
-    ;  
+
 
 switch_identifier: 
     IDENTIFIER              {
@@ -350,7 +394,7 @@ switch_identifier:
                             value.id_value = $1;
                             $$ = insert_node("ID", value);
                             // check declared
-                            if(is_correct_scope($1, current_scope, true) == 1){
+                            if(is_correct_scope($1, current_scope, true) == 1 && !is_function($1, current_scope,false)){
                                 // check initialized
                                 if(is_initialized($1, current_scope)){
                                     // set used
@@ -369,21 +413,23 @@ terminals:
                             Value value;
                             value.bool_value = false;
                             $$ = insert_node("BOOL", value);
-                            }			
+                            }	
+
+    | function_call
 
     | IDENTIFIER            {
                             Value value;
                             value.id_value = $1;
                             $$ = insert_node("ID", value);
                             // check declared
-                            if(is_correct_scope($1, current_scope, true) == 1){
+                            if(is_correct_scope($1, current_scope, true) == 1 && !is_function($1, current_scope,false)){
                                 // check initialized
                                 if(is_initialized($1, current_scope)){
                                     // set used
                                     set_used($1, current_scope);
                                 }
                             }
-                            }          
+                            } 
 
     | INTEGER_VAL	        {
                             Value value;
@@ -444,7 +490,7 @@ expr:
     ;
 %%
 
-void insert_symbol(char *name, char *type, bool is_const, Scope *scope){
+void insert_symbol(char *name, char *type, bool is_const, Scope *scope, char* return_type){
     symbol_table_idx++;
     Symbol *new_symbol = malloc(sizeof(Symbol));
     // Allocate memory for name and type
@@ -457,20 +503,7 @@ void insert_symbol(char *name, char *type, bool is_const, Scope *scope){
     new_symbol->is_initialized = false;
     new_symbol->is_used = false;
 
-    // Initialize Value field based on type
-    if (strcmp(type, "INT") == 0) {
-        new_symbol->value.int_value = 0; // Initialize to default value for int
-    } else if (strcmp(type, "FLOAT") == 0) {
-        new_symbol->value.float_value = 0.0; // Initialize to default value for float
-    } else if (strcmp(type, "CHAR") == 0) {
-        new_symbol->value.char_value = '\0'; // Initialize to default value for char
-    } else if (strcmp(type, "BOOL") == 0) {
-        new_symbol->value.bool_value = false; // Initialize to default value for bool
-    } else {
-        // Handle invalid type
-        fprintf(stderr, "Invalid type: %s\n", type);
-        //exit(EXIT_FAILURE);
-    }
+    new_symbol-> return_type = return_type;
 
     // Insert symbol into symbol table
     symbol_table[symbol_table_idx] = new_symbol;
@@ -530,6 +563,7 @@ bool is_redeclared(char* name, Scope *scope){
                     return true;
                 }
                 else{
+                    printf("Well Done: %s at line %d\n", name, lineno);
                     temp_scope = temp_scope -> parent;
                 }
             }
@@ -663,6 +697,57 @@ void set_used(char* name, Scope *scope){
     }
 }
 
+bool is_function(char* name, Scope *scope, bool need_to_be_function){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    if(strcmp(symbol_table[i] -> type, "FUNC")==0){
+                        if(!need_to_be_function){
+                            printf("improper function useage: name %s at line number %d", name, lineno);
+                        }
+                        return true;
+                    }
+                    else{
+                        if(need_to_be_function){
+                            printf("Error at line: %d     this ID: %s isn't a function name\n", lineno, name);
+                        }
+                        return false;
+                    }
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
+        }
+    }
+}
+
+void insert_function_parameters(char* name, Scope *scope, function_parameter **parameters, int no_of_parameters){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    symbol_table[i] -> no_of_parameters = no_of_parameters;
+                    for (int k = 0; k< no_of_parameters; k++){
+                        symbol_table[i] -> parameters[k] = parameters[k];
+                    }
+                    return;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
+        }
+    }
+}
+
 bool is_all_used(){
     for (int i =0; i<=symbol_table_idx; i++){
         if(symbol_table[i] && symbol_table[i]-> is_used == false){
@@ -672,14 +757,36 @@ bool is_all_used(){
     return true;
 }
 
-void enter_scope(){
+void enter_block(){
     Scope* new_scope = (Scope*) malloc(sizeof(Scope));
     new_scope -> parent = current_scope;
     current_scope = new_scope;
 }
 
-void exit_scope(){
+void exit_block(){
     current_scope = current_scope -> parent;
+}
+
+void print_symbol_table() {
+    FILE *file = fopen("symbol_table.txt", "w");
+    if (!file) {
+        printf("Error: unable to open symbol table file.\n");
+        return;
+    }
+
+    fprintf(file, "Name\tType\tConst\tScope\tReturn Type\tInitialized\tUsed\n");
+    for (int i = 0; i <= symbol_table_idx; i++) {
+        fprintf(file, "%s\t%s\t%s\t%p\t%s\t%s\t%s\n", 
+                symbol_table[i]->name,
+                symbol_table[i]->type,
+                symbol_table[i]->is_const ? "true" : "false",
+                (void*)symbol_table[i]->scope,
+                symbol_table[i]->return_type ? symbol_table[i]->return_type : "N/A",
+                symbol_table[i]->is_initialized ? "true" : "false",
+                symbol_table[i]->is_used ? "true" : "false");
+    }
+
+    fclose(file);
 }
 
 int main(int argc, char *argv[]) {
@@ -707,7 +814,7 @@ int main(int argc, char *argv[]) {
     if (!is_all_used()) {
         printf("Not all variables used\n");
     }
-
+    print_symbol_table();
     free(current_scope); // Clean up allocated memory before exiting
     return EXIT_SUCCESS;
 }

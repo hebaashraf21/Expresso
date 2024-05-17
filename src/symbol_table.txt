@@ -1,0 +1,4 @@
+Name	Type	Const	Scope	Return Type	Initialized	Used
+a	INT	false	0x5576945e02a0		true	true
+x	INT	false	0x5576945e02a0	N/A	false	false
+b	FUNC	true	0x5576945e02a0	INT	false	false

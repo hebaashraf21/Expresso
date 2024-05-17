@@ -81,6 +81,10 @@
     // insert the function parameters in the symol table
     void insert_function_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
     bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
+    
+    int parameter_count = 0;
+    function_parameter * parameters[100];
+
     // check all variables are used
     bool is_all_used();
 
@@ -147,6 +151,8 @@
 %type <node_value> expr
 %type <node_value> switch_identifier
 %type <node_value> function_call
+%type<int_value> parameters_list
+%type<int_value> parameters_list_call
 // starting point of parsing
 %start program
 %%
@@ -272,15 +278,19 @@ stmt:
                                                                                         exit_block();
                                                                                         if(!is_redeclared($2, current_scope)){
                                                                                             insert_symbol($2, "FUNC", true, current_scope, "VOID");
-                                                                                        }  
+                                                                                            insert_function_parameters($2, current_scope, parameters, parameter_count);
+                                                                                        } 
+                                                                                        parameter_count = 0; 
                                                                                         }
                             
             
-        | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   {   
+        | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   {
+                                                                                            printf("parameter_count %d\n", parameter_count);
                                                                                             exit_block();
                                                                                             if(!is_redeclared($2, current_scope)){
                                                                                                 insert_symbol($2, "FUNC", true, current_scope, $1 -> type);
                                                                                             }
+                                                                                            parameter_count = 0;
                                                                                             }
         
         /*Functions Call*/   
@@ -288,15 +298,17 @@ stmt:
         | BREAK
         | CONTINUE
         ;	
+
 function_call: 
         IDENTIFIER '(' parameters_list_call ')' ';'  {
-                                                    Value value;
-                                                    value.id_value = $1;
-                                                    $$ = insert_node("FUNC", value);
-                                                    if(is_correct_scope($1, current_scope, true) == 1 && is_function($1, current_scope,true)){
-                                                        
+                                                        parameter_count = 0;
+                                                        Value value;
+                                                        value.id_value = $1;
+                                                        $$ = insert_node("FUNC", value);
+                                                        if(is_correct_scope($1, current_scope, true) == 1 && is_function($1, current_scope,true)){
+                                                            
+                                                        }
                                                     }
-                                                }
 
 else_stmt:
         /*Empty production*/
@@ -357,23 +369,50 @@ var_declaration:
                                                 if(!is_redeclared($2, current_scope)){
                                                     // insert the symbol
                                                     insert_symbol($2, $1->type, false, current_scope, NULL);
+                                                    parameters[parameter_count] = malloc(sizeof(function_parameter));
+                                                    if (parameters[parameter_count] != NULL) {
+                                                        parameters[parameter_count]->name = $2;
+                                                        parameters[parameter_count]->type = $1->type;
+                                                        parameter_count++; // Increment after assignment
+                                                    } else {
+                                                        // Handle memory allocation failure if needed
+                                                        yyerror("Memory allocation failed for function parameter");
+                                                    }
                                                 }
                                                 }
 		;
 
 
 parameters_list:
-		/* Empty production */
-		| var_declaration
-		| parameters_list ',' var_declaration
-		;
-              
+    /* Empty production */
+    {
+        $$ = 0; // Initialize count to 0
+    }
+    | var_declaration { 
+        // Increment count for each var_declaration
+        $$ = 1;
+      }
+    | parameters_list ',' var_declaration {
+        // Increment count for each var_declaration
+        $$ = $1 + 1;
+      }
+    ;
+
 parameters_list_call:
-        /* Empty production */
-		| IDENTIFIER
-		| parameters_list_call ',' IDENTIFIER
-        ;
-        
+    /* Empty production */
+    {
+        $$ = 0; // Initialize count to 0
+    }
+    | IDENTIFIER {
+        // Increment count for each var_declaration
+        $$ = 1;
+      }
+    | parameters_list_call ',' IDENTIFIER {
+        // Increment count for each var_declaration
+        $$ = $1 + 1;
+      }
+    ;
+
 case_list:
       case_stmt
     | case_list case_stmt

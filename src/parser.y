@@ -509,11 +509,6 @@ bool is_all_used(){
 }
 
 void generate_quadruple_push_operation(char* operation, Node* operand1, Node* operand2) {
-    // Check if the operands are of the same type
-    if (strcmp(operand1->type, operand2->type) != 0) {
-        printf("Type mismatch in %s operation at line %d\n", operation, lineno);
-        exit(1);
-    }
 
     // Generate quadruple based on the type
     quad_idx++;
@@ -528,6 +523,12 @@ void generate_quadruple_push_operation(char* operation, Node* operand1, Node* op
         sprintf(quadruples[quad_idx].operand1, "%f", operand1->value.float_value);
         sprintf(quadruples[quad_idx].operand2, "%f", operand2->value.float_value);
     } 
+    else
+    {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand1);
+        sprintf(quadruples[quad_idx].operand2, "%s", operand2);
+
+    }
 
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");

@@ -721,6 +721,9 @@ bool is_const(char *name, Scope *scope){
                         printf("trying to modify const variable %s at line %d\n\n",name, lineno);
                         return true;
                     }
+                    else{
+                        return false;
+                    }
                 }
                 else{
                     temp_scope = temp_scope -> parent;

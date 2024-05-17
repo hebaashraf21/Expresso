@@ -92,6 +92,24 @@
     // to deal with nested blocks
     void enter_block();
     void exit_block();
+
+    // quadruples
+    // Define the quadruple struct
+    typedef struct Quadruple {
+        char* operation;
+        char* operand1;
+        char* operand2;
+        char* result;
+    } Quadruple;
+
+    Quadruple quadruples[1000];
+    int quad_idx = -1;
+
+    // used for printing boolean values
+    const char* boolToString(bool b);
+
+    void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2);
+    void generate_quadruple_pop(char* operand);
 %}
 
 %union { 
@@ -193,6 +211,7 @@ stmt:
                                                             if(is_same_type($2, current_scope, $4)){
                                                                 // set initialized
                                                                 set_initialized($2, current_scope);
+                                                                generate_quadruple_pop($2);
                                                             }
                                                         }
                                                     }
@@ -202,6 +221,7 @@ stmt:
                                                             if(is_same_type($2, current_scope, $4)){
                                                                 // set initialized
                                                                 set_initialized($2, current_scope);
+                                                                generate_quadruple_pop($2);
                                                             }
                                                         }
                                                     }
@@ -209,6 +229,7 @@ stmt:
                                                         if(is_same_type($2, current_scope, $4)){
                                                             // set initialized
                                                             set_initialized($2, current_scope);
+                                                            generate_quadruple_pop($2);
                                                         }
                                                     }
                                                     
@@ -227,6 +248,7 @@ stmt:
                                                             if(is_same_type($3, current_scope, $5)){
                                                                 // set initialized
                                                                 set_initialized($3, current_scope);
+                                                                generate_quadruple_pop($3);
                                                             }
                                                         }
                                                     }
@@ -236,6 +258,7 @@ stmt:
                                                             if(is_same_type($3, current_scope, $5)){
                                                                 // set initialized
                                                                 set_initialized($3, current_scope);
+                                                                generate_quadruple_pop($3);
                                                             }
                                                         }
                                                     }
@@ -244,6 +267,7 @@ stmt:
                                                         if(is_same_type($3, current_scope, $5)){
                                                             // set initialized
                                                             set_initialized($3, current_scope);
+                                                            generate_quadruple_pop($3);
                                                         }
                                                     }
                                                 }
@@ -260,6 +284,7 @@ stmt:
                                                             if(is_same_type($1, current_scope, $3)){
                                                                 // set initialized
                                                                 set_initialized($1, current_scope);
+                                                                generate_quadruple_pop($1);
                                                             } 
                                                         }
                                                     }
@@ -269,6 +294,7 @@ stmt:
                                                             if(is_same_type($1, current_scope, $3)){
                                                                 // set initialized
                                                                 set_initialized($1, current_scope);
+                                                                generate_quadruple_pop($1);
                                                             }
                                                         }
                                                     }
@@ -276,6 +302,7 @@ stmt:
                                                         if(is_same_type($1, current_scope, $3)){
                                                             // set initialized
                                                             set_initialized($1, current_scope);
+                                                            generate_quadruple_pop($1);
                                                         } 
                                                     }
                                                 }
@@ -378,6 +405,7 @@ assignment:
                                                             if(is_same_type($2, current_scope, $4)){
                                                                 // set initialized
                                                                 set_initialized($2, current_scope);
+                                                                generate_quadruple_pop($2);
                                                             } 
                                                         }
                                                     }
@@ -387,6 +415,7 @@ assignment:
                                                             if(is_same_type($2, current_scope, $4)){
                                                                 // set initialized
                                                                 set_initialized($2, current_scope);
+                                                                generate_quadruple_pop($2);
                                                             }
                                                         }
                                                     }
@@ -394,6 +423,7 @@ assignment:
                                                         if(is_same_type($2, current_scope, $4)){
                                                             // set initialized
                                                             set_initialized($2, current_scope);
+                                                            generate_quadruple_pop($2);
                                                         }
                                                     }
                                                      
@@ -468,7 +498,7 @@ parameters_list_call:
     | parameters_list_call ',' IDENTIFIER {
         // Increment count for each var_declaration
         $$ = $1 + 1;
-      }
+    }
     ;
 
 case_list:
@@ -565,25 +595,25 @@ expr:
     | expr INCR                 		
     | DECR expr                 		
     | expr DECR                 		
-    | expr '+' expr				
-    | expr '-' expr				
-    | expr '*' expr				
-    | expr '/' expr				
-    | expr '^' expr				
-    | expr '%' expr				
+    | expr '+' expr		{generate_quadruple_push_operation_2_ops("ADD", $1, $3);}		
+    | expr '-' expr		{generate_quadruple_push_operation_2_ops("SUB", $1, $3);}		
+    | expr '*' expr		{generate_quadruple_push_operation_2_ops("MUL", $1, $3);}		
+    | expr '/' expr		{generate_quadruple_push_operation_2_ops("DIV", $1, $3);}		
+    | expr '^' expr		{generate_quadruple_push_operation_2_ops("POW", $1, $3);}		
+    | expr '%' expr		{generate_quadruple_push_operation_2_ops("MOD", $1, $3);}		
      
      /* logical expressions */
-    | expr LOGICAL_AND expr			
-    | expr LOGICAL_OR expr			
-    | LOGICAL_NOT expr			
+    | expr LOGICAL_AND expr		{generate_quadruple_push_operation_2_ops("LOGICAL_AND", $1, $3);}	
+    | expr LOGICAL_OR expr		{generate_quadruple_push_operation_2_ops("LOGICAL_OR", $1, $3);}		
+    | LOGICAL_NOT expr			{generate_quadruple_push_operation_2_ops("LOGICAL_NOT", $1, $3);}	
      
      /* comparison expressions */
-    | expr EQUALS expr			
-    | expr NOT_EQUALS expr			
-    | expr LESS_THAN expr			
-    | expr LESS_THAN_OR_EQUALS expr		
-    | expr GREATER_THAN expr			
-    | expr GREATER_THAN_OR_EQUALS expr 	 
+    | expr EQUALS expr			        {generate_quadruple_push_operation_2_ops("IS_EQUAL", $1, $3);}	
+    | expr NOT_EQUALS expr		        {generate_quadruple_push_operation_2_ops("IS_NOT_EQUAL", $1, $3);}		
+    | expr LESS_THAN expr		        {generate_quadruple_push_operation_2_ops("LESS_THAN", $1, $3);}		
+    | expr LESS_THAN_OR_EQUALS expr	    {generate_quadruple_push_operation_2_ops("LESS_THAN_OR_EQUALS", $1, $3);}		
+    | expr GREATER_THAN expr		    {generate_quadruple_push_operation_2_ops("GREATER_THAN", $1, $3);}		
+    | expr GREATER_THAN_OR_EQUALS expr 	{generate_quadruple_push_operation_2_ops("GREATER_THAN_OR_EQUALS", $1, $3);}	 
     ;
 %%
 
@@ -938,6 +968,67 @@ void exit_block(){
     current_scope = current_scope -> parent;
 }
 
+/*==========================================================================================*/
+/*Quadruples*/
+void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2) {
+
+    // Generate quadruple based on the type
+    quad_idx++;
+    quadruples[quad_idx].operation = operation;
+    quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
+    quadruples[quad_idx].operand2 = malloc(sizeof(char) * 10); // Assuming operand2 is a string
+
+    if (strcmp(operand1->type, "INT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%d", operand1->value.int_value);
+        sprintf(quadruples[quad_idx].operand2, "%d", operand2->value.int_value);
+    } 
+    else if (strcmp(operand1->type, "FLOAT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%f", operand1->value.float_value);
+        sprintf(quadruples[quad_idx].operand2, "%f", operand2->value.float_value);
+    } 
+    else if (strcmp(operand1->type, "BOOL") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.bool_value));
+        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.bool_value));
+    }
+    else if (strcmp(operand1->type, "ID") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.id_value));
+        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.id_value));
+    }
+    else if (strcmp(operand1->type, "CHAR") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.char_value));
+        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.char_value));
+    }
+    else if (strcmp(operand1->type, "STRING") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.str_value));
+        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.str_value));
+    }
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+    fprintf(quad_file, "%s\n", operation);
+    fclose(quad_file);
+}
+
+void generate_quadruple_pop(char* operand) {
+    // Generate quadruple for pop
+    quad_idx++;
+    quadruples[quad_idx].operation = "pop";
+    quadruples[quad_idx].operand1 = operand; // Assuming operand is a string
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "pop %s\n", operand);
+    fclose(quad_file);
+}
+
+const char* boolToString(bool b) {
+    return b ? "true" : "false";
+}
+/*==============================================================================*/
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input file>\n", argv[0]);
@@ -963,7 +1054,6 @@ int main(int argc, char *argv[]) {
     if (!is_all_used()) {
         printf("Not all variables used\n");
     }
-    print_symbol_table();
     free(current_scope); // Clean up allocated memory before exiting
     return EXIT_SUCCESS;
 }

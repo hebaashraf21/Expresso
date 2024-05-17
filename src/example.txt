@@ -1,10 +1,1 @@
-int a = 5;
-int b(int x, int y){
-    print(a);
-}
-int c (int z){
-;
-}
-int g = 5;
-int k =5;
-a = b(g, k);
+int a = 5 + 3;

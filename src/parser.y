@@ -16,7 +16,7 @@
     typedef struct Value{
         int int_value;         
         char* str_value; 
-        char char_value;
+        char* char_value;
         float float_value;
         bool bool_value;
         char* id_value;
@@ -111,13 +111,14 @@
 
     void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2);
     void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric);
+    void generate_quadruple_push_terminal(Node* operand);
     void generate_quadruple_pop(char* operand);
 %}
 
 %union { 
     int int_value;        
     char* str_value;        
-    char char_value;      
+    char* char_value;      
     float float_value;  
     bool bool_value;    
     char* identifier;
@@ -536,12 +537,14 @@ terminals:
                             Value value;
                             value.bool_value = true;
                             $$ = insert_node("BOOL", value);
+                            generate_quadruple_push_terminal($$);
                             }	
 
     | FALSE_VAL	            {
                             Value value;
                             value.bool_value = false;
                             $$ = insert_node("BOOL", value);
+                            generate_quadruple_push_terminal($$);
                             }	
 
     | function_call
@@ -556,6 +559,7 @@ terminals:
                                 if(is_initialized($1, current_scope)){
                                     // set used
                                     set_used($1, current_scope);
+                                    generate_quadruple_push_terminal($$);
                                 }
                             }
                             } 
@@ -564,24 +568,28 @@ terminals:
                             Value value;
                             value.int_value = $1;
                             $$ = insert_node("INT", value);
+                            generate_quadruple_push_terminal($$);
                             }	
 
     | FLOAT_VAL		        {
                             Value value;
                             value.float_value = $1;
                             $$ = insert_node("FLOAT", value);
+                            generate_quadruple_push_terminal($$);
                             }	
 
     | CHAR_VAL				{
                             Value value;
                             value.char_value = $1;
                             $$ = insert_node("CHAR", value);
+                            generate_quadruple_push_terminal($$);
                             }
 
     | STRING_VAL            {
                             Value value;
                             value.str_value = $1;
                             $$ = insert_node("STRING", value);
+                            generate_quadruple_push_terminal($$);
                             }
     ;
     
@@ -1027,8 +1035,8 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
         sprintf(quadruples[quad_idx].operand2, "%s", operand2->value.id_value);
     }
     else if (strcmp(operand1->type, "CHAR") == 0) {
-        sprintf(quadruples[quad_idx].operand1, "%d", operand1->value.char_value);
-        sprintf(quadruples[quad_idx].operand2, "%d", operand2->value.char_value);
+        sprintf(quadruples[quad_idx].operand1, "%s", operand1->value.char_value);
+        sprintf(quadruples[quad_idx].operand2, "%s", operand2->value.char_value);
     }
     else if (strcmp(operand1->type, "STRING") == 0) {
         sprintf(quadruples[quad_idx].operand1, "%s", operand1->value.str_value);
@@ -1068,7 +1076,7 @@ void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool
     quadruples[quad_idx].operand2 = NULL;
     quadruples[quad_idx].result = NULL;
 
-    if (strcmp(operand->type, "INT") != 0) {
+    if (strcmp(operand->type, "INT") == 0) {
             sprintf(quadruples[quad_idx].operand1, "%d", operand->value.int_value);
     } 
     else if (strcmp(operand->type, "FLOAT") == 0) {
@@ -1081,7 +1089,7 @@ void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool
         sprintf(quadruples[quad_idx].operand1, "%s", operand->value.id_value);
     }
     else if (strcmp(operand->type, "CHAR") == 0) {
-        sprintf(quadruples[quad_idx].operand1, "%d", operand->value.char_value);
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.char_value);
     }
     else if (strcmp(operand->type, "STRING") == 0) {
         sprintf(quadruples[quad_idx].operand1, "%s", operand->value.str_value);
@@ -1091,6 +1099,38 @@ void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool
     FILE *quad_file = fopen("quads.txt", "a");
     fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fprintf(quad_file, "%s\n", operation);
+    fclose(quad_file);
+}
+
+void generate_quadruple_push_terminal(Node* operand){
+    quad_idx++;
+    quadruples[quad_idx].operation = NULL;
+    quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    if (strcmp(operand->type, "INT") == 0) {
+            sprintf(quadruples[quad_idx].operand1, "%d", operand->value.int_value);
+    } 
+    else if (strcmp(operand->type, "FLOAT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%f", operand->value.float_value);
+    } 
+    else if (strcmp(operand->type, "BOOL") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand->value.bool_value));
+    }
+    else if (strcmp(operand->type, "ID") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.id_value);
+    }
+    else if (strcmp(operand->type, "CHAR") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.char_value);
+    }
+    else if (strcmp(operand->type, "STRING") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.str_value);
+    }
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fclose(quad_file);
 }
 

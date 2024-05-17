@@ -88,7 +88,7 @@ int lineno = 1; // initialize to 1
 		    		}
 		    
 '[^\\']'            { 
-						yylval.char_value = yytext[0];
+						yylval.char_value = strdup(yytext);
 		       			return CHAR_VAL; 
 		   			}
 		      

@@ -1090,7 +1090,7 @@ case 49:
 YY_RULE_SETUP
 #line 90 "lex.l"
 { 
-						yylval.char_value = yytext[0];
+						yylval.char_value = strdup(yytext);
 		       			return CHAR_VAL; 
 		   			}
 	YY_BREAK

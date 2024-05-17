@@ -1,7 +1,3 @@
-const int i = 5;
-{char a = 'a';}
-bool b = false;
-{int j = i;}
-print(j);
+int a ;
+a = 3;
 print(a);
-print(b);

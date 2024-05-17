@@ -3,7 +3,7 @@
 	#include <math.h>
     #include <stdbool.h> 
     #include <string.h>
-
+    #include <stdlib.h>
 	void yyerror(const char *);
 	extern int yylex(void);
 	extern FILE *yyin;
@@ -50,7 +50,7 @@
     Node* insert_node(char *type, Value value);
 
     // to check peoper use
-    int is_correct_scope(char *name, Scope *scope);
+    int is_correct_scope(char *name, Scope *scope, bool in_place);
     // to prevent redeclaration
     bool is_redeclared(char *name, Scope *scope);
     // to prevent type mismatch
@@ -146,48 +146,69 @@ statements:
 
         
 stmt:
+    /*Empty production*/
 	 ';'  
 	 /*Variables declaration*/
         | datatype IDENTIFIER ';'               {
                                                 // check multiple declaration
-                                                is_redeclared($2, current_scope);
-                                                // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
+                                                if(!is_redeclared($2, current_scope)){
+                                                    // insert the symbol
+                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                }
                                                 }
 
         | datatype IDENTIFIER '=' expr ';'      {
                                                 // check multiple declaration
-                                                is_redeclared($2, current_scope);
-                                                // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
-                                                // check type matching
-                                                is_same_type($2, current_scope, $4);
-                                                // set initialized
-                                                set_initialized($2, current_scope);
+                                                if(!is_redeclared($2, current_scope)){
+                                                    // insert the symbol
+                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                    if(strcmp($4 -> type, "ID") == 0){
+                                                        if(is_correct_scope($4 -> value.id_value, current_scope, false) == 1){
+                                                            // check type matching
+                                                            if(is_same_type($2, current_scope, $4)){
+                                                                // set initialized
+                                                                set_initialized($2, current_scope);
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                }
                                                 }
         
         /*Constant declaration*/
         | CONST datatype IDENTIFIER '=' expr ';' {
                                                 // check multiple declaration
-                                                is_redeclared($3, current_scope);
-                                                // insert the symbol
-                                                insert_symbol($3, $2->type, true, current_scope);
-                                                // check type matching
-                                                is_same_type($3, current_scope, $5);
-                                                // set initialized
-                                                set_initialized($3, current_scope);
+                                                if(!is_redeclared($3, current_scope)){
+                                                    // insert the symbol
+                                                    insert_symbol($3, $2->type, true, current_scope);
+                                                    if(strcmp($5 -> type, "ID") == 0){
+                                                        if(is_correct_scope($5 -> value.id_value, current_scope, false) == 1){
+                                                            // check type matching
+                                                            if(is_same_type($3, current_scope, $5)){
+                                                                // set initialized
+                                                                set_initialized($3, current_scope);
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                                 }				
         
         /*Assignment statements*/
         | IDENTIFIER '=' expr ';'		    {
                                             // check declared or not ($1)
-                                            is_correct_scope($1, current_scope);
-                                            // check if constant
-                                            is_const($1, current_scope);
-                                            // check type matching ($1)
-                                            is_same_type($1, current_scope, $3);
-                                            //set initialized ($1)
-                                            set_initialized($1, current_scope);
+                                            if(is_correct_scope($1, current_scope, true) == 1){
+                                                // check if constant
+                                                if(!is_const($1, current_scope)){
+                                                    if(strcmp($3 -> type, "ID") == 0){
+                                                        if(is_correct_scope($3 -> value.id_value, current_scope, false) == 1){
+                                                            if(is_same_type($1, current_scope, $3)){
+                                                                // set initialized
+                                                                set_initialized($1, current_scope);
+                                                            } 
+                                                        }
+                                                    }
+                                                }
+                                            }
                                             }
         
         /*Print Statement*/
@@ -195,19 +216,18 @@ stmt:
             
         
         /*Conditional Statements*/
-        | IF '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();} ELSE '{' {enter_scope();} statements '}' {exit_scope();}
-        | IF '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();} {exit_scope();}
+        | IF '(' expr ')' '{' {enter_scope();} statements '}'  {exit_scope();} else_stmt
         
         /*Loops*/
         | WHILE '(' expr ')' '{' {enter_scope();} statements '}' {exit_scope();}
-        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_scope();} statements '}' {exit_scope();}
+        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_scope();} statements '}'  {exit_scope();}
         | REPEAT '{' {enter_scope();} statements '}' {exit_scope();} UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
-        | SWITCH '(' IDENTIFIER ')' '{' {enter_scope();} case_list default_case '}' {exit_scope();}
+        | SWITCH '(' IDENTIFIER ')' '{' {enter_scope();} case_list default_case '}'  {exit_scope();}
         
         /*Block Strusture*/
-        | '{' {enter_scope();} statements '}' {exit_scope();}
+        | '{' {enter_scope();} statements'}' {exit_scope();}
         
         
         /*Functions Definition*/   
@@ -220,7 +240,10 @@ stmt:
         | CONTINUE
         ;	
 	
-	
+else_stmt:
+        /*Empty production*/
+        |
+        ELSE '{' {enter_scope();} statements '}'  {exit_scope();}
 datatype:   
         INTEGER             {
                             struct Value value;
@@ -248,21 +271,29 @@ datatype:
 assignment:
 	datatype IDENTIFIER '=' expr                {
                                                 // check multiple declaration
-                                                is_redeclared($2, current_scope);
-                                                // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
-                                                // check type matching
-                                                is_same_type($2, current_scope, $4);
-                                                // set initialized
-                                                set_initialized($2, current_scope);
+                                                if(!is_redeclared($2, current_scope)){
+                                                    // insert the symbol
+                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                    // check type matching
+                                                    if(strcmp($4 -> type, "ID") == 0){
+                                                        if(is_correct_scope($4 -> value.id_value, current_scope, false) == 1){
+                                                            if(is_same_type($2, current_scope, $4)){
+                                                                // set initialized
+                                                                set_initialized($2, current_scope);
+                                                            } 
+                                                        }
+                                                    }
+                                                     
+                                                }
                                                 }
 
 var_declaration: 
 		datatype IDENTIFIER                     {
                                                 // check multiple declaration
-                                                is_redeclared($2, current_scope);
-                                                // insert the symbol
-                                                insert_symbol($2, $1->type, false, current_scope);
+                                                if(!is_redeclared($2, current_scope)){
+                                                    // insert the symbol
+                                                    insert_symbol($2, $1->type, false, current_scope);
+                                                }
                                                 }
 		;
 
@@ -302,16 +333,17 @@ terminals:
                             }			
 
     | IDENTIFIER            {
-                            // check declared
-                            is_correct_scope($1, current_scope);
-                            // check initialized
-                            is_initialized($1, current_scope);
-                            // set used
-                            set_used($1, current_scope);
-
                             Value value;
                             value.id_value = $1;
                             $$ = insert_node("ID", value);
+                            // check declared
+                            if(is_correct_scope($1, current_scope, true) == 1){
+                                // check initialized
+                                if(is_initialized($1, current_scope)){
+                                    // set used
+                                    set_used($1, current_scope);
+                                }
+                            }
                             }          
 
     | INTEGER_VAL	        {
@@ -414,24 +446,35 @@ Node* insert_node(char *type, Value value){
     return new_node;
 }
 
-int is_correct_scope(char* name, Scope *scope){
+int is_correct_scope(char* name, Scope *scope, bool in_place){
     bool found = false;
     for (int i =0; i<=symbol_table_idx; i++){
         if(strcmp(symbol_table[i]-> name, name)==0){
             found = true;
-            if(symbol_table[i] -> scope == scope){
-                // return 1 if all right!
-                return 1;
+            Scope *temp_scope = scope;
+            while(temp_scope != NULL){
+                if(symbol_table[i] -> scope == temp_scope){
+                    // return 1 if all right!
+                    return 1;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
             }
         }
     }
     if(!found){
         // return -1 if not declared (ERROR)
-        printf("Not Declared: %s at line %d\n", name, lineno);
+        if(in_place){
+            printf("Not Declared: %s at line %d\n", name, lineno);
+        }
         return -1;
     }
     else{
         // found = true ==> declared but wrong scope (ERROR)
+        if(in_place){
+            printf("Not Declared In this scope: %s at line %d\n", name, lineno);
+        }
         return 0; 
     }
 }
@@ -439,45 +482,59 @@ int is_correct_scope(char* name, Scope *scope){
 bool is_redeclared(char* name, Scope *scope){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
-        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            // redeclaration (ERROR)
-            printf("Redeclared: %s at line %d\n", name, lineno);
-            return 0;
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    // redeclaration (ERROR)
+                    printf("Redeclared: %s at line %d\n", name, lineno);
+                    return true;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
         }
     }
     // not redeclaration
-    return 1;
+    return false;
 }
 
-bool is_same_type(char *name, Scope * scope, Node* id_node){
+bool is_same_type(char *name, Scope* scope, Node* id_node){
     for (int i =0; i<=symbol_table_idx; i++){
         // get the variable in this scope
-        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            if(strcmp(symbol_table[i]-> type, id_node -> type)==0){
-                return true;
-            }
-            else{
-                // IDs type is ID
-                // we want to check the ID type
-                if(strcmp(id_node-> type, "ID")==0){
-                    // get the type of the ID from the symbol table
-                    for (int j =0; j<=symbol_table_idx; j++){
-                        // get the variable in this scope
-                        if(strcmp(symbol_table[j]-> name, id_node -> value.id_value)==0){
-                            if(strcmp(symbol_table[i]-> type, symbol_table[j]-> type)==0){
-                                return true;
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    if(strcmp(symbol_table[i]-> type, id_node -> type)==0){
+                        return true;
+                    }
+                    else{
+                        // IDs type is ID
+                        // we want to check the ID type
+                        if(strcmp(id_node-> type, "ID")==0){
+                            // get the type of the ID from the symbol table
+                            for (int j =0; j<=symbol_table_idx; j++){
+                                // get the variable in this scope
+                                if(strcmp(symbol_table[j]-> name, id_node -> value.id_value)==0){
+                                    if(strcmp(symbol_table[i]-> type, symbol_table[j]-> type)==0){
+                                        return true;
+                                    }
+                                }
                             }
                         }
+                        else{
+                            printf("type mismatch: %s at line %d\n", name, lineno);
+                            return false;
+                        }
+                        
                     }
                 }
                 else{
-                    printf("type mismatch: %s at line %d\n", name, lineno);
-                    return false;
+                    temp_scope = temp_scope -> parent;
                 }
-                
             }
-        }
-        else{
         }
     }
 }
@@ -485,12 +542,21 @@ bool is_same_type(char *name, Scope * scope, Node* id_node){
 bool is_const(char *name, Scope *scope){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
-        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            if(symbol_table[i]-> is_const){
-                // const (ERROR)
-                printf("trying to modify const variable %s at line %d\n\n",name, lineno);
-                return true;
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    if(symbol_table[i]-> is_const){
+                        // const (ERROR)
+                        printf("trying to modify const variable %s at line %d\n\n",name, lineno);
+                        return true;
+                    }
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
             }
+            
         }
     }
     return false;
@@ -499,8 +565,18 @@ bool is_const(char *name, Scope *scope){
 void set_initialized(char* name, Scope *scope){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
-        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            symbol_table[i]-> is_initialized = true;
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    symbol_table[i]-> is_initialized = true;
+                    return;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
         }
     }
 }
@@ -508,14 +584,22 @@ void set_initialized(char* name, Scope *scope){
 bool is_initialized(char* name, Scope *scope){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
-        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            if(symbol_table[i]-> is_initialized){
-                return true;
-            }
-            else{
-                // used before initializing (ERROR)
-                printf("trying to use variable before initializing %s at line %d\n",name, lineno);
-                return false;
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    if(symbol_table[i]-> is_initialized){
+                        return true;
+                    }
+                    else{
+                        // used before initializing (ERROR)
+                        printf("trying to use variable before initializing %s at line %d\n",name, lineno);
+                        return false;
+                    }
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
             }
         }
     }
@@ -524,8 +608,18 @@ bool is_initialized(char* name, Scope *scope){
 void set_used(char* name, Scope *scope){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
-        if(strcmp(symbol_table[i]-> name, name)==0 && symbol_table[i] -> scope == scope){
-            symbol_table[i]-> is_used = true;
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    symbol_table[i]-> is_used = true;
+                    return;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
         }
     }
 }
@@ -549,18 +643,36 @@ void exit_scope(){
     current_scope = current_scope -> parent;
 }
 
-int main (int argc, char *argv[]){
-    Scope *current_scope = (Scope*) malloc(sizeof(Scope));
-    current_scope -> parent = NULL;
-    // parsing
-    yyin = fopen(argv[1], "r");
-    yyparse();
-    fclose(yyin);
-    if(!is_all_used()){
-      printf("Not all variables used\n");
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <input file>\n", argv[0]);
+        return EXIT_FAILURE;
     }
-    return 0;
+
+    current_scope = (Scope*) malloc(sizeof(Scope));
+    if (current_scope == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return EXIT_FAILURE;
+    }
+    current_scope->parent = NULL;
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
+        fprintf(stderr, "Error opening file: %s\n", argv[1]);
+        free(current_scope); // Clean up allocated memory
+        return EXIT_FAILURE;
+    }
+    yyparse();
+
+    fclose(yyin);
+
+    if (!is_all_used()) {
+        printf("Not all variables used\n");
+    }
+
+    free(current_scope); // Clean up allocated memory before exiting
+    return EXIT_SUCCESS;
 }
+
 
 void yyerror(char const *s)
 {

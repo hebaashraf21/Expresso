@@ -179,7 +179,7 @@
     const char* boolToString(bool b);
 
     void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2);
-    void generate_quadruple_push_operation_1_op_number(char* operation, Node* operand);
+    void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric);
     void generate_quadruple_pop(char* operand);
 
 #line 186 "y.tab.c"
@@ -2291,31 +2291,31 @@ yyreduce:
 
   case 66:
 #line 595 "parser.y"
-                        {generate_quadruple_push_operation_1_op_number("NEG", (yyvsp[0].node_value));}
+                        {generate_quadruple_push_operation_1_op("NEG", (yyvsp[0].node_value), true);}
 #line 2296 "y.tab.c"
     break;
 
   case 67:
 #line 596 "parser.y"
-                        {generate_quadruple_push_operation_1_op_number("PRE_INCR", (yyvsp[0].node_value));}
+                        {generate_quadruple_push_operation_1_op("PRE_INCR", (yyvsp[0].node_value), true);}
 #line 2302 "y.tab.c"
     break;
 
   case 68:
 #line 597 "parser.y"
-                        {generate_quadruple_push_operation_1_op_number("POST_INCR", (yyvsp[-1].node_value));}
+                        {generate_quadruple_push_operation_1_op("POST_INCR", (yyvsp[-1].node_value), true);}
 #line 2308 "y.tab.c"
     break;
 
   case 69:
 #line 598 "parser.y"
-                        {generate_quadruple_push_operation_1_op_number("PRE_DEC", (yyvsp[0].node_value));}
+                        {generate_quadruple_push_operation_1_op("PRE_DEC", (yyvsp[0].node_value), true);}
 #line 2314 "y.tab.c"
     break;
 
   case 70:
 #line 599 "parser.y"
-                        {generate_quadruple_push_operation_1_op_number("POST_DECR", (yyvsp[-1].node_value));}
+                        {generate_quadruple_push_operation_1_op("POST_DECR", (yyvsp[-1].node_value), true);}
 #line 2320 "y.tab.c"
     break;
 
@@ -2367,44 +2367,50 @@ yyreduce:
 #line 2368 "y.tab.c"
     break;
 
+  case 79:
+#line 611 "parser.y"
+                                {generate_quadruple_push_operation_1_op("LOGICAL_NOT", (yyvsp[0].node_value), false);}
+#line 2374 "y.tab.c"
+    break;
+
   case 80:
 #line 614 "parser.y"
                                                 {generate_quadruple_push_operation_2_ops("IS_EQUAL", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2374 "y.tab.c"
+#line 2380 "y.tab.c"
     break;
 
   case 81:
 #line 615 "parser.y"
                                                 {generate_quadruple_push_operation_2_ops("IS_NOT_EQUAL", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2380 "y.tab.c"
+#line 2386 "y.tab.c"
     break;
 
   case 82:
 #line 616 "parser.y"
                                                 {generate_quadruple_push_operation_2_ops("LESS_THAN", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2386 "y.tab.c"
+#line 2392 "y.tab.c"
     break;
 
   case 83:
 #line 617 "parser.y"
                                             {generate_quadruple_push_operation_2_ops("LESS_THAN_OR_EQUALS", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2392 "y.tab.c"
+#line 2398 "y.tab.c"
     break;
 
   case 84:
 #line 618 "parser.y"
                                             {generate_quadruple_push_operation_2_ops("GREATER_THAN", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2398 "y.tab.c"
+#line 2404 "y.tab.c"
     break;
 
   case 85:
 #line 619 "parser.y"
                                         {generate_quadruple_push_operation_2_ops("GREATER_THAN_OR_EQUALS", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2404 "y.tab.c"
+#line 2410 "y.tab.c"
     break;
 
 
-#line 2408 "y.tab.c"
+#line 2414 "y.tab.c"
 
       default: break;
     }
@@ -3062,20 +3068,22 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
     fclose(quad_file);
 }
 
-void generate_quadruple_push_operation_1_op_number(char* operation, Node* operand){
-    // this function is for arithmetic unary operators
-    // check the type is number
-    if(strcmp(operand->type, "INT") != 0 && strcmp(operand->type, "FLOAT") != 0){
-        if(strcmp(operand->type, "ID") != 0){
-            printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
-            return;
-        }
-        if(strcmp(operand->type, "ID") == 0){
-            // if ID ==> check its type
-            //if not INT or FLOAT ==> return
-            if(strcmp(get_symbol_type(operand -> value.id_value, current_scope), "INT") != 0 && strcmp(get_symbol_type(operand -> value.id_value, current_scope), "FLOAT") != 0){
+void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric){
+    // this function is for unary operators
+    //  if the operator is arithmetic ==> numeric is true ==> check the rype of the operand
+    if(numeric){
+        if(strcmp(operand->type, "INT") != 0 && strcmp(operand->type, "FLOAT") != 0){
+            if(strcmp(operand->type, "ID") != 0){
                 printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
                 return;
+            }
+            if(strcmp(operand->type, "ID") == 0){
+                // if ID ==> check its type
+                //if not INT or FLOAT ==> return
+                if(strcmp(get_symbol_type(operand -> value.id_value, current_scope), "INT") != 0 && strcmp(get_symbol_type(operand -> value.id_value, current_scope), "FLOAT") != 0){
+                    printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
+                    return;
+                }
             }
         }
     }

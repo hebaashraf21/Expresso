@@ -110,7 +110,7 @@
     const char* boolToString(bool b);
 
     void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2);
-    void generate_quadruple_push_operation_1_op_number(char* operation, Node* operand);
+    void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric);
     void generate_quadruple_pop(char* operand);
 %}
 
@@ -592,11 +592,11 @@ expr:
     | '(' expr ')'				
      
      /* Mthematical expressions */
-    | '-' expr	        {generate_quadruple_push_operation_1_op_number("NEG", $2);}
-    | INCR expr         {generate_quadruple_push_operation_1_op_number("PRE_INCR", $2);}     		
-    | expr INCR         {generate_quadruple_push_operation_1_op_number("POST_INCR", $1);}         		
-    | DECR expr         {generate_quadruple_push_operation_1_op_number("PRE_DEC", $2);}        		
-    | expr DECR         {generate_quadruple_push_operation_1_op_number("POST_DECR", $1);}
+    | '-' expr	        {generate_quadruple_push_operation_1_op("NEG", $2, true);}
+    | INCR expr         {generate_quadruple_push_operation_1_op("PRE_INCR", $2, true);}     		
+    | expr INCR         {generate_quadruple_push_operation_1_op("POST_INCR", $1, true);}         		
+    | DECR expr         {generate_quadruple_push_operation_1_op("PRE_DEC", $2, true);}        		
+    | expr DECR         {generate_quadruple_push_operation_1_op("POST_DECR", $1, true);}
 
     | expr '+' expr		{generate_quadruple_push_operation_2_ops("ADD", $1, $3);}		
     | expr '-' expr		{generate_quadruple_push_operation_2_ops("SUB", $1, $3);}		
@@ -608,7 +608,7 @@ expr:
      /* logical expressions */
     | expr LOGICAL_AND expr		{generate_quadruple_push_operation_2_ops("LOGICAL_AND", $1, $3);}	
     | expr LOGICAL_OR expr		{generate_quadruple_push_operation_2_ops("LOGICAL_OR", $1, $3);}		
-    | LOGICAL_NOT expr	
+    | LOGICAL_NOT expr	        {generate_quadruple_push_operation_1_op("LOGICAL_NOT", $2, false);}
      
      /* comparison expressions */
     | expr EQUALS expr			        {generate_quadruple_push_operation_2_ops("IS_EQUAL", $1, $3);}	
@@ -1043,20 +1043,22 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
     fclose(quad_file);
 }
 
-void generate_quadruple_push_operation_1_op_number(char* operation, Node* operand){
-    // this function is for arithmetic unary operators
-    // check the type is number
-    if(strcmp(operand->type, "INT") != 0 && strcmp(operand->type, "FLOAT") != 0){
-        if(strcmp(operand->type, "ID") != 0){
-            printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
-            return;
-        }
-        if(strcmp(operand->type, "ID") == 0){
-            // if ID ==> check its type
-            //if not INT or FLOAT ==> return
-            if(strcmp(get_symbol_type(operand -> value.id_value, current_scope), "INT") != 0 && strcmp(get_symbol_type(operand -> value.id_value, current_scope), "FLOAT") != 0){
+void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric){
+    // this function is for unary operators
+    //  if the operator is arithmetic ==> numeric is true ==> check the rype of the operand
+    if(numeric){
+        if(strcmp(operand->type, "INT") != 0 && strcmp(operand->type, "FLOAT") != 0){
+            if(strcmp(operand->type, "ID") != 0){
                 printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
                 return;
+            }
+            if(strcmp(operand->type, "ID") == 0){
+                // if ID ==> check its type
+                //if not INT or FLOAT ==> return
+                if(strcmp(get_symbol_type(operand -> value.id_value, current_scope), "INT") != 0 && strcmp(get_symbol_type(operand -> value.id_value, current_scope), "FLOAT") != 0){
+                    printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
+                    return;
+                }
             }
         }
     }

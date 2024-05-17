@@ -171,6 +171,12 @@ stmt:
                                                             }
                                                         }
                                                     }
+                                                    else{
+                                                        if(is_same_type($2, current_scope, $4)){
+                                                            // set initialized
+                                                            set_initialized($2, current_scope);
+                                                        }
+                                                    }
                                                     
                                                 }
                                                 }
@@ -190,6 +196,13 @@ stmt:
                                                             }
                                                         }
                                                     }
+                                                    else{
+                                                        // check type matching
+                                                        if(is_same_type($3, current_scope, $5)){
+                                                            // set initialized
+                                                            set_initialized($3, current_scope);
+                                                        }
+                                                    }
                                                 }
                                                 }				
         
@@ -206,6 +219,12 @@ stmt:
                                                                 set_initialized($1, current_scope);
                                                             } 
                                                         }
+                                                    }
+                                                    else{
+                                                        if(is_same_type($1, current_scope, $3)){
+                                                            // set initialized
+                                                            set_initialized($1, current_scope);
+                                                        } 
                                                     }
                                                 }
                                             }
@@ -281,6 +300,12 @@ assignment:
                                                                 // set initialized
                                                                 set_initialized($2, current_scope);
                                                             } 
+                                                        }
+                                                    }
+                                                    else{
+                                                        if(is_same_type($2, current_scope, $4)){
+                                                            // set initialized
+                                                            set_initialized($2, current_scope);
                                                         }
                                                     }
                                                      

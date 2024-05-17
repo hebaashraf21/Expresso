@@ -666,14 +666,14 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   137,   137,   138,   143,   144,   150,   152,   160,   179,
-     197,   215,   219,   219,   219,   222,   222,   223,   223,   224,
-     224,   224,   227,   227,   230,   230,   234,   234,   235,   235,
-     238,   239,   240,   243,   246,   246,   248,   252,   256,   260,
-     264,   272,   291,   301,   303,   304,   308,   310,   315,   319,
-     323,   329,   335,   349,   355,   361,   367,   375,   378,   381,
-     382,   383,   384,   385,   386,   387,   388,   389,   390,   391,
-     394,   395,   396,   399,   400,   401,   402,   403,   404
+       0,   137,   137,   138,   143,   144,   150,   152,   160,   185,
+     210,   222,   226,   226,   226,   229,   229,   230,   230,   231,
+     231,   231,   234,   234,   237,   237,   241,   241,   242,   242,
+     245,   246,   247,   250,   253,   253,   255,   259,   263,   267,
+     271,   279,   304,   314,   316,   317,   321,   323,   328,   332,
+     336,   342,   348,   362,   368,   374,   380,   388,   391,   394,
+     395,   396,   397,   398,   399,   400,   401,   402,   403,   404,
+     407,   408,   409,   412,   413,   414,   415,   416,   417
 };
 #endif
 
@@ -1713,14 +1713,20 @@ yyreduce:
                                                             }
                                                         }
                                                     }
+                                                    else{
+                                                        if(is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value))){
+                                                            // set initialized
+                                                            set_initialized((yyvsp[-3].identifier), current_scope);
+                                                        }
+                                                    }
                                                     
                                                 }
                                                 }
-#line 1720 "y.tab.c"
+#line 1726 "y.tab.c"
     break;
 
   case 9:
-#line 179 "parser.y"
+#line 185 "parser.y"
                                                  {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[-3].identifier), current_scope)){
@@ -1735,187 +1741,188 @@ yyreduce:
                                                             }
                                                         }
                                                     }
-                                                }
-                                                }
-#line 1741 "y.tab.c"
-    break;
-
-  case 10:
-#line 197 "parser.y"
-                                                    {
-                                            // check declared or not ($1)
-                                            if(is_correct_scope((yyvsp[-3].identifier), current_scope, true) == 1){
-                                                // check if constant
-                                                if(!is_const((yyvsp[-3].identifier), current_scope)){
-                                                    if(strcmp((yyvsp[-1].node_value) -> type, "ID") == 0){
-                                                        if(is_correct_scope((yyvsp[-1].node_value) -> value.id_value, current_scope, false) == 1){
-                                                            if(is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value))){
-                                                                // set initialized
-                                                                set_initialized((yyvsp[-3].identifier), current_scope);
-                                                            } 
+                                                    else{
+                                                        // check type matching
+                                                        if(is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value))){
+                                                            // set initialized
+                                                            set_initialized((yyvsp[-3].identifier), current_scope);
                                                         }
                                                     }
                                                 }
+                                                }
+#line 1754 "y.tab.c"
+    break;
+
+  case 10:
+#line 210 "parser.y"
+                                                    {
+                                            // check declared or not ($1)
+                                            is_correct_scope((yyvsp[-3].identifier), current_scope, true);
+                                            // check if constant
+                                            is_const((yyvsp[-3].identifier), current_scope);
+                                            // check type matching ($1)
+                                            is_same_type((yyvsp[-3].identifier), current_scope, (yyvsp[-1].node_value));
+                                            //set initialized ($1)
+                                            set_initialized((yyvsp[-3].identifier), current_scope);
                                             }
-                                            }
-#line 1762 "y.tab.c"
+#line 1769 "y.tab.c"
     break;
 
   case 12:
-#line 219 "parser.y"
+#line 226 "parser.y"
                               {enter_scope();}
-#line 1768 "y.tab.c"
+#line 1775 "y.tab.c"
     break;
 
   case 13:
-#line 219 "parser.y"
+#line 226 "parser.y"
                                                                {exit_scope();}
-#line 1774 "y.tab.c"
+#line 1781 "y.tab.c"
     break;
 
   case 15:
-#line 222 "parser.y"
+#line 229 "parser.y"
                                  {enter_scope();}
-#line 1780 "y.tab.c"
+#line 1787 "y.tab.c"
     break;
 
   case 16:
-#line 222 "parser.y"
+#line 229 "parser.y"
                                                                  {exit_scope();}
-#line 1786 "y.tab.c"
+#line 1793 "y.tab.c"
     break;
 
   case 17:
-#line 223 "parser.y"
+#line 230 "parser.y"
                                                                       {enter_scope();}
-#line 1792 "y.tab.c"
+#line 1799 "y.tab.c"
     break;
 
   case 18:
-#line 223 "parser.y"
+#line 230 "parser.y"
                                                                                                        {exit_scope();}
-#line 1798 "y.tab.c"
+#line 1805 "y.tab.c"
     break;
 
   case 19:
-#line 224 "parser.y"
+#line 231 "parser.y"
                      {enter_scope();}
-#line 1804 "y.tab.c"
+#line 1811 "y.tab.c"
     break;
 
   case 20:
-#line 224 "parser.y"
+#line 231 "parser.y"
                                                      {exit_scope();}
-#line 1810 "y.tab.c"
+#line 1817 "y.tab.c"
     break;
 
   case 22:
-#line 227 "parser.y"
+#line 234 "parser.y"
                                         {enter_scope();}
-#line 1816 "y.tab.c"
+#line 1823 "y.tab.c"
     break;
 
   case 23:
-#line 227 "parser.y"
+#line 234 "parser.y"
                                                                                      {exit_scope();}
-#line 1822 "y.tab.c"
+#line 1829 "y.tab.c"
     break;
 
   case 24:
-#line 230 "parser.y"
+#line 237 "parser.y"
               {enter_scope();}
-#line 1828 "y.tab.c"
+#line 1835 "y.tab.c"
     break;
 
   case 25:
-#line 230 "parser.y"
+#line 237 "parser.y"
                                              {exit_scope();}
-#line 1834 "y.tab.c"
+#line 1841 "y.tab.c"
     break;
 
   case 26:
-#line 234 "parser.y"
+#line 241 "parser.y"
                                                       {enter_scope();}
-#line 1840 "y.tab.c"
+#line 1847 "y.tab.c"
     break;
 
   case 27:
-#line 234 "parser.y"
+#line 241 "parser.y"
                                                                                       {exit_scope();}
-#line 1846 "y.tab.c"
+#line 1853 "y.tab.c"
     break;
 
   case 28:
-#line 235 "parser.y"
+#line 242 "parser.y"
                                                           {enter_scope();}
-#line 1852 "y.tab.c"
+#line 1859 "y.tab.c"
     break;
 
   case 29:
-#line 235 "parser.y"
+#line 242 "parser.y"
                                                                                           {exit_scope();}
-#line 1858 "y.tab.c"
+#line 1865 "y.tab.c"
     break;
 
   case 34:
-#line 246 "parser.y"
+#line 253 "parser.y"
                  {enter_scope();}
-#line 1864 "y.tab.c"
+#line 1871 "y.tab.c"
     break;
 
   case 35:
-#line 246 "parser.y"
+#line 253 "parser.y"
                                                   {exit_scope();}
-#line 1870 "y.tab.c"
+#line 1877 "y.tab.c"
     break;
 
   case 36:
-#line 248 "parser.y"
+#line 255 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("INT", value);
                             }
-#line 1879 "y.tab.c"
+#line 1886 "y.tab.c"
     break;
 
   case 37:
-#line 252 "parser.y"
+#line 259 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("FLOAT", value);
                             }
-#line 1888 "y.tab.c"
+#line 1895 "y.tab.c"
     break;
 
   case 38:
-#line 256 "parser.y"
+#line 263 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("CHAR", value);
                             }
-#line 1897 "y.tab.c"
+#line 1904 "y.tab.c"
     break;
 
   case 39:
-#line 260 "parser.y"
+#line 267 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("STRING", value);
                             }
-#line 1906 "y.tab.c"
+#line 1913 "y.tab.c"
     break;
 
   case 40:
-#line 264 "parser.y"
+#line 271 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("BOOL", value);
                             }
-#line 1915 "y.tab.c"
+#line 1922 "y.tab.c"
     break;
 
   case 41:
-#line 272 "parser.y"
+#line 279 "parser.y"
                                                     {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[-2].identifier), current_scope)){
@@ -1930,14 +1937,20 @@ yyreduce:
                                                             } 
                                                         }
                                                     }
+                                                    else{
+                                                        if(is_same_type((yyvsp[-2].identifier), current_scope, (yyvsp[0].node_value))){
+                                                            // set initialized
+                                                            set_initialized((yyvsp[-2].identifier), current_scope);
+                                                        }
+                                                    }
                                                      
                                                 }
                                                 }
-#line 1937 "y.tab.c"
+#line 1950 "y.tab.c"
     break;
 
   case 42:
-#line 291 "parser.y"
+#line 304 "parser.y"
                                                         {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[0].identifier), current_scope)){
@@ -1945,31 +1958,31 @@ yyreduce:
                                                     insert_symbol((yyvsp[0].identifier), (yyvsp[-1].node_value)->type, false, current_scope);
                                                 }
                                                 }
-#line 1949 "y.tab.c"
+#line 1962 "y.tab.c"
     break;
 
   case 50:
-#line 323 "parser.y"
+#line 336 "parser.y"
                             {
                             Value value;
                             value.bool_value = true;
                             (yyval.node_value) = insert_node("BOOL", value);
                             }
-#line 1959 "y.tab.c"
+#line 1972 "y.tab.c"
     break;
 
   case 51:
-#line 329 "parser.y"
+#line 342 "parser.y"
                             {
                             Value value;
                             value.bool_value = false;
                             (yyval.node_value) = insert_node("BOOL", value);
                             }
-#line 1969 "y.tab.c"
+#line 1982 "y.tab.c"
     break;
 
   case 52:
-#line 335 "parser.y"
+#line 348 "parser.y"
                             {
                             Value value;
                             value.id_value = (yyvsp[0].identifier);
@@ -1983,51 +1996,51 @@ yyreduce:
                                 }
                             }
                             }
-#line 1987 "y.tab.c"
+#line 2000 "y.tab.c"
     break;
 
   case 53:
-#line 349 "parser.y"
+#line 362 "parser.y"
                                 {
                             Value value;
                             value.int_value = (yyvsp[0].int_value);
                             (yyval.node_value) = insert_node("INT", value);
                             }
-#line 1997 "y.tab.c"
+#line 2010 "y.tab.c"
     break;
 
   case 54:
-#line 355 "parser.y"
+#line 368 "parser.y"
                                 {
                             Value value;
                             value.float_value = (yyvsp[0].float_value);
                             (yyval.node_value) = insert_node("FLOAT", value);
                             }
-#line 2007 "y.tab.c"
+#line 2020 "y.tab.c"
     break;
 
   case 55:
-#line 361 "parser.y"
+#line 374 "parser.y"
                                         {
                             Value value;
                             value.char_value = (yyvsp[0].char_value);
                             (yyval.node_value) = insert_node("CHAR", value);
                             }
-#line 2017 "y.tab.c"
+#line 2030 "y.tab.c"
     break;
 
   case 56:
-#line 367 "parser.y"
+#line 380 "parser.y"
                             {
                             Value value;
                             value.str_value = (yyvsp[0].str_value);
                             (yyval.node_value) = insert_node("STRING", value);
                             }
-#line 2027 "y.tab.c"
+#line 2040 "y.tab.c"
     break;
 
 
-#line 2031 "y.tab.c"
+#line 2044 "y.tab.c"
 
       default: break;
     }
@@ -2259,7 +2272,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 406 "parser.y"
+#line 419 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, Scope *scope){
@@ -2425,10 +2438,8 @@ void set_initialized(char* name, Scope *scope){
         if(strcmp(symbol_table[i]-> name, name)==0){
             Scope *temp_scope = scope;
             while(temp_scope){
-                printf("HERE\n");
                 if(symbol_table[i] -> scope == temp_scope){
                     symbol_table[i]-> is_initialized = true;
-                    printf("Init\n");
                     return;
                 }
                 else{

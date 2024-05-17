@@ -72,6 +72,7 @@
     void set_initialized(char* name, Scope *scope);
     // check if a variable is initialized before using
     bool is_initialized(char* name, Scope *scope);
+
     // shen use varuiable ==> set that
     void set_used(char* name, Scope *scope);
 
@@ -82,7 +83,7 @@
     // insert the function parameters in the symol table
     void insert_function_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
     bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
-    char* get_parameter_type(char* name, Scope *scope);
+    char* get_symbol_type(char* name, Scope *scope);
     int parameter_count = 0;
     function_parameter * parameters[100];
 
@@ -109,6 +110,7 @@
     const char* boolToString(bool b);
 
     void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2);
+    void generate_quadruple_push_operation_1_op_number(char* operation, Node* operand);
     void generate_quadruple_pop(char* operand);
 %}
 
@@ -483,7 +485,7 @@ parameters_list_call:
                 parameters[parameter_count] = malloc(sizeof(function_parameter));
                 if (parameters[parameter_count] != NULL) {
                     parameters[parameter_count]->name = $1;
-                    parameters[parameter_count]->type = get_parameter_type($1, current_scope);
+                    parameters[parameter_count]->type = get_symbol_type($1, current_scope);
                     parameter_count++; // Increment after assignment
                 } else {
                     // Handle memory allocation failure if needed
@@ -590,11 +592,12 @@ expr:
     | '(' expr ')'				
      
      /* Mthematical expressions */
-    | '-' expr	
-    | INCR expr                 		
-    | expr INCR                 		
-    | DECR expr                 		
-    | expr DECR                 		
+    | '-' expr	        {generate_quadruple_push_operation_1_op_number("NEG", $2);}
+    | INCR expr         {generate_quadruple_push_operation_1_op_number("PRE_INCR", $2);}     		
+    | expr INCR         {generate_quadruple_push_operation_1_op_number("POST_INCR", $1);}         		
+    | DECR expr         {generate_quadruple_push_operation_1_op_number("PRE_DEC", $2);}        		
+    | expr DECR         {generate_quadruple_push_operation_1_op_number("POST_DECR", $1);}
+
     | expr '+' expr		{generate_quadruple_push_operation_2_ops("ADD", $1, $3);}		
     | expr '-' expr		{generate_quadruple_push_operation_2_ops("SUB", $1, $3);}		
     | expr '*' expr		{generate_quadruple_push_operation_2_ops("MUL", $1, $3);}		
@@ -605,7 +608,7 @@ expr:
      /* logical expressions */
     | expr LOGICAL_AND expr		{generate_quadruple_push_operation_2_ops("LOGICAL_AND", $1, $3);}	
     | expr LOGICAL_OR expr		{generate_quadruple_push_operation_2_ops("LOGICAL_OR", $1, $3);}		
-    | LOGICAL_NOT expr			{generate_quadruple_push_operation_2_ops("LOGICAL_NOT", $1, $3);}	
+    | LOGICAL_NOT expr	
      
      /* comparison expressions */
     | expr EQUALS expr			        {generate_quadruple_push_operation_2_ops("IS_EQUAL", $1, $3);}	
@@ -900,7 +903,7 @@ void insert_function_parameters(char* name, Scope *scope, function_parameter **p
     }
 }
 
-char* get_parameter_type(char* name, Scope *scope){
+char* get_symbol_type(char* name, Scope *scope){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
         if(strcmp(symbol_table[i]-> name, name)==0){
@@ -971,7 +974,36 @@ void exit_block(){
 /*==========================================================================================*/
 /*Quadruples*/
 void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2) {
-
+    // check if the 2 operands are IDs
+    if(strcmp(operand1->type, "ID") == 0 && strcmp(operand1->type, "ID") == 0){
+        // check the 2 IDs are the same type
+        // if not the same type ==> return
+        if(strcmp(get_symbol_type(operand1 -> value.id_value, current_scope), get_symbol_type(operand2 -> value.id_value, current_scope)) != 0){
+            printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
+            return;
+        }
+    }
+    // check if the first operand is ID
+    else if(strcmp(operand1->type, "ID") == 0 ){
+        // if not the same type ==> return
+        if(strcmp(get_symbol_type(operand1 -> value.id_value, current_scope), operand2->type) != 0){
+            printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
+            return;
+        }
+    }
+    // check if the second operand is ID
+    else if(strcmp(operand2->type, "ID") == 0 ){
+        // if not the same type ==> return
+        if(strcmp(operand1->type, get_symbol_type(operand2 -> value.id_value, current_scope)) != 0){
+            printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
+            return;
+        }
+    }
+    // the 2 operands are not IDs ==> check the type
+    else if(strcmp(operand1->type, operand2->type) != 0){
+        printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
+        return;
+    }
     // Generate quadruple based on the type
     quad_idx++;
     quadruples[quad_idx].operation = operation;
@@ -991,22 +1023,71 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
         sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.bool_value));
     }
     else if (strcmp(operand1->type, "ID") == 0) {
-        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.id_value));
-        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.id_value));
+        sprintf(quadruples[quad_idx].operand1, "%s", operand1->value.id_value);
+        sprintf(quadruples[quad_idx].operand2, "%s", operand2->value.id_value);
     }
     else if (strcmp(operand1->type, "CHAR") == 0) {
-        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.char_value));
-        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.char_value));
+        sprintf(quadruples[quad_idx].operand1, "%d", operand1->value.char_value);
+        sprintf(quadruples[quad_idx].operand2, "%d", operand2->value.char_value);
     }
     else if (strcmp(operand1->type, "STRING") == 0) {
-        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand1->value.str_value));
-        sprintf(quadruples[quad_idx].operand2, "%s", boolToString(operand2->value.str_value));
+        sprintf(quadruples[quad_idx].operand1, "%s", operand1->value.str_value);
+        sprintf(quadruples[quad_idx].operand2, "%s", operand2->value.str_value);
     }
 
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");
     fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+    fprintf(quad_file, "%s\n", operation);
+    fclose(quad_file);
+}
+
+void generate_quadruple_push_operation_1_op_number(char* operation, Node* operand){
+    // this function is for arithmetic unary operators
+    // check the type is number
+    if(strcmp(operand->type, "INT") != 0 && strcmp(operand->type, "FLOAT") != 0){
+        if(strcmp(operand->type, "ID") != 0){
+            printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
+            return;
+        }
+        if(strcmp(operand->type, "ID") == 0){
+            // if ID ==> check its type
+            //if not INT or FLOAT ==> return
+            if(strcmp(get_symbol_type(operand -> value.id_value, current_scope), "INT") != 0 && strcmp(get_symbol_type(operand -> value.id_value, current_scope), "FLOAT") != 0){
+                printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
+                return;
+            }
+        }
+    }
+    quad_idx++;
+    quadruples[quad_idx].operation = operation;
+    quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    if (strcmp(operand->type, "INT") != 0) {
+            sprintf(quadruples[quad_idx].operand1, "%d", operand->value.int_value);
+    } 
+    else if (strcmp(operand->type, "FLOAT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%f", operand->value.float_value);
+    } 
+    else if (strcmp(operand->type, "BOOL") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand->value.bool_value));
+    }
+    else if (strcmp(operand->type, "ID") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.id_value);
+    }
+    else if (strcmp(operand->type, "CHAR") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%d", operand->value.char_value);
+    }
+    else if (strcmp(operand->type, "STRING") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.str_value);
+    }
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fprintf(quad_file, "%s\n", operation);
     fclose(quad_file);
 }

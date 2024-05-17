@@ -1,0 +1,3 @@
+push 
+POST_INCR
+pop a

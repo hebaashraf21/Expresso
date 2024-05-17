@@ -1,2 +1,6 @@
-int a = 5;
-print(a);
+int a(int x){
+    x = 5;
+    print(x);
+}
+int y = 0;
+a(y);

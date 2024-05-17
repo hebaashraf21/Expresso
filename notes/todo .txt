@@ -1,0 +1,7 @@
+function call
+switch
+function definition
+for loops
+while loops
+repeat until
+if else

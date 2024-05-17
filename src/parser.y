@@ -114,6 +114,8 @@
     void generate_quadruple_push_terminal(Node* operand);
     void generate_quadruple_pop(char* operand);
     void quad_print(Node* operand);
+    void quad_function_call_label(char* operand);
+    void quad_function_call_parameters(char* operand);
 %}
 
 %union { 
@@ -187,7 +189,7 @@ program:
 
 
 statements:
-        stmt
+         stmt
         | statements stmt
         ;
 
@@ -367,6 +369,7 @@ function_call:
                                                             check_correct_parameters($1, current_scope, parameters, parameter_count);
                                                         }
                                                         parameter_count = 0;
+                                                        quad_function_call_label($1);
                                                     }
 
 else_stmt:
@@ -489,6 +492,7 @@ parameters_list_call:
                     parameters[parameter_count]->name = $1;
                     parameters[parameter_count]->type = get_symbol_type($1, current_scope);
                     parameter_count++; // Increment after assignment
+                    quad_function_call_parameters($1);
                 } else {
                     // Handle memory allocation failure if needed
                     yyerror("Memory allocation failed for function parameter");
@@ -1164,6 +1168,32 @@ void quad_print(Node* operand){
     FILE *quad_file = fopen("quads.txt", "a");
     fprintf(quad_file, "CALL PRINT \n");
     fprintf(quad_file, "pop %s\n", quadruples[quad_idx].operand1);
+    fclose(quad_file);
+}
+
+void quad_function_call_label(char* operand){
+    quad_idx++;
+    quadruples[quad_idx].operation = "CALL";
+    quadruples[quad_idx].operand1 = operand;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "CALL %s\n", operand);
+    fclose(quad_file);
+}
+
+void quad_function_call_parameters(char* operand){
+    quad_idx++;
+    quadruples[quad_idx].operation = "PUSH";
+    quadruples[quad_idx].operand1 = operand;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", operand);
     fclose(quad_file);
 }
 

@@ -1,8 +1,7 @@
 Name	Type	Const	Scope	Return Type	Initialized	Used
-a	INT	false	0x55559354d2a0		true	true
-x	INT	false	0x55559354d2a0	N/A	false	false
-y	INT	false	0x55559354d2a0	N/A	false	false
-b	FUNC	true	0x55559354d2a0	VOID	false	false
-z	INT	false	0x55559354d2a0	N/A	false	false
-w	INT	false	0x55559354d2a0	N/A	false	false
-c	FUNC	true	0x55559354d2a0	INT	false	false
+a	INT	false	0x5652fde822a0		true	true
+x	INT	false	0x5652fde822a0	N/A	false	false
+y	INT	false	0x5652fde822a0	N/A	false	false
+b	FUNC	true	0x5652fde822a0	VOID	false	false
+c	FUNC	true	0x5652fde822a0	INT	false	false
+q	INT	false	0x5652fde822a0		true	false

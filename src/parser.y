@@ -20,6 +20,7 @@
         float float_value;
         bool bool_value;
         char* id_value;
+        char* func_value;
     }Value;
 
     typedef struct Node{
@@ -81,7 +82,7 @@
     // insert the function parameters in the symol table
     void insert_function_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
     bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
-    
+
     int parameter_count = 0;
     function_parameter * parameters[100];
 
@@ -195,6 +196,15 @@ stmt:
                                                             }
                                                         }
                                                     }
+                                                    else if(strcmp($4 -> type, "FUNC") == 0){
+                                                        if(is_correct_scope($4 -> value.func_value, current_scope, false) == 1){
+                                                            // check type matching
+                                                            if(is_same_type($2, current_scope, $4)){
+                                                                // set initialized
+                                                                set_initialized($2, current_scope);
+                                                            }
+                                                        }
+                                                    }
                                                     else{
                                                         if(is_same_type($2, current_scope, $4)){
                                                             // set initialized
@@ -213,6 +223,15 @@ stmt:
                                                     insert_symbol($3, $2->type, true, current_scope,NULL);
                                                     if(strcmp($5 -> type, "ID") == 0){
                                                         if(is_correct_scope($5 -> value.id_value, current_scope, false) == 1){
+                                                            // check type matching
+                                                            if(is_same_type($3, current_scope, $5)){
+                                                                // set initialized
+                                                                set_initialized($3, current_scope);
+                                                            }
+                                                        }
+                                                    }
+                                                    else if(strcmp($5 -> type, "FUNC") == 0){
+                                                        if(is_correct_scope($5 -> value.func_value, current_scope, false) == 1){
                                                             // check type matching
                                                             if(is_same_type($3, current_scope, $5)){
                                                                 // set initialized
@@ -242,6 +261,15 @@ stmt:
                                                                 // set initialized
                                                                 set_initialized($1, current_scope);
                                                             } 
+                                                        }
+                                                    }
+                                                    else if(strcmp($3 -> type, "FUNC") == 0){
+                                                        if(is_correct_scope($3 -> value.func_value, current_scope, false) == 1){
+                                                            // check type matching
+                                                            if(is_same_type($1, current_scope, $3)){
+                                                                // set initialized
+                                                                set_initialized($1, current_scope);
+                                                            }
                                                         }
                                                     }
                                                     else{
@@ -285,10 +313,10 @@ stmt:
                             
             
         | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   {
-                                                                                            printf("parameter_count %d\n", parameter_count);
                                                                                             exit_block();
                                                                                             if(!is_redeclared($2, current_scope)){
                                                                                                 insert_symbol($2, "FUNC", true, current_scope, $1 -> type);
+                                                                                                insert_function_parameters($2, current_scope, parameters, parameter_count);
                                                                                             }
                                                                                             parameter_count = 0;
                                                                                             }
@@ -300,10 +328,10 @@ stmt:
         ;	
 
 function_call: 
-        IDENTIFIER '(' parameters_list_call ')' ';'  {
+        IDENTIFIER '(' parameters_list_call ')'  {
                                                         parameter_count = 0;
                                                         Value value;
-                                                        value.id_value = $1;
+                                                        value.func_value = $1;
                                                         $$ = insert_node("FUNC", value);
                                                         if(is_correct_scope($1, current_scope, true) == 1 && is_function($1, current_scope,true)){
                                                             
@@ -351,6 +379,15 @@ assignment:
                                                                 // set initialized
                                                                 set_initialized($2, current_scope);
                                                             } 
+                                                        }
+                                                    }
+                                                    else if(strcmp($4 -> type, "FUNC") == 0){
+                                                        if(is_correct_scope($4 -> value.func_value, current_scope, false) == 1){
+                                                            // check type matching
+                                                            if(is_same_type($2, current_scope, $4)){
+                                                                // set initialized
+                                                                set_initialized($2, current_scope);
+                                                            }
                                                         }
                                                     }
                                                     else{
@@ -632,6 +669,27 @@ bool is_same_type(char *name, Scope* scope, Node* id_node){
                                 if(strcmp(symbol_table[j]-> name, id_node -> value.id_value)==0){
                                     if(strcmp(symbol_table[i]-> type, symbol_table[j]-> type)==0){
                                         return true;
+                                    }
+                                    else{
+                                        printf("type mismatch: %s at line %d\n", name, lineno);
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                        // functions type is FUNC
+                        // we want to check the ID type
+                        if(strcmp(id_node-> type, "FUNC")==0){
+                            // get the type of the ID from the symbol table
+                            for (int j =0; j<=symbol_table_idx; j++){
+                                // get the variable in this scope
+                                if(strcmp(symbol_table[j]-> name, id_node -> value.func_value)==0){
+                                    if(strcmp(symbol_table[i]-> type, symbol_table[j]-> return_type)==0){
+                                        return true;
+                                    }
+                                    else{
+                                        printf("type mismatch: %s at line %d\n", name, lineno);
+                                        return false;
                                     }
                                 }
                             }

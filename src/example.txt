@@ -2,7 +2,8 @@ int a = 5;
 void b(int x, int y){
     print(a);
 }
-int c (int z, int w){
+int c (){
 ;
 }
-b(x,y);
+
+int q = c();

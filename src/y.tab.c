@@ -151,7 +151,7 @@
     // insert the function parameters in the symol table
     void insert_function_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
     bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
-
+    char* get_parameter_type(char* name, Scope *scope);
     int parameter_count = 0;
     function_parameter * parameters[100];
 
@@ -692,11 +692,11 @@ static const yytype_int16 yyrline[] =
      253,   286,   290,   290,   290,   293,   293,   294,   294,   295,
      295,   295,   298,   298,   301,   301,   305,   305,   315,   315,
      325,   326,   327,   331,   341,   344,   344,   346,   350,   354,
-     358,   362,   370,   404,   425,   428,   432,   440,   443,   447,
-     454,   455,   456,   460,   464,   468,   482,   488,   494,   496,
-     510,   516,   522,   528,   536,   539,   542,   543,   544,   545,
-     546,   547,   548,   549,   550,   551,   552,   555,   556,   557,
-     560,   561,   562,   563,   564,   565
+     358,   362,   370,   404,   425,   428,   432,   440,   445,   469,
+     477,   478,   479,   483,   487,   491,   505,   511,   517,   519,
+     533,   539,   545,   551,   559,   562,   565,   566,   567,   568,
+     569,   570,   571,   572,   573,   574,   575,   578,   579,   580,
+     583,   584,   585,   586,   587,   588
 };
 #endif
 
@@ -1964,13 +1964,13 @@ yyreduce:
   case 33:
 #line 331 "parser.y"
                                                  {
-                                                        parameter_count = 0;
                                                         Value value;
                                                         value.func_value = (yyvsp[-3].identifier);
                                                         (yyval.node_value) = insert_node("FUNC", value);
                                                         if(is_correct_scope((yyvsp[-3].identifier), current_scope, true) == 1 && is_function((yyvsp[-3].identifier), current_scope,true)){
-                                                            
+                                                            check_correct_parameters((yyvsp[-3].identifier), current_scope, parameters, parameter_count);
                                                         }
+                                                        parameter_count = 0;
                                                     }
 #line 1976 "y.tab.c"
     break;
@@ -2120,30 +2120,51 @@ yyreduce:
 #line 440 "parser.y"
     {
         (yyval.int_value) = 0; // Initialize count to 0
+        printf("thi this\n");
     }
-#line 2125 "y.tab.c"
+#line 2126 "y.tab.c"
     break;
 
   case 48:
-#line 443 "parser.y"
+#line 445 "parser.y"
                  {
+        // check scope
+        // check initialized
+        // set parameters
+        if(is_correct_scope((yyvsp[0].identifier), current_scope, true) == 1 && !is_function((yyvsp[0].identifier), current_scope,false)){
+            // check initialized
+            if(is_initialized((yyvsp[0].identifier), current_scope)){
+                // set used
+                set_used((yyvsp[0].identifier), current_scope);
+                parameters[parameter_count] = malloc(sizeof(function_parameter));
+                if (parameters[parameter_count] != NULL) {
+                    parameters[parameter_count]->name = (yyvsp[0].identifier);
+                    parameters[parameter_count]->type = get_parameter_type((yyvsp[0].identifier), current_scope);
+                    parameter_count++; // Increment after assignment
+                } else {
+                    // Handle memory allocation failure if needed
+                    yyerror("Memory allocation failed for function parameter");
+                }
+            }
+        }
         // Increment count for each var_declaration
         (yyval.int_value) = 1;
       }
-#line 2134 "y.tab.c"
+#line 2154 "y.tab.c"
     break;
 
   case 49:
-#line 447 "parser.y"
+#line 469 "parser.y"
                                           {
         // Increment count for each var_declaration
         (yyval.int_value) = (yyvsp[-2].int_value) + 1;
+        printf("num %d\n", (yyval.int_value));
       }
-#line 2143 "y.tab.c"
+#line 2164 "y.tab.c"
     break;
 
   case 55:
-#line 468 "parser.y"
+#line 491 "parser.y"
                             {
                             Value value;
                             value.id_value = (yyvsp[0].identifier);
@@ -2157,31 +2178,31 @@ yyreduce:
                                 }
                             }
                             }
-#line 2161 "y.tab.c"
+#line 2182 "y.tab.c"
     break;
 
   case 56:
-#line 482 "parser.y"
+#line 505 "parser.y"
                             {
                             Value value;
                             value.bool_value = true;
                             (yyval.node_value) = insert_node("BOOL", value);
                             }
-#line 2171 "y.tab.c"
+#line 2192 "y.tab.c"
     break;
 
   case 57:
-#line 488 "parser.y"
+#line 511 "parser.y"
                             {
                             Value value;
                             value.bool_value = false;
                             (yyval.node_value) = insert_node("BOOL", value);
                             }
-#line 2181 "y.tab.c"
+#line 2202 "y.tab.c"
     break;
 
   case 59:
-#line 496 "parser.y"
+#line 519 "parser.y"
                             {
                             Value value;
                             value.id_value = (yyvsp[0].identifier);
@@ -2195,51 +2216,51 @@ yyreduce:
                                 }
                             }
                             }
-#line 2199 "y.tab.c"
+#line 2220 "y.tab.c"
     break;
 
   case 60:
-#line 510 "parser.y"
+#line 533 "parser.y"
                                 {
                             Value value;
                             value.int_value = (yyvsp[0].int_value);
                             (yyval.node_value) = insert_node("INT", value);
                             }
-#line 2209 "y.tab.c"
+#line 2230 "y.tab.c"
     break;
 
   case 61:
-#line 516 "parser.y"
+#line 539 "parser.y"
                                 {
                             Value value;
                             value.float_value = (yyvsp[0].float_value);
                             (yyval.node_value) = insert_node("FLOAT", value);
                             }
-#line 2219 "y.tab.c"
+#line 2240 "y.tab.c"
     break;
 
   case 62:
-#line 522 "parser.y"
+#line 545 "parser.y"
                                         {
                             Value value;
                             value.char_value = (yyvsp[0].char_value);
                             (yyval.node_value) = insert_node("CHAR", value);
                             }
-#line 2229 "y.tab.c"
+#line 2250 "y.tab.c"
     break;
 
   case 63:
-#line 528 "parser.y"
+#line 551 "parser.y"
                             {
                             Value value;
                             value.str_value = (yyvsp[0].str_value);
                             (yyval.node_value) = insert_node("STRING", value);
                             }
-#line 2239 "y.tab.c"
+#line 2260 "y.tab.c"
     break;
 
 
-#line 2243 "y.tab.c"
+#line 2264 "y.tab.c"
 
       default: break;
     }
@@ -2471,7 +2492,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 567 "parser.y"
+#line 590 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, Scope *scope, char* return_type){
@@ -2704,7 +2725,8 @@ void set_used(char* name, Scope *scope){
         }
     }
 }
-
+/*======================================================================================================*/
+/*Function Hnadling functions*/
 bool is_function(char* name, Scope *scope, bool need_to_be_function){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
@@ -2756,6 +2778,55 @@ void insert_function_parameters(char* name, Scope *scope, function_parameter **p
     }
 }
 
+char* get_parameter_type(char* name, Scope *scope){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    return symbol_table[i] -> type;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
+        }
+    }
+}
+
+bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    if(symbol_table[i] -> no_of_parameters == no_of_parameters){
+                        for(int j = 0; j < no_of_parameters ;j++){
+                            if(strcmp(symbol_table[i] -> parameters[j] -> type, parameters[j] -> type)){
+                                printf("Unexpected parameter at position %d for function %s at line %d\n", j + 1, name, lineno);
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    else{
+                        printf("Wrong Number of parameters for function: %s at line: %d    expected: %d, but found: %d\n", name, lineno, symbol_table[i] -> no_of_parameters, no_of_parameters);
+                        return false;
+                    }
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
+        }
+    }
+}
+/*=======================================================================================================*/
+/*General Methods*/
 bool is_all_used(){
     for (int i =0; i<=symbol_table_idx; i++){
         if(symbol_table[i] && symbol_table[i]-> is_used == false){

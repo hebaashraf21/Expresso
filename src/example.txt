@@ -1,9 +1,10 @@
 int a = 5;
-void b(int x, int y){
+int b(int x, int y){
     print(a);
 }
-int c (){
+int c (int z){
 ;
 }
-
-a = c();
+int g = 5;
+int k =5;
+a = b(g, k);

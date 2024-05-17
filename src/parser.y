@@ -82,7 +82,7 @@
     // insert the function parameters in the symol table
     void insert_function_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
     bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters);
-
+    char* get_parameter_type(char* name, Scope *scope);
     int parameter_count = 0;
     function_parameter * parameters[100];
 
@@ -329,13 +329,13 @@ stmt:
 
 function_call: 
         IDENTIFIER '(' parameters_list_call ')'  {
-                                                        parameter_count = 0;
                                                         Value value;
                                                         value.func_value = $1;
                                                         $$ = insert_node("FUNC", value);
                                                         if(is_correct_scope($1, current_scope, true) == 1 && is_function($1, current_scope,true)){
-                                                            
+                                                            check_correct_parameters($1, current_scope, parameters, parameter_count);
                                                         }
+                                                        parameter_count = 0;
                                                     }
 
 else_stmt:
@@ -440,10 +440,31 @@ parameters_list_call:
     {
         $$ = 0; // Initialize count to 0
     }
+
     | IDENTIFIER {
+        // check scope
+        // check initialized
+        // set parameters
+        if(is_correct_scope($1, current_scope, true) == 1 && !is_function($1, current_scope,false)){
+            // check initialized
+            if(is_initialized($1, current_scope)){
+                // set used
+                set_used($1, current_scope);
+                parameters[parameter_count] = malloc(sizeof(function_parameter));
+                if (parameters[parameter_count] != NULL) {
+                    parameters[parameter_count]->name = $1;
+                    parameters[parameter_count]->type = get_parameter_type($1, current_scope);
+                    parameter_count++; // Increment after assignment
+                } else {
+                    // Handle memory allocation failure if needed
+                    yyerror("Memory allocation failed for function parameter");
+                }
+            }
+        }
         // Increment count for each var_declaration
         $$ = 1;
       }
+
     | parameters_list_call ',' IDENTIFIER {
         // Increment count for each var_declaration
         $$ = $1 + 1;
@@ -796,7 +817,8 @@ void set_used(char* name, Scope *scope){
         }
     }
 }
-
+/*======================================================================================================*/
+/*Function Hnadling functions*/
 bool is_function(char* name, Scope *scope, bool need_to_be_function){
     for (int i =0; i<=symbol_table_idx; i++){
         // same name and same scope
@@ -848,6 +870,55 @@ void insert_function_parameters(char* name, Scope *scope, function_parameter **p
     }
 }
 
+char* get_parameter_type(char* name, Scope *scope){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    return symbol_table[i] -> type;
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
+        }
+    }
+}
+
+bool check_correct_parameters(char* name, Scope *scope, function_parameter ** parameters, int no_of_parameters){
+    for (int i =0; i<=symbol_table_idx; i++){
+        // same name and same scope
+        if(strcmp(symbol_table[i]-> name, name)==0){
+            Scope *temp_scope = scope;
+            while(temp_scope){
+                if(symbol_table[i] -> scope == temp_scope){
+                    if(symbol_table[i] -> no_of_parameters == no_of_parameters){
+                        for(int j = 0; j < no_of_parameters ;j++){
+                            if(strcmp(symbol_table[i] -> parameters[j] -> type, parameters[j] -> type)){
+                                printf("Unexpected parameter at position %d for function %s at line %d\n", j + 1, name, lineno);
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    else{
+                        printf("Wrong Number of parameters for function: %s at line: %d    expected: %d, but found: %d\n", name, lineno, symbol_table[i] -> no_of_parameters, no_of_parameters);
+                        return false;
+                    }
+                }
+                else{
+                    temp_scope = temp_scope -> parent;
+                }
+            }
+            
+        }
+    }
+}
+/*=======================================================================================================*/
+/*General Methods*/
 bool is_all_used(){
     for (int i =0; i<=symbol_table_idx; i++){
         if(symbol_table[i] && symbol_table[i]-> is_used == false){

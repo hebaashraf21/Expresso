@@ -938,28 +938,6 @@ void exit_block(){
     current_scope = current_scope -> parent;
 }
 
-void print_symbol_table() {
-    FILE *file = fopen("symbol_table.txt", "w");
-    if (!file) {
-        printf("Error: unable to open symbol table file.\n");
-        return;
-    }
-
-    fprintf(file, "Name\tType\tConst\tScope\tReturn Type\tInitialized\tUsed\n");
-    for (int i = 0; i <= symbol_table_idx; i++) {
-        fprintf(file, "%s\t%s\t%s\t%p\t%s\t%s\t%s\n", 
-                symbol_table[i]->name,
-                symbol_table[i]->type,
-                symbol_table[i]->is_const ? "true" : "false",
-                (void*)symbol_table[i]->scope,
-                symbol_table[i]->return_type ? symbol_table[i]->return_type : "N/A",
-                symbol_table[i]->is_initialized ? "true" : "false",
-                symbol_table[i]->is_used ? "true" : "false");
-    }
-
-    fclose(file);
-}
-
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input file>\n", argv[0]);

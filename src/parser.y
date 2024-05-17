@@ -113,6 +113,7 @@
     void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric);
     void generate_quadruple_push_terminal(Node* operand);
     void generate_quadruple_pop(char* operand);
+    void quad_print(Node* operand);
 %}
 
 %union { 
@@ -313,7 +314,7 @@ stmt:
                                             }
         
         /*Print Statement*/
-        | PRINT '(' expr ')' ';'                 
+        | PRINT '(' expr ')' ';'                {quad_print($3);}           
             
         
         /*Conditional Statements*/
@@ -1133,12 +1134,44 @@ void generate_quadruple_push_terminal(Node* operand){
     fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fclose(quad_file);
 }
+void quad_print(Node* operand){
+    quad_idx++;
+    quadruples[quad_idx].operation = "CALL PRINT";
+    quadruples[quad_idx].operand1 = malloc(sizeof(char) * 10); // Assuming operand1 is a string
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    if (strcmp(operand->type, "INT") == 0) {
+            sprintf(quadruples[quad_idx].operand1, "%d", operand->value.int_value);
+    } 
+    else if (strcmp(operand->type, "FLOAT") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%f", operand->value.float_value);
+    } 
+    else if (strcmp(operand->type, "BOOL") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", boolToString(operand->value.bool_value));
+    }
+    else if (strcmp(operand->type, "ID") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.id_value);
+    }
+    else if (strcmp(operand->type, "CHAR") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.char_value);
+    }
+    else if (strcmp(operand->type, "STRING") == 0) {
+        sprintf(quadruples[quad_idx].operand1, "%s", operand->value.str_value);
+    }
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "CALL PRINT \n");
+    fprintf(quad_file, "pop %s\n", quadruples[quad_idx].operand1);
+    fclose(quad_file);
+}
 
 void generate_quadruple_pop(char* operand) {
     // Generate quadruple for pop
     quad_idx++;
     quadruples[quad_idx].operation = "pop";
-    quadruples[quad_idx].operand1 = operand; // Assuming operand is a string
+    quadruples[quad_idx].operand1 = operand;
     quadruples[quad_idx].operand2 = NULL;
     quadruples[quad_idx].result = NULL;
 

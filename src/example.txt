@@ -1,1 +1,2 @@
-char a = 'c';
+int a = 5;
+print(a);

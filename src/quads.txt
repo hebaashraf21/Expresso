@@ -1,2 +1,5 @@
-push 'c'
+push 5
+pop a
+push a
+CALL PRINT 
 pop a

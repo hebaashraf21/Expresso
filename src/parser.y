@@ -121,7 +121,7 @@
     void quad_return();
     void quad_get_label();
     void generate_label(char* label, int label_number);
-    void quad_jmp_while();
+    void quad_jmp_loop();
 %}
 
 %union { 
@@ -330,8 +330,8 @@ stmt:
         | IF '(' expr ')' '{' {enter_block();} statements '}'  {exit_block();} else_stmt
         
         /*Loops*/
-        | WHILE '(' {quad_get_label();} expr {quad_jmp_while();}')' '{' {enter_block();} statements '}' {exit_block(); quad_get_label();}
-        | FOR '(' {quad_get_label();} assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_block();} statements '}'  {exit_block(); quad_get_label();}
+        | WHILE '(' {quad_get_label();} expr {quad_jmp_loop();}')' '{' {enter_block();} statements '}' {exit_block(); quad_get_label();}
+        | FOR '(' {quad_get_label();} assignment ';' expr ';' {quad_jmp_loop();} IDENTIFIER '=' expr ')' '{' {enter_block();} statements '}'  {exit_block(); quad_get_label();}
         | REPEAT '{' {quad_get_label();} {enter_block();} statements '}' {exit_block(); quad_get_label();} UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
@@ -1272,7 +1272,7 @@ void quad_get_label(){
     fclose(quad_file);
 }
 
-void quad_jmp_while(){
+void quad_jmp_loop(){
     char Label[10];
     generate_label(Label, label_count);
 

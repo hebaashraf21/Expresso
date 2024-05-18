@@ -118,6 +118,7 @@
     void quad_function_call_parameters(char* operand);
     void quad_function_declare(char* operand);
     void quad_function_end(char* operand);
+    void quad_return();
 %}
 
 %union { 
@@ -133,7 +134,7 @@
 %token PRINT
 
 %token IF ELSE 
-%token WHILE FOR DO CONTINUE BREAK
+%token WHILE FOR DO CONTINUE BREAK RETURN
 %token SWITCH CASE DEFAULT 
 %token REPEAT UNTIL
 
@@ -363,7 +364,13 @@ stmt:
         | function_call
         | BREAK
         | CONTINUE
+        | return_stmt               {quad_return();}
         ;	
+
+return_stmt:
+        RETURN ';'
+        | RETURN expr ';'
+        ;
 
 function_call: 
         IDENTIFIER '(' parameters_list_call ')'  {
@@ -1230,6 +1237,19 @@ void quad_function_end(char* operand){
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");
     fprintf(quad_file, "ENDPROC %s\n", operand);
+    fclose(quad_file);
+}
+
+void quad_return(){
+    quad_idx++;
+    quadruples[quad_idx].operation = "RET";
+    quadruples[quad_idx].operand1 = NULL;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "RET\n");
     fclose(quad_file);
 }
 

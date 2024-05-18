@@ -36,7 +36,7 @@ int lineno = 1; // initialize to 1
 "void"              { return VOID; }
 "continue"          { return CONTINUE; }
 "break"             { return BREAK; }
-
+"return"			{ return RETURN; }
 "const"             { return CONST;}
 
 "print"             { return PRINT;}

@@ -3,3 +3,6 @@ for loops
 while loops
 repeat until
 if else
+
+break
+continue

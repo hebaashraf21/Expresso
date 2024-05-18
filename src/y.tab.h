@@ -57,38 +57,39 @@ extern int yydebug;
     DO = 263,
     CONTINUE = 264,
     BREAK = 265,
-    SWITCH = 266,
-    CASE = 267,
-    DEFAULT = 268,
-    REPEAT = 269,
-    UNTIL = 270,
-    VOID = 271,
-    ENUM = 272,
-    INTEGER = 273,
-    FLOAT = 274,
-    CHAR = 275,
-    BOOL = 276,
-    STRING = 277,
-    CONST = 278,
-    FLOAT_VAL = 279,
-    INTEGER_VAL = 280,
-    CHAR_VAL = 281,
-    STRING_VAL = 282,
-    TRUE_VAL = 283,
-    FALSE_VAL = 284,
-    IDENTIFIER = 285,
-    INCR = 286,
-    DECR = 287,
-    LOGICAL_OR = 288,
-    LOGICAL_AND = 289,
-    EQUALS = 290,
-    NOT_EQUALS = 291,
-    LESS_THAN = 292,
-    LESS_THAN_OR_EQUALS = 293,
-    GREATER_THAN = 294,
-    GREATER_THAN_OR_EQUALS = 295,
-    LOGICAL_NOT = 296,
-    UMINUS = 297
+    RETURN = 266,
+    SWITCH = 267,
+    CASE = 268,
+    DEFAULT = 269,
+    REPEAT = 270,
+    UNTIL = 271,
+    VOID = 272,
+    ENUM = 273,
+    INTEGER = 274,
+    FLOAT = 275,
+    CHAR = 276,
+    BOOL = 277,
+    STRING = 278,
+    CONST = 279,
+    FLOAT_VAL = 280,
+    INTEGER_VAL = 281,
+    CHAR_VAL = 282,
+    STRING_VAL = 283,
+    TRUE_VAL = 284,
+    FALSE_VAL = 285,
+    IDENTIFIER = 286,
+    INCR = 287,
+    DECR = 288,
+    LOGICAL_OR = 289,
+    LOGICAL_AND = 290,
+    EQUALS = 291,
+    NOT_EQUALS = 292,
+    LESS_THAN = 293,
+    LESS_THAN_OR_EQUALS = 294,
+    GREATER_THAN = 295,
+    GREATER_THAN_OR_EQUALS = 296,
+    LOGICAL_NOT = 297,
+    UMINUS = 298
   };
 #endif
 /* Tokens.  */
@@ -100,44 +101,45 @@ extern int yydebug;
 #define DO 263
 #define CONTINUE 264
 #define BREAK 265
-#define SWITCH 266
-#define CASE 267
-#define DEFAULT 268
-#define REPEAT 269
-#define UNTIL 270
-#define VOID 271
-#define ENUM 272
-#define INTEGER 273
-#define FLOAT 274
-#define CHAR 275
-#define BOOL 276
-#define STRING 277
-#define CONST 278
-#define FLOAT_VAL 279
-#define INTEGER_VAL 280
-#define CHAR_VAL 281
-#define STRING_VAL 282
-#define TRUE_VAL 283
-#define FALSE_VAL 284
-#define IDENTIFIER 285
-#define INCR 286
-#define DECR 287
-#define LOGICAL_OR 288
-#define LOGICAL_AND 289
-#define EQUALS 290
-#define NOT_EQUALS 291
-#define LESS_THAN 292
-#define LESS_THAN_OR_EQUALS 293
-#define GREATER_THAN 294
-#define GREATER_THAN_OR_EQUALS 295
-#define LOGICAL_NOT 296
-#define UMINUS 297
+#define RETURN 266
+#define SWITCH 267
+#define CASE 268
+#define DEFAULT 269
+#define REPEAT 270
+#define UNTIL 271
+#define VOID 272
+#define ENUM 273
+#define INTEGER 274
+#define FLOAT 275
+#define CHAR 276
+#define BOOL 277
+#define STRING 278
+#define CONST 279
+#define FLOAT_VAL 280
+#define INTEGER_VAL 281
+#define CHAR_VAL 282
+#define STRING_VAL 283
+#define TRUE_VAL 284
+#define FALSE_VAL 285
+#define IDENTIFIER 286
+#define INCR 287
+#define DECR 288
+#define LOGICAL_OR 289
+#define LOGICAL_AND 290
+#define EQUALS 291
+#define NOT_EQUALS 292
+#define LESS_THAN 293
+#define LESS_THAN_OR_EQUALS 294
+#define GREATER_THAN 295
+#define GREATER_THAN_OR_EQUALS 296
+#define LOGICAL_NOT 297
+#define UMINUS 298
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 123 "parser.y"
+#line 124 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -148,7 +150,7 @@ union YYSTYPE
     struct Node *node_value;
 ;
 
-#line 152 "y.tab.h"
+#line 154 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -5,6 +5,7 @@ pop x
 push x
 CALL PRINT 
 pop x
+RET
 ENDPROC a
 push 0
 pop y

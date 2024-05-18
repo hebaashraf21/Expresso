@@ -3600,6 +3600,37 @@ void generate_label(char* label, int label_number) {
     sprintf(label, "L%03d", label_number);
 }
 /*==============================================================================*/
+
+void print_symbol_table(const char* filename) {
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        fprintf(stderr, "Error: Could not open file %s for writing\n", filename);
+        return;
+    }
+
+    for (int i = 0; i <= symbol_table_idx; i++) {
+        Symbol *symbol = symbol_table[i];
+        fprintf(file, "Name: %s, Type: %s, Const: %s, Initialized: %s, Used: %s, Return Type: %s\n",
+                symbol->name,
+                symbol->type,
+                symbol->is_const ? "true" : "false",
+                symbol->is_initialized ? "true" : "false",
+                symbol->is_used ? "true" : "false",
+                symbol->return_type ? symbol->return_type : "N/A");
+
+        if (strcmp(symbol->type, "FUNC") == 0) {
+            fprintf(file, "Parameters: \n");
+            for (int j = 0; j < symbol->no_of_parameters; j++) {
+                function_parameter *param = symbol->parameters[j];
+                fprintf(file, "  Param Name: %s, Param Type: %s\n", param->name, param->type);
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input file>\n", argv[0]);
@@ -3625,6 +3656,7 @@ int main(int argc, char *argv[]) {
     if (!is_all_used()) {
         printf("Not all variables used\n");
     }
+    print_symbol_table("symbol_table.txt");
     free(current_scope); // Clean up allocated memory before exiting
     return EXIT_SUCCESS;
 }

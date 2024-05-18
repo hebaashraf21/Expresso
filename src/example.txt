@@ -1,12 +1,1 @@
-int x = 2;
-switch (x) {
-    case 1:
-      x = 10;
-      break;
-    case 2:
-        x = 3;
-        break;
-    default:
-        x = 5;
-        break;
-  }
+int x (){;}

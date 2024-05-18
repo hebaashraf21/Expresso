@@ -1,18 +1,27 @@
-push 10
+push 2
 pop x
-push x
-push 10
-EQ
-JNZ L000
-push 10
-pop b
 L000:
 push x
-push 5
+push 1
 EQ
-JNZ L001
-push 5
-pop b
+JZ L001
+JNZ L002
 L001:
+push 10
+pop x
+JMP E0000
+L002:
 push x
-pop b
+push 2
+EQ
+JZ L003
+JNZ L004
+L003:
+push 3
+pop x
+JMP E0000
+L004:
+push 5
+pop x
+JMP E0000
+E0000:

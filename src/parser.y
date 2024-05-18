@@ -109,6 +109,12 @@
     // used for printing boolean values
     const char* boolToString(bool b);
 
+    // to store the variable we check in the witch statement
+    char* switch_expression;
+    char* end_switch_label = "E0000";
+    int case_count = 0;
+    int default_count = 0;
+
     void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, Node* operand2);
     void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool numeric);
     void generate_quadruple_push_terminal(Node* operand);
@@ -125,6 +131,12 @@
     void quad_repeat_jnz();
     void quad_repeat_jmp();
     void quad_if_jnz();
+    void push_switch_expression();
+    void switch_jmp_to_end();
+    void case_jnz();
+    void case_jz();
+    void quad_EQ();
+    void generate_end_label();
 %}
 
 %union { 
@@ -338,7 +350,7 @@ stmt:
         | REPEAT '{' {quad_get_label();} {enter_block();} statements '}' {exit_block(); } UNTIL '(' expr ')' ';' {quad_repeat_jnz();  quad_repeat_jmp();  quad_get_label();}
         
         /*Switch Statements*/
-        | SWITCH '(' {quad_get_label();} switch_identifier ')' '{' {enter_block();} case_list '}' {exit_block(); quad_get_label();}
+        | SWITCH '(' switch_identifier ')' '{' {enter_block();} case_list '}' {exit_block(); case_count = 0; default_count = 0; generate_end_label();}
         
         /*Block Strusture*/
         | '{' {enter_block();} statements'}' {exit_block();}
@@ -368,7 +380,6 @@ stmt:
         
         /*Functions Call*/   
         | function_call
-        | BREAK
         | CONTINUE
         | return_stmt               {quad_return();}
         ;	
@@ -492,7 +503,7 @@ parameters_list:
     | parameters_list ',' var_declaration {
         // Increment count for each var_declaration
         $$ = $1 + 1;
-      }
+    }
     ;
 
 parameters_list_call:
@@ -539,11 +550,11 @@ case_list:
     ;
     
 case_stmt:
-      CASE expr ':' statements ';'
+      CASE  {quad_get_label(); push_switch_expression();} expr { quad_EQ();   case_jz();    case_jnz();  quad_get_label(); case_count ++;}':' statements BREAK {switch_jmp_to_end();}';'
     ;  
 
 default_case:
-    DEFAULT ':' statements ';'
+    DEFAULT ':' {quad_get_label(); default_count++;} statements BREAK {switch_jmp_to_end();}';'
 
 
 switch_identifier: 
@@ -557,6 +568,7 @@ switch_identifier:
                                 if(is_initialized($1, current_scope)){
                                     // set used
                                     set_used($1, current_scope);
+                                    switch_expression = $1;
                                 }
                             }
                             }
@@ -1332,6 +1344,74 @@ void quad_repeat_jmp(){
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");
     fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
+}
+
+void push_switch_expression(){
+    // Generate quadruple for push
+    quad_idx++;
+    quadruples[quad_idx].operation = "push";
+    quadruples[quad_idx].operand1 = switch_expression;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "push %s\n", switch_expression);
+    fclose(quad_file);
+}
+
+void switch_jmp_to_end(){
+    quad_idx++;
+    quadruples[quad_idx].operation = "JMP";
+    quadruples[quad_idx].operand1 = end_switch_label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "JMP %s\n", end_switch_label);
+    fclose(quad_file);
+}
+
+void case_jz(){
+    char Label[10];
+    generate_label(Label, label_count);
+
+    quad_idx++;
+    quadruples[quad_idx].operation = "JZ";
+    quadruples[quad_idx].operand1 = Label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
+}
+
+void case_jnz(){
+    char Label[10];
+    generate_label(Label, label_count + 1);
+
+    quad_idx++;
+    quadruples[quad_idx].operation = "JNZ";
+    quadruples[quad_idx].operand1 = Label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
+}
+
+void quad_EQ(){
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "EQ\n");
+    fclose(quad_file);
+}
+
+void generate_end_label(){
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "E0000:\n");
     fclose(quad_file);
 }
 void generate_quadruple_pop(char* operand) {

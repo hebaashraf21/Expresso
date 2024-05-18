@@ -634,12 +634,12 @@ expr:
     | LOGICAL_NOT expr	        {generate_quadruple_push_operation_1_op("LOGICAL_NOT", $2, false);}
      
      /* comparison expressions */
-    | expr EQUALS expr			        {generate_quadruple_push_operation_2_ops("IS_EQUAL", $1, $3);}	
-    | expr NOT_EQUALS expr		        {generate_quadruple_push_operation_2_ops("IS_NOT_EQUAL", $1, $3);}		
-    | expr LESS_THAN expr		        {generate_quadruple_push_operation_2_ops("LESS_THAN", $1, $3);}		
-    | expr LESS_THAN_OR_EQUALS expr	    {generate_quadruple_push_operation_2_ops("LESS_THAN_OR_EQUALS", $1, $3);}		
-    | expr GREATER_THAN expr		    {generate_quadruple_push_operation_2_ops("GREATER_THAN", $1, $3);}		
-    | expr GREATER_THAN_OR_EQUALS expr 	{generate_quadruple_push_operation_2_ops("GREATER_THAN_OR_EQUALS", $1, $3);}	 
+    | expr EQUALS expr			        {generate_quadruple_push_operation_2_ops("EQ", $1, $3);}	
+    | expr NOT_EQUALS expr		        {generate_quadruple_push_operation_2_ops("NEQ", $1, $3);}		
+    | expr LESS_THAN expr		        {generate_quadruple_push_operation_2_ops("LT", $1, $3);}		
+    | expr LESS_THAN_OR_EQUALS expr	    {generate_quadruple_push_operation_2_ops("LTQ", $1, $3);}		
+    | expr GREATER_THAN expr		    {generate_quadruple_push_operation_2_ops("GT", $1, $3);}		
+    | expr GREATER_THAN_OR_EQUALS expr 	{generate_quadruple_push_operation_2_ops("GTQ", $1, $3);}	 
     ;
 %%
 

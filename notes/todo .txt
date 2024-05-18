@@ -1,5 +1,4 @@
 switch
-function definition
 for loops
 while loops
 repeat until

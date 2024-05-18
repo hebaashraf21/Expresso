@@ -1,13 +1,4 @@
-START PROC a
-push x
+push 1
 push 5
+ADD
 pop x
-push x
-CALL PRINT 
-pop x
-RET
-ENDPROC a
-push 0
-pop y
-push y
-CALL a

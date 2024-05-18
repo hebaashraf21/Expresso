@@ -105,7 +105,7 @@
 
     Quadruple quadruples[1000];
     int quad_idx = -1;
-
+    int label_count = 0;
     // used for printing boolean values
     const char* boolToString(bool b);
 
@@ -119,6 +119,9 @@
     void quad_function_declare(char* operand);
     void quad_function_end(char* operand);
     void quad_return();
+    void quad_get_label();
+    void generate_label(char* label, int label_number);
+    void quad_jmp_while();
 %}
 
 %union { 
@@ -327,12 +330,12 @@ stmt:
         | IF '(' expr ')' '{' {enter_block();} statements '}'  {exit_block();} else_stmt
         
         /*Loops*/
-        | WHILE '(' expr ')' '{' {enter_block();} statements '}' {exit_block();}
-        | FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_block();} statements '}'  {exit_block();}
-        | REPEAT '{' {enter_block();} statements '}' {exit_block();} UNTIL '(' expr ')' ';'
+        | WHILE '(' {quad_get_label();} expr {quad_jmp_while();}')' '{' {enter_block();} statements '}' {exit_block(); quad_get_label();}
+        | FOR '(' {quad_get_label();} assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' {enter_block();} statements '}'  {exit_block(); quad_get_label();}
+        | REPEAT '{' {quad_get_label();} {enter_block();} statements '}' {exit_block(); quad_get_label();} UNTIL '(' expr ')' ';'
         
         /*Switch Statements*/
-        | SWITCH '(' switch_identifier ')' '{' {enter_block();} case_list '}' {exit_block();}
+        | SWITCH '(' {quad_get_label();} switch_identifier ')' '{' {enter_block();} case_list '}' {exit_block(); quad_get_label();}
         
         /*Block Strusture*/
         | '{' {enter_block();} statements'}' {exit_block();}
@@ -1067,8 +1070,8 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
 
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");
-    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
-    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
+    //fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+    //fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand2);
     fprintf(quad_file, "%s\n", operation);
     fclose(quad_file);
 }
@@ -1119,7 +1122,7 @@ void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool
 
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");
-    fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
+    //fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fprintf(quad_file, "%s\n", operation);
     fclose(quad_file);
 }
@@ -1155,6 +1158,7 @@ void generate_quadruple_push_terminal(Node* operand){
     fprintf(quad_file, "push %s\n", quadruples[quad_idx].operand1);
     fclose(quad_file);
 }
+
 void quad_print(Node* operand){
     quad_idx++;
     quadruples[quad_idx].operation = "CALL PRINT";
@@ -1253,6 +1257,36 @@ void quad_return(){
     fclose(quad_file);
 }
 
+void quad_get_label(){
+    char Label[10];
+    generate_label(Label, label_count);
+    quad_idx++;
+    quadruples[quad_idx].operation = Label;
+    quadruples[quad_idx].operand1 = NULL;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    label_count++;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s:\n", quadruples[quad_idx].operation);
+    fclose(quad_file);
+}
+
+void quad_jmp_while(){
+    char Label[10];
+    generate_label(Label, label_count);
+
+    quad_idx++;
+    quadruples[quad_idx].operation = "JZ";
+    quadruples[quad_idx].operand1 = Label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
+
+}
 void generate_quadruple_pop(char* operand) {
     // Generate quadruple for pop
     quad_idx++;
@@ -1269,6 +1303,10 @@ void generate_quadruple_pop(char* operand) {
 
 const char* boolToString(bool b) {
     return b ? "true" : "false";
+}
+
+void generate_label(char* label, int label_number) {
+    sprintf(label, "L%03d", label_number);
 }
 /*==============================================================================*/
 int main(int argc, char *argv[]) {

@@ -6,3 +6,5 @@ if else
 
 break
 continue
+
+check return type

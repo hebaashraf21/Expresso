@@ -58,3 +58,7 @@ START PROC x
 START PROC x
 START PROC x
 ENDPROC x
+push 10
+pop x
+push 10
+pop c

@@ -1,0 +1,8 @@
+void greet() {
+    print("Hello, world!");
+}
+
+int main() {
+    greet();
+    return 0;
+}

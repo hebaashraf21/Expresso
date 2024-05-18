@@ -1,0 +1,6 @@
+char a = 'a';
+int b = 5;
+{
+    // redeclrataion
+    int a = 5;
+}

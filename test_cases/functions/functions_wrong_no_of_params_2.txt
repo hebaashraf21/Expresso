@@ -2,4 +2,5 @@ void greet() {
     print("Hello, world!");
 }
 
-greet();
+int a = 5;
+greet(a);

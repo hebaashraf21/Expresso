@@ -1,3 +1,2 @@
-Name: x, Type: FUNC, Const: true, Initialized: false, Used: false, Return Type: INT
-Parameters: 
+Name: x, Type: BOOL, Const: false, Initialized: false, Used: false, Return Type: 
 

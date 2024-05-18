@@ -4,5 +4,8 @@ char c = 'A';
 bool d = true;
 string e = "Hello, world!";
 
-const int f = 5;
-f = 3;
+print(a);
+print(b);
+print(c);
+print(d);
+// e is unused

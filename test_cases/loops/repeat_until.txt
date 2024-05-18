@@ -1,9 +1,5 @@
-int main() {
-    int i = 0;
-    repeat {
-        print(i);
-        i++;
-    } until (i >= 5);
-
-    return 0;
-}
+int i = 0;
+repeat {
+    print(i);
+    i++;
+} until (i >= 5);

@@ -3771,6 +3771,11 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
+// Delete the file at the start
+    if (remove("quads.txt") != 0) {
+        fprintf(stderr, "Error deleting file: quads.txt\n");
+        return EXIT_FAILURE;
+    }
 
 void yyerror(char const *s)
 {

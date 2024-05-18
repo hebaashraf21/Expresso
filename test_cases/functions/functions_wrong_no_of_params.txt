@@ -1,4 +1,4 @@
-void greet() {
+void greet(int a) {
     print("Hello, world!");
 }
 

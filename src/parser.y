@@ -1607,7 +1607,6 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-
 void yyerror(char const *s)
 {
     fprintf(stderr, "%s at line %d\n", s, lineno);

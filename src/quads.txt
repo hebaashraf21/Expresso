@@ -1,8 +1,11 @@
+START PROC a
+push x
 push 5
 pop x
 push x
 CALL PRINT 
 pop x
+ENDPROC a
 push 0
 pop y
 push y

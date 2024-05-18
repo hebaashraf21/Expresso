@@ -116,6 +116,8 @@
     void quad_print(Node* operand);
     void quad_function_call_label(char* operand);
     void quad_function_call_parameters(char* operand);
+    void quad_function_declare(char* operand);
+    void quad_function_end(char* operand);
 %}
 
 %union { 
@@ -176,6 +178,7 @@
 %type <node_value> expr
 %type <node_value> switch_identifier
 %type <node_value> function_call
+%type <node_value> var_declaration
 %type<int_value> parameters_list
 %type<int_value> parameters_list_call
 // starting point of parsing
@@ -335,23 +338,25 @@ stmt:
         
         
         /*Functions Definition*/   
-        | VOID IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   { 
+        | VOID IDENTIFIER  {quad_function_declare($2);}'(' parameters_list ')' '{' {enter_block();} statements '}'   { 
                                                                                         exit_block();
                                                                                         if(!is_redeclared($2, current_scope)){
                                                                                             insert_symbol($2, "FUNC", true, current_scope, "VOID");
                                                                                             insert_function_parameters($2, current_scope, parameters, parameter_count);
                                                                                         } 
                                                                                         parameter_count = 0; 
+                                                                                        quad_function_end($2);
                                                                                         }
                             
             
-        | datatype IDENTIFIER '(' parameters_list ')' '{' {enter_block();} statements '}'   {
+        | datatype IDENTIFIER {quad_function_declare($2);}'(' parameters_list ')' '{' {enter_block();} statements '}'   {
                                                                                             exit_block();
                                                                                             if(!is_redeclared($2, current_scope)){
                                                                                                 insert_symbol($2, "FUNC", true, current_scope, $1 -> type);
                                                                                                 insert_function_parameters($2, current_scope, parameters, parameter_count);
                                                                                             }
                                                                                             parameter_count = 0;
+                                                                                            quad_function_end($2);
                                                                                             }
         
         /*Functions Call*/   
@@ -448,6 +453,11 @@ var_declaration:
                                                         parameters[parameter_count]->name = $2;
                                                         parameters[parameter_count]->type = $1->type;
                                                         parameter_count++; // Increment after assignment
+                                                        // create node for the identifier
+                                                        Value value;
+                                                        value.id_value = $2;
+                                                        $$ = insert_node("ID", value);
+                                                        generate_quadruple_push_terminal($$);
                                                     } else {
                                                         // Handle memory allocation failure if needed
                                                         yyerror("Memory allocation failed for function parameter");
@@ -1194,6 +1204,32 @@ void quad_function_call_parameters(char* operand){
     // Output the quadruple to a file
     FILE *quad_file = fopen("quads.txt", "a");
     fprintf(quad_file, "push %s\n", operand);
+    fclose(quad_file);
+}
+
+void quad_function_declare(char* operand){
+    quad_idx++;
+    quadruples[quad_idx].operation = "START PROC";
+    quadruples[quad_idx].operand1 = operand;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "START PROC %s\n", operand);
+    fclose(quad_file);
+}
+
+void quad_function_end(char* operand){
+    quad_idx++;
+    quadruples[quad_idx].operation = "ENDPROC";
+    quadruples[quad_idx].operand1 = operand;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "ENDPROC %s\n", operand);
     fclose(quad_file);
 }
 

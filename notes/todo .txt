@@ -1,4 +1,3 @@
-function call
 switch
 function definition
 for loops

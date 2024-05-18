@@ -78,6 +78,7 @@
 	extern FILE *yyin;
     extern FILE *yyout;
     extern int lineno;
+    FILE *errors_file;
 	int sym[26];
 
     #define Symbol_TABLE_SIZE 1000
@@ -207,7 +208,7 @@
     void quad_EQ();
     void generate_end_label();
 
-#line 211 "y.tab.c"
+#line 212 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -345,7 +346,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 142 "parser.y"
+#line 143 "parser.y"
  
     int int_value;        
     char* str_value;        
@@ -356,7 +357,7 @@ union YYSTYPE
     struct Node *node_value;
 ;
 
-#line 360 "y.tab.c"
+#line 361 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -735,17 +736,17 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   208,   208,   209,   214,   215,   221,   223,   231,   268,
-     305,   341,   345,   345,   345,   345,   345,   348,   348,   348,
-     348,   349,   349,   349,   349,   350,   350,   350,   350,   353,
-     353,   356,   356,   360,   360,   360,   371,   371,   371,   382,
-     383,   384,   388,   389,   393,   404,   407,   407,   409,   413,
-     417,   421,   425,   433,   470,   496,   499,   503,   511,   515,
-     540,   547,   548,   549,   553,   553,   553,   553,   557,   557,
-     557,   561,   576,   583,   590,   592,   607,   614,   621,   628,
-     637,   640,   643,   644,   645,   646,   647,   649,   650,   651,
-     652,   653,   654,   657,   658,   659,   662,   663,   664,   665,
-     666,   667
+       0,   209,   209,   210,   215,   216,   222,   224,   232,   269,
+     306,   342,   346,   346,   346,   346,   346,   349,   349,   349,
+     349,   350,   350,   350,   350,   351,   351,   351,   351,   354,
+     354,   357,   357,   361,   361,   361,   372,   372,   372,   383,
+     384,   385,   389,   390,   394,   405,   408,   408,   410,   414,
+     418,   422,   426,   434,   471,   497,   500,   504,   512,   516,
+     541,   548,   549,   550,   554,   554,   554,   554,   558,   558,
+     558,   562,   577,   584,   591,   593,   608,   615,   622,   629,
+     638,   641,   644,   645,   646,   647,   648,   650,   651,   652,
+     653,   654,   655,   658,   659,   660,   663,   664,   665,   666,
+     667,   668
 };
 #endif
 
@@ -1818,7 +1819,7 @@ yyreduce:
   switch (yyn)
     {
   case 7:
-#line 223 "parser.y"
+#line 224 "parser.y"
                                                 {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[-1].identifier), current_scope)){
@@ -1826,11 +1827,11 @@ yyreduce:
                                                     insert_symbol((yyvsp[-1].identifier), (yyvsp[-2].node_value)->type, false, current_scope, NULL);
                                                 }
                                                 }
-#line 1830 "y.tab.c"
+#line 1831 "y.tab.c"
     break;
 
   case 8:
-#line 231 "parser.y"
+#line 232 "parser.y"
                                                 {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[-3].identifier), current_scope)){
@@ -1866,11 +1867,11 @@ yyreduce:
                                                     
                                                 }
                                                 }
-#line 1870 "y.tab.c"
+#line 1871 "y.tab.c"
     break;
 
   case 9:
-#line 268 "parser.y"
+#line 269 "parser.y"
                                                  {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[-3].identifier), current_scope)){
@@ -1906,11 +1907,11 @@ yyreduce:
                                                     }
                                                 }
                                                 }
-#line 1910 "y.tab.c"
+#line 1911 "y.tab.c"
     break;
 
   case 10:
-#line 305 "parser.y"
+#line 306 "parser.y"
                                                     {
                                             // check declared or not ($1)
                                             if(is_correct_scope((yyvsp[-3].identifier), current_scope, true) == 1 && !is_function((yyvsp[-3].identifier), current_scope,false)){
@@ -1945,149 +1946,149 @@ yyreduce:
                                                 }
                                             }
                                             }
-#line 1949 "y.tab.c"
+#line 1950 "y.tab.c"
     break;
 
   case 11:
-#line 341 "parser.y"
+#line 342 "parser.y"
                                                 {quad_print((yyvsp[-2].node_value));}
-#line 1955 "y.tab.c"
+#line 1956 "y.tab.c"
     break;
 
   case 12:
-#line 345 "parser.y"
+#line 346 "parser.y"
                       {quad_if_jnz();}
-#line 1961 "y.tab.c"
+#line 1962 "y.tab.c"
     break;
 
   case 13:
-#line 345 "parser.y"
+#line 346 "parser.y"
                                               {enter_block();}
-#line 1967 "y.tab.c"
+#line 1968 "y.tab.c"
     break;
 
   case 14:
-#line 345 "parser.y"
+#line 346 "parser.y"
                                                                                {exit_block();}
-#line 1973 "y.tab.c"
+#line 1974 "y.tab.c"
     break;
 
   case 15:
-#line 345 "parser.y"
+#line 346 "parser.y"
                                                                                                {quad_get_label();}
-#line 1979 "y.tab.c"
+#line 1980 "y.tab.c"
     break;
 
   case 17:
-#line 348 "parser.y"
+#line 349 "parser.y"
                     {quad_get_label();}
-#line 1985 "y.tab.c"
+#line 1986 "y.tab.c"
     break;
 
   case 18:
-#line 348 "parser.y"
+#line 349 "parser.y"
                                              {quad_jmp_loop();}
-#line 1991 "y.tab.c"
+#line 1992 "y.tab.c"
     break;
 
   case 19:
-#line 348 "parser.y"
+#line 349 "parser.y"
                                                                        {enter_block();}
-#line 1997 "y.tab.c"
+#line 1998 "y.tab.c"
     break;
 
   case 20:
-#line 348 "parser.y"
+#line 349 "parser.y"
                                                                                                        {exit_block(); quad_get_label();}
-#line 2003 "y.tab.c"
+#line 2004 "y.tab.c"
     break;
 
   case 21:
-#line 349 "parser.y"
+#line 350 "parser.y"
                   {quad_get_label();}
-#line 2009 "y.tab.c"
+#line 2010 "y.tab.c"
     break;
 
   case 22:
-#line 349 "parser.y"
+#line 350 "parser.y"
                                                               {quad_jmp_loop();}
-#line 2015 "y.tab.c"
+#line 2016 "y.tab.c"
     break;
 
   case 23:
-#line 349 "parser.y"
+#line 350 "parser.y"
                                                                                                              {enter_block();}
-#line 2021 "y.tab.c"
+#line 2022 "y.tab.c"
     break;
 
   case 24:
-#line 349 "parser.y"
+#line 350 "parser.y"
                                                                                                                                               {exit_block(); quad_get_label();}
-#line 2027 "y.tab.c"
+#line 2028 "y.tab.c"
     break;
 
   case 25:
-#line 350 "parser.y"
+#line 351 "parser.y"
                      {quad_get_label();}
-#line 2033 "y.tab.c"
+#line 2034 "y.tab.c"
     break;
 
   case 26:
-#line 350 "parser.y"
+#line 351 "parser.y"
                                          {enter_block();}
-#line 2039 "y.tab.c"
+#line 2040 "y.tab.c"
     break;
 
   case 27:
-#line 350 "parser.y"
+#line 351 "parser.y"
                                                                          {exit_block(); }
-#line 2045 "y.tab.c"
+#line 2046 "y.tab.c"
     break;
 
   case 28:
-#line 350 "parser.y"
+#line 351 "parser.y"
                                                                                                                  {quad_repeat_jnz();  quad_repeat_jmp();  quad_get_label();}
-#line 2051 "y.tab.c"
+#line 2052 "y.tab.c"
     break;
 
   case 29:
-#line 353 "parser.y"
+#line 354 "parser.y"
                                                {enter_block();}
-#line 2057 "y.tab.c"
+#line 2058 "y.tab.c"
     break;
 
   case 30:
-#line 353 "parser.y"
+#line 354 "parser.y"
                                                                               {exit_block(); case_count = 0; default_count = 0; generate_end_label();}
-#line 2063 "y.tab.c"
+#line 2064 "y.tab.c"
     break;
 
   case 31:
-#line 356 "parser.y"
+#line 357 "parser.y"
               {enter_block();}
-#line 2069 "y.tab.c"
+#line 2070 "y.tab.c"
     break;
 
   case 32:
-#line 356 "parser.y"
+#line 357 "parser.y"
                                              {exit_block();}
-#line 2075 "y.tab.c"
+#line 2076 "y.tab.c"
     break;
 
   case 33:
-#line 360 "parser.y"
+#line 361 "parser.y"
                            {quad_function_declare((yyvsp[0].identifier));}
-#line 2081 "y.tab.c"
+#line 2082 "y.tab.c"
     break;
 
   case 34:
-#line 360 "parser.y"
+#line 361 "parser.y"
                                                                                    {enter_block();}
-#line 2087 "y.tab.c"
+#line 2088 "y.tab.c"
     break;
 
   case 35:
-#line 360 "parser.y"
+#line 361 "parser.y"
                                                                                                                      { 
                                                                                         exit_block();
                                                                                         if(!is_redeclared((yyvsp[-8].identifier), current_scope)){
@@ -2097,23 +2098,23 @@ yyreduce:
                                                                                         parameter_count = 0; 
                                                                                         quad_function_end((yyvsp[-8].identifier));
                                                                                         }
-#line 2101 "y.tab.c"
+#line 2102 "y.tab.c"
     break;
 
   case 36:
-#line 371 "parser.y"
+#line 372 "parser.y"
                               {quad_function_declare((yyvsp[0].identifier));}
-#line 2107 "y.tab.c"
+#line 2108 "y.tab.c"
     break;
 
   case 37:
-#line 371 "parser.y"
+#line 372 "parser.y"
                                                                                       {enter_block();}
-#line 2113 "y.tab.c"
+#line 2114 "y.tab.c"
     break;
 
   case 38:
-#line 371 "parser.y"
+#line 372 "parser.y"
                                                                                                                         {
                                                                                             exit_block();
                                                                                             if(!is_redeclared((yyvsp[-8].identifier), current_scope)){
@@ -2123,17 +2124,17 @@ yyreduce:
                                                                                             parameter_count = 0;
                                                                                             quad_function_end((yyvsp[-8].identifier));
                                                                                             }
-#line 2127 "y.tab.c"
+#line 2128 "y.tab.c"
     break;
 
   case 41:
-#line 384 "parser.y"
+#line 385 "parser.y"
                                     {quad_return();}
-#line 2133 "y.tab.c"
+#line 2134 "y.tab.c"
     break;
 
   case 44:
-#line 393 "parser.y"
+#line 394 "parser.y"
                                                  {
                                                         Value value;
                                                         value.func_value = (yyvsp[-3].identifier);
@@ -2144,68 +2145,68 @@ yyreduce:
                                                         parameter_count = 0;
                                                         quad_function_call_label((yyvsp[-3].identifier));
                                                     }
-#line 2148 "y.tab.c"
+#line 2149 "y.tab.c"
     break;
 
   case 46:
-#line 407 "parser.y"
+#line 408 "parser.y"
                  {enter_block();}
-#line 2154 "y.tab.c"
+#line 2155 "y.tab.c"
     break;
 
   case 47:
-#line 407 "parser.y"
+#line 408 "parser.y"
                                                   {exit_block();}
-#line 2160 "y.tab.c"
+#line 2161 "y.tab.c"
     break;
 
   case 48:
-#line 409 "parser.y"
+#line 410 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("INT", value);
                             }
-#line 2169 "y.tab.c"
+#line 2170 "y.tab.c"
     break;
 
   case 49:
-#line 413 "parser.y"
+#line 414 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("FLOAT", value);
                             }
-#line 2178 "y.tab.c"
+#line 2179 "y.tab.c"
     break;
 
   case 50:
-#line 417 "parser.y"
+#line 418 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("CHAR", value);
                             }
-#line 2187 "y.tab.c"
+#line 2188 "y.tab.c"
     break;
 
   case 51:
-#line 421 "parser.y"
+#line 422 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("STRING", value);
                             }
-#line 2196 "y.tab.c"
+#line 2197 "y.tab.c"
     break;
 
   case 52:
-#line 425 "parser.y"
+#line 426 "parser.y"
                             {
                             struct Value value;
                             (yyval.node_value) = insert_node("BOOL", value);
                             }
-#line 2205 "y.tab.c"
+#line 2206 "y.tab.c"
     break;
 
   case 53:
-#line 433 "parser.y"
+#line 434 "parser.y"
                                                     {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[-2].identifier), current_scope)){
@@ -2241,11 +2242,11 @@ yyreduce:
                                                      
                                                 }
                                                 }
-#line 2245 "y.tab.c"
+#line 2246 "y.tab.c"
     break;
 
   case 54:
-#line 470 "parser.y"
+#line 471 "parser.y"
                                                         {
                                                 // check multiple declaration
                                                 if(!is_redeclared((yyvsp[0].identifier), current_scope)){
@@ -2267,45 +2268,45 @@ yyreduce:
                                                     }
                                                 }
                                                 }
-#line 2271 "y.tab.c"
+#line 2272 "y.tab.c"
     break;
 
   case 55:
-#line 496 "parser.y"
+#line 497 "parser.y"
     {
         (yyval.int_value) = 0; // Initialize count to 0
     }
-#line 2279 "y.tab.c"
+#line 2280 "y.tab.c"
     break;
 
   case 56:
-#line 499 "parser.y"
+#line 500 "parser.y"
                       { 
         // Increment count for each var_declaration
         (yyval.int_value) = 1;
       }
-#line 2288 "y.tab.c"
+#line 2289 "y.tab.c"
     break;
 
   case 57:
-#line 503 "parser.y"
+#line 504 "parser.y"
                                           {
         // Increment count for each var_declaration
         (yyval.int_value) = (yyvsp[-2].int_value) + 1;
     }
-#line 2297 "y.tab.c"
+#line 2298 "y.tab.c"
     break;
 
   case 58:
-#line 511 "parser.y"
+#line 512 "parser.y"
     {
         (yyval.int_value) = 0; // Initialize count to 0
     }
-#line 2305 "y.tab.c"
+#line 2306 "y.tab.c"
     break;
 
   case 59:
-#line 515 "parser.y"
+#line 516 "parser.y"
                  {
         // check scope
         // check initialized
@@ -2330,50 +2331,50 @@ yyreduce:
         // Increment count for each var_declaration
         (yyval.int_value) = 1;
       }
-#line 2334 "y.tab.c"
+#line 2335 "y.tab.c"
     break;
 
   case 60:
-#line 540 "parser.y"
+#line 541 "parser.y"
                                           {
         // Increment count for each var_declaration
         (yyval.int_value) = (yyvsp[-2].int_value) + 1;
     }
-#line 2343 "y.tab.c"
+#line 2344 "y.tab.c"
     break;
 
   case 64:
-#line 553 "parser.y"
+#line 554 "parser.y"
             {quad_get_label(); push_switch_expression();}
-#line 2349 "y.tab.c"
+#line 2350 "y.tab.c"
     break;
 
   case 65:
-#line 553 "parser.y"
+#line 554 "parser.y"
                                                                { quad_EQ();   case_jz();    case_jnz();  quad_get_label(); case_count ++;}
-#line 2355 "y.tab.c"
+#line 2356 "y.tab.c"
     break;
 
   case 66:
-#line 553 "parser.y"
+#line 554 "parser.y"
                                                                                                                                                                {switch_jmp_to_end();}
-#line 2361 "y.tab.c"
+#line 2362 "y.tab.c"
     break;
 
   case 68:
-#line 557 "parser.y"
+#line 558 "parser.y"
                 {quad_get_label(); default_count++;}
-#line 2367 "y.tab.c"
+#line 2368 "y.tab.c"
     break;
 
   case 69:
-#line 557 "parser.y"
+#line 558 "parser.y"
                                                                       {switch_jmp_to_end();}
-#line 2373 "y.tab.c"
+#line 2374 "y.tab.c"
     break;
 
   case 71:
-#line 561 "parser.y"
+#line 562 "parser.y"
                             {
                             Value value;
                             value.id_value = (yyvsp[0].identifier);
@@ -2388,33 +2389,33 @@ yyreduce:
                                 }
                             }
                             }
-#line 2392 "y.tab.c"
+#line 2393 "y.tab.c"
     break;
 
   case 72:
-#line 576 "parser.y"
+#line 577 "parser.y"
                             {
                             Value value;
                             value.bool_value = true;
                             (yyval.node_value) = insert_node("BOOL", value);
                             generate_quadruple_push_terminal((yyval.node_value));
                             }
-#line 2403 "y.tab.c"
+#line 2404 "y.tab.c"
     break;
 
   case 73:
-#line 583 "parser.y"
+#line 584 "parser.y"
                             {
                             Value value;
                             value.bool_value = false;
                             (yyval.node_value) = insert_node("BOOL", value);
                             generate_quadruple_push_terminal((yyval.node_value));
                             }
-#line 2414 "y.tab.c"
+#line 2415 "y.tab.c"
     break;
 
   case 75:
-#line 592 "parser.y"
+#line 593 "parser.y"
                             {
                             Value value;
                             value.id_value = (yyvsp[0].identifier);
@@ -2429,175 +2430,175 @@ yyreduce:
                                 }
                             }
                             }
-#line 2433 "y.tab.c"
+#line 2434 "y.tab.c"
     break;
 
   case 76:
-#line 607 "parser.y"
+#line 608 "parser.y"
                                 {
                             Value value;
                             value.int_value = (yyvsp[0].int_value);
                             (yyval.node_value) = insert_node("INT", value);
                             generate_quadruple_push_terminal((yyval.node_value));
                             }
-#line 2444 "y.tab.c"
+#line 2445 "y.tab.c"
     break;
 
   case 77:
-#line 614 "parser.y"
+#line 615 "parser.y"
                                 {
                             Value value;
                             value.float_value = (yyvsp[0].float_value);
                             (yyval.node_value) = insert_node("FLOAT", value);
                             generate_quadruple_push_terminal((yyval.node_value));
                             }
-#line 2455 "y.tab.c"
+#line 2456 "y.tab.c"
     break;
 
   case 78:
-#line 621 "parser.y"
+#line 622 "parser.y"
                                         {
                             Value value;
                             value.char_value = (yyvsp[0].char_value);
                             (yyval.node_value) = insert_node("CHAR", value);
                             generate_quadruple_push_terminal((yyval.node_value));
                             }
-#line 2466 "y.tab.c"
+#line 2467 "y.tab.c"
     break;
 
   case 79:
-#line 628 "parser.y"
+#line 629 "parser.y"
                             {
                             Value value;
                             value.str_value = (yyvsp[0].str_value);
                             (yyval.node_value) = insert_node("STRING", value);
                             generate_quadruple_push_terminal((yyval.node_value));
                             }
-#line 2477 "y.tab.c"
+#line 2478 "y.tab.c"
     break;
 
   case 82:
-#line 643 "parser.y"
+#line 644 "parser.y"
                         {generate_quadruple_push_operation_1_op("NEG", (yyvsp[0].node_value), true);}
-#line 2483 "y.tab.c"
+#line 2484 "y.tab.c"
     break;
 
   case 83:
-#line 644 "parser.y"
+#line 645 "parser.y"
                         {generate_quadruple_push_operation_1_op("PRE_INCR", (yyvsp[0].node_value), true);}
-#line 2489 "y.tab.c"
+#line 2490 "y.tab.c"
     break;
 
   case 84:
-#line 645 "parser.y"
+#line 646 "parser.y"
                         {generate_quadruple_push_operation_1_op("POST_INCR", (yyvsp[-1].node_value), true);}
-#line 2495 "y.tab.c"
+#line 2496 "y.tab.c"
     break;
 
   case 85:
-#line 646 "parser.y"
+#line 647 "parser.y"
                         {generate_quadruple_push_operation_1_op("PRE_DEC", (yyvsp[0].node_value), true);}
-#line 2501 "y.tab.c"
+#line 2502 "y.tab.c"
     break;
 
   case 86:
-#line 647 "parser.y"
+#line 648 "parser.y"
                         {generate_quadruple_push_operation_1_op("POST_DECR", (yyvsp[-1].node_value), true);}
-#line 2507 "y.tab.c"
+#line 2508 "y.tab.c"
     break;
 
   case 87:
-#line 649 "parser.y"
+#line 650 "parser.y"
                                 {generate_quadruple_push_operation_2_ops("ADD", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2513 "y.tab.c"
+#line 2514 "y.tab.c"
     break;
 
   case 88:
-#line 650 "parser.y"
+#line 651 "parser.y"
                                 {generate_quadruple_push_operation_2_ops("SUB", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2519 "y.tab.c"
+#line 2520 "y.tab.c"
     break;
 
   case 89:
-#line 651 "parser.y"
+#line 652 "parser.y"
                                 {generate_quadruple_push_operation_2_ops("MUL", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2525 "y.tab.c"
+#line 2526 "y.tab.c"
     break;
 
   case 90:
-#line 652 "parser.y"
+#line 653 "parser.y"
                                 {generate_quadruple_push_operation_2_ops("DIV", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2531 "y.tab.c"
+#line 2532 "y.tab.c"
     break;
 
   case 91:
-#line 653 "parser.y"
+#line 654 "parser.y"
                                 {generate_quadruple_push_operation_2_ops("POW", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2537 "y.tab.c"
+#line 2538 "y.tab.c"
     break;
 
   case 92:
-#line 654 "parser.y"
+#line 655 "parser.y"
                                 {generate_quadruple_push_operation_2_ops("MOD", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2543 "y.tab.c"
+#line 2544 "y.tab.c"
     break;
 
   case 93:
-#line 657 "parser.y"
+#line 658 "parser.y"
                                         {generate_quadruple_push_operation_2_ops("LOGICAL_AND", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2549 "y.tab.c"
+#line 2550 "y.tab.c"
     break;
 
   case 94:
-#line 658 "parser.y"
+#line 659 "parser.y"
                                         {generate_quadruple_push_operation_2_ops("LOGICAL_OR", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2555 "y.tab.c"
+#line 2556 "y.tab.c"
     break;
 
   case 95:
-#line 659 "parser.y"
+#line 660 "parser.y"
                                 {generate_quadruple_push_operation_1_op("LOGICAL_NOT", (yyvsp[0].node_value), false);}
-#line 2561 "y.tab.c"
+#line 2562 "y.tab.c"
     break;
 
   case 96:
-#line 662 "parser.y"
+#line 663 "parser.y"
                                                 {generate_quadruple_push_operation_2_ops("EQ", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2567 "y.tab.c"
+#line 2568 "y.tab.c"
     break;
 
   case 97:
-#line 663 "parser.y"
+#line 664 "parser.y"
                                                 {generate_quadruple_push_operation_2_ops("NEQ", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2573 "y.tab.c"
+#line 2574 "y.tab.c"
     break;
 
   case 98:
-#line 664 "parser.y"
+#line 665 "parser.y"
                                                 {generate_quadruple_push_operation_2_ops("LT", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2579 "y.tab.c"
+#line 2580 "y.tab.c"
     break;
 
   case 99:
-#line 665 "parser.y"
+#line 666 "parser.y"
                                             {generate_quadruple_push_operation_2_ops("LTQ", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2585 "y.tab.c"
+#line 2586 "y.tab.c"
     break;
 
   case 100:
-#line 666 "parser.y"
+#line 667 "parser.y"
                                             {generate_quadruple_push_operation_2_ops("GT", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2591 "y.tab.c"
+#line 2592 "y.tab.c"
     break;
 
   case 101:
-#line 667 "parser.y"
+#line 668 "parser.y"
                                         {generate_quadruple_push_operation_2_ops("GTQ", (yyvsp[-2].node_value), (yyvsp[0].node_value));}
-#line 2597 "y.tab.c"
+#line 2598 "y.tab.c"
     break;
 
 
-#line 2601 "y.tab.c"
+#line 2602 "y.tab.c"
 
       default: break;
     }
@@ -2829,7 +2830,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 669 "parser.y"
+#line 670 "parser.y"
 
 
 void insert_symbol(char *name, char *type, bool is_const, Scope *scope, char* return_type){
@@ -2880,6 +2881,11 @@ int is_correct_scope(char* name, Scope *scope, bool in_place){
     if(!found){
         // return -1 if not declared (ERROR)
         if(in_place){
+            if (errors_file == NULL) {
+                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+            }
+                fprintf(errors_file, "Not Declared: %s at line %d\n", name, lineno);
+                fclose(errors_file);
             printf("Not Declared: %s at line %d\n", name, lineno);
         }
         return -1;
@@ -2887,6 +2893,11 @@ int is_correct_scope(char* name, Scope *scope, bool in_place){
     else{
         // found = true ==> declared but wrong scope (ERROR)
         if(in_place){
+            if (errors_file == NULL) {
+                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+            }
+                fprintf(errors_file, "Not Declared In this scope: %s at line %d\n", name, lineno );
+                fclose(errors_file);
             printf("Not Declared In this scope: %s at line %d\n", name, lineno);
         }
         return 0; 
@@ -2901,10 +2912,20 @@ bool is_redeclared(char* name, Scope *scope){
             while(temp_scope){
                 if(symbol_table[i] -> scope == temp_scope){
                     // redeclaration (ERROR)
+                    if (errors_file == NULL) {
+                        fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                    }
+                        fprintf(errors_file, "Redeclared: %s at line %d\n", name, lineno);
+                        fclose(errors_file);
                     printf("Redeclared: %s at line %d\n", name, lineno);
                     return true;
                 }
                 else{
+                    if (errors_file == NULL) {
+                        fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                    }
+                        fprintf(errors_file, "Well Done: %s at line %d\n", name, lineno);
+                        fclose(errors_file);
                     printf("Well Done: %s at line %d\n", name, lineno);
                     temp_scope = temp_scope -> parent;
                 }
@@ -2937,6 +2958,11 @@ bool is_same_type(char *name, Scope* scope, Node* id_node){
                                         return true;
                                     }
                                     else{
+                                        if (errors_file == NULL) {
+                                            fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                                        }
+                                            fprintf(errors_file, "type mismatch: %s at line %d\n", name, lineno);
+                                            fclose(errors_file);
                                         printf("type mismatch: %s at line %d\n", name, lineno);
                                         return false;
                                     }
@@ -2954,6 +2980,11 @@ bool is_same_type(char *name, Scope* scope, Node* id_node){
                                         return true;
                                     }
                                     else{
+                                        if (errors_file == NULL) {
+                                            fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                                        }
+                                            fprintf(errors_file, "type mismatch: %s at line %d\n", name, lineno);
+                                            fclose(errors_file);
                                         printf("type mismatch: %s at line %d\n", name, lineno);
                                         return false;
                                     }
@@ -2961,6 +2992,11 @@ bool is_same_type(char *name, Scope* scope, Node* id_node){
                             }
                         }
                         else{
+                            if (errors_file == NULL) {
+                                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                            }
+                                fprintf(errors_file, "type mismatch: %s at line %d\n", name, lineno);
+                                fclose(errors_file);
                             printf("type mismatch: %s at line %d\n", name, lineno);
                             return false;
                         }
@@ -2984,6 +3020,11 @@ bool is_const(char *name, Scope *scope){
                 if(symbol_table[i] -> scope == temp_scope){
                     if(symbol_table[i]-> is_const){
                         // const (ERROR)
+                        if (errors_file == NULL) {
+                            fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                        }
+                            fprintf(errors_file, "trying to modify const variable %s at line %d\n\n",name, lineno);
+                            fclose(errors_file);
                         printf("trying to modify const variable %s at line %d\n\n",name, lineno);
                         return true;
                     }
@@ -3032,6 +3073,11 @@ bool is_initialized(char* name, Scope *scope){
                     }
                     else{
                         // used before initializing (ERROR)
+                        if (errors_file == NULL) {
+                            fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                        }
+                            fprintf(errors_file, "trying to use variable before initializing %s at line %d\n",name, lineno);
+                            fclose(errors_file);
                         printf("trying to use variable before initializing %s at line %d\n",name, lineno);
                         return false;
                     }
@@ -3073,12 +3119,22 @@ bool is_function(char* name, Scope *scope, bool need_to_be_function){
                 if(symbol_table[i] -> scope == temp_scope){
                     if(strcmp(symbol_table[i] -> type, "FUNC")==0){
                         if(!need_to_be_function){
+                            if (errors_file == NULL) {
+                                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                            }
+                                fprintf(errors_file, "improper function useage: name %s at line number %d", name, lineno);
+                                fclose(errors_file);
                             printf("improper function useage: name %s at line number %d", name, lineno);
                         }
                         return true;
                     }
                     else{
                         if(need_to_be_function){
+                            if (errors_file == NULL) {
+                                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                            }
+                                fprintf(errors_file, "Error at line: %d     this ID: %s isn't a function name\n", lineno, name);
+                                fclose(errors_file);
                             printf("Error at line: %d     this ID: %s isn't a function name\n", lineno, name);
                         }
                         return false;
@@ -3143,6 +3199,11 @@ bool check_correct_parameters(char* name, Scope *scope, function_parameter ** pa
                     if(symbol_table[i] -> no_of_parameters == no_of_parameters){
                         for(int j = 0; j < no_of_parameters ;j++){
                             if(strcmp(symbol_table[i] -> parameters[j] -> type, parameters[j] -> type)){
+                                if (errors_file == NULL) {
+                                    fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                                }
+                                    fprintf(errors_file, "Unexpected parameter at position %d for function %s at line %d\n", j + 1, name, lineno);
+                                    fclose(errors_file);
                                 printf("Unexpected parameter at position %d for function %s at line %d\n", j + 1, name, lineno);
                                 return false;
                             }
@@ -3150,6 +3211,11 @@ bool check_correct_parameters(char* name, Scope *scope, function_parameter ** pa
                         return true;
                     }
                     else{
+                        if (errors_file == NULL) {
+                            fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                        }
+                            fprintf(errors_file, "Wrong Number of parameters for function: %s at line: %d    expected: %d, but found: %d\n", name, lineno, symbol_table[i] -> no_of_parameters, no_of_parameters);
+                            fclose(errors_file);
                         printf("Wrong Number of parameters for function: %s at line: %d    expected: %d, but found: %d\n", name, lineno, symbol_table[i] -> no_of_parameters, no_of_parameters);
                         return false;
                     }
@@ -3191,6 +3257,11 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
         // check the 2 IDs are the same type
         // if not the same type ==> return
         if(strcmp(get_symbol_type(operand1 -> value.id_value, current_scope), get_symbol_type(operand2 -> value.id_value, current_scope)) != 0){
+            if (errors_file == NULL) {
+                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+            }
+                fprintf(errors_file, "Error at line: %d    the 2 operands must be the same type\n", lineno);
+                fclose(errors_file);
             printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
             return;
         }
@@ -3199,6 +3270,11 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
     else if(strcmp(operand1->type, "ID") == 0 ){
         // if not the same type ==> return
         if(strcmp(get_symbol_type(operand1 -> value.id_value, current_scope), operand2->type) != 0){
+            if (errors_file == NULL) {
+                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+            }
+                fprintf(errors_file, "Error at line: %d    the 2 operands must be the same type\n", lineno);
+                fclose(errors_file);
             printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
             return;
         }
@@ -3207,12 +3283,22 @@ void generate_quadruple_push_operation_2_ops(char* operation, Node* operand1, No
     else if(strcmp(operand2->type, "ID") == 0 ){
         // if not the same type ==> return
         if(strcmp(operand1->type, get_symbol_type(operand2 -> value.id_value, current_scope)) != 0){
+            if (errors_file == NULL) {
+                fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+            }
+                fprintf(errors_file, "Error at line: %d    the 2 operands must be the same type\n", lineno);
+                fclose(errors_file);
             printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
             return;
         }
     }
     // the 2 operands are not IDs ==> check the type
     else if(strcmp(operand1->type, operand2->type) != 0){
+        if (errors_file == NULL) {
+            fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+        }
+            fprintf(errors_file, "Error at line: %d    the 2 operands must be the same type\n", lineno);
+            fclose(errors_file);
         printf("Error at line: %d    the 2 operands must be the same type\n", lineno);
         return;
     }
@@ -3261,6 +3347,11 @@ void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool
     if(numeric){
         if(strcmp(operand->type, "INT") != 0 && strcmp(operand->type, "FLOAT") != 0){
             if(strcmp(operand->type, "ID") != 0){
+                if (errors_file == NULL) {
+                    fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                }
+                    fprintf(errors_file, "Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
+                    fclose(errors_file);
                 printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
                 return;
             }
@@ -3268,6 +3359,11 @@ void generate_quadruple_push_operation_1_op(char* operation, Node* operand, bool
                 // if ID ==> check its type
                 //if not INT or FLOAT ==> return
                 if(strcmp(get_symbol_type(operand -> value.id_value, current_scope), "INT") != 0 && strcmp(get_symbol_type(operand -> value.id_value, current_scope), "FLOAT") != 0){
+                    if (errors_file == NULL) {
+                        fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+                    }
+                        fprintf(errors_file, "Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
+                        fclose(errors_file);
                     printf("Improper type for arithmetic operation at line: %d      expected float or int\n", lineno);
                     return;
                 }
@@ -3631,6 +3727,14 @@ void print_symbol_table(const char* filename) {
     fclose(file);
 }
 
+void write_to_errors_file(char * error_txt){
+    if (errors_file == NULL) {
+        fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+    }
+        fprintf(errors_file, "%s\n", error_txt);
+        fclose(errors_file);
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input file>\n", argv[0]);
@@ -3649,11 +3753,17 @@ int main(int argc, char *argv[]) {
         free(current_scope); // Clean up allocated memory
         return EXIT_FAILURE;
     }
+    errors_file = fopen("errors.txt", "w");
     yyparse();
 
     fclose(yyin);
 
     if (!is_all_used()) {
+        if (errors_file == NULL) {
+        fprintf(stderr, "Error: Could not open file errors_file for writing\n");
+    }
+        fprintf(errors_file, "Not all variables used\n");
+        fclose(errors_file);
         printf("Not all variables used\n");
     }
     print_symbol_table("symbol_table.txt");

@@ -1577,6 +1577,12 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
+    // Delete the file at the start
+    if (remove("quads.txt") != 0) {
+        fprintf(stderr, "Error deleting file: quads.txt\n");
+        return EXIT_FAILURE;
+    }
+
     current_scope = (Scope*) malloc(sizeof(Scope));
     if (current_scope == NULL) {
         fprintf(stderr, "Memory allocation failed\n");

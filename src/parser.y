@@ -122,6 +122,8 @@
     void quad_get_label();
     void generate_label(char* label, int label_number);
     void quad_jmp_loop();
+    void quad_repeat_jnz();
+    void quad_repeat_jmp();
 %}
 
 %union { 
@@ -332,7 +334,7 @@ stmt:
         /*Loops*/
         | WHILE '(' {quad_get_label();} expr {quad_jmp_loop();}')' '{' {enter_block();} statements '}' {exit_block(); quad_get_label();}
         | FOR '(' {quad_get_label();} assignment ';' expr ';' {quad_jmp_loop();} IDENTIFIER '=' expr ')' '{' {enter_block();} statements '}'  {exit_block(); quad_get_label();}
-        | REPEAT '{' {quad_get_label();} {enter_block();} statements '}' {exit_block(); quad_get_label();} UNTIL '(' expr ')' ';'
+        | REPEAT '{' {quad_get_label();} {enter_block();} statements '}' {exit_block(); } UNTIL '(' expr ')' ';' {quad_repeat_jnz();  quad_repeat_jmp();  quad_get_label();}
         
         /*Switch Statements*/
         | SWITCH '(' {quad_get_label();} switch_identifier ')' '{' {enter_block();} case_list '}' {exit_block(); quad_get_label();}
@@ -1286,6 +1288,36 @@ void quad_jmp_loop(){
     fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
     fclose(quad_file);
 
+}
+
+void quad_repeat_jnz(){
+    char Label[10];
+    generate_label(Label, label_count - 1);
+
+    quad_idx++;
+    quadruples[quad_idx].operation = "JNZ";
+    quadruples[quad_idx].operand1 = Label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
+}
+
+void quad_repeat_jmp(){
+    char Label[10];
+    generate_label(Label, label_count);
+
+    quad_idx++;
+    quadruples[quad_idx].operation = "JMP";
+    quadruples[quad_idx].operand1 = Label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
 }
 void generate_quadruple_pop(char* operand) {
     // Generate quadruple for pop

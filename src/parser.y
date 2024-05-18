@@ -124,6 +124,7 @@
     void quad_jmp_loop();
     void quad_repeat_jnz();
     void quad_repeat_jmp();
+    void quad_if_jnz();
 %}
 
 %union { 
@@ -329,7 +330,7 @@ stmt:
             
         
         /*Conditional Statements*/
-        | IF '(' expr ')' '{' {enter_block();} statements '}'  {exit_block();} else_stmt
+        | IF '(' expr {quad_if_jnz();}')' '{' {enter_block();} statements '}'  {exit_block();} {quad_get_label();} else_stmt
         
         /*Loops*/
         | WHILE '(' {quad_get_label();} expr {quad_jmp_loop();}')' '{' {enter_block();} statements '}' {exit_block(); quad_get_label();}
@@ -1288,6 +1289,20 @@ void quad_jmp_loop(){
     fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
     fclose(quad_file);
 
+}
+void quad_if_jnz(){
+    char Label[10];
+    generate_label(Label, label_count);
+
+    quad_idx++;
+    quadruples[quad_idx].operation = "JNZ";
+    quadruples[quad_idx].operand1 = Label;
+    quadruples[quad_idx].operand2 = NULL;
+    quadruples[quad_idx].result = NULL;
+    // Output the quadruple to a file
+    FILE *quad_file = fopen("quads.txt", "a");
+    fprintf(quad_file, "%s %s\n", quadruples[quad_idx].operation, quadruples[quad_idx].operand1);
+    fclose(quad_file);
 }
 
 void quad_repeat_jnz(){

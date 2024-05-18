@@ -1,13 +1,18 @@
-push 5
+push 10
 pop x
+push x
+push 10
+EQ
+JNZ L000
+push 10
+pop b
 L000:
 push x
-push 1
-ADD
-pop x
-push x
-push 20
-GT
-JNZ L000
-JMP L001
+push 5
+EQ
+JNZ L001
+push 5
+pop b
 L001:
+push x
+pop b

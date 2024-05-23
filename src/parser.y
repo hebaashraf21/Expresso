@@ -644,7 +644,7 @@ expr:
     | '-' expr	        {generate_quadruple_push_operation_1_op("NEG", $2, true);}
     | INCR expr         {generate_quadruple_push_operation_1_op("PRE_INCR", $2, true);}     		
     | expr INCR         {generate_quadruple_push_operation_1_op("POST_INCR", $1, true);}         		
-    | DECR expr         {generate_quadruple_push_operation_1_op("PRE_DEC", $2, true);}        		
+    | DECR expr         {generate_quadruple_push_operation_1_op("PRE_DECR", $2, true);}        		
     | expr DECR         {generate_quadruple_push_operation_1_op("POST_DECR", $1, true);}
 
     | expr '+' expr		{generate_quadruple_push_operation_2_ops("ADD", $1, $3);}		
@@ -757,12 +757,6 @@ bool is_redeclared(char* name, Scope *scope){
                     return true;
                 }
                 else{
-                    if (errors_file == NULL) {
-                        fprintf(stderr, "Error: Could not open file errors_file for writing\n");
-                    }
-                        fprintf(errors_file, "Well Done: %s at line %d\n", name, lineno);
-                        fclose(errors_file);
-                    printf("Well Done: %s at line %d\n", name, lineno);
                     temp_scope = temp_scope -> parent;
                 }
             }

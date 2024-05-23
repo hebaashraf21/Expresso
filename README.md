@@ -370,3 +370,25 @@ func_2(1, 2); // function call
  **GTQ**        | Check if the first expression is greater than or equal the second     | expression      | expression      |                
  **LT**         | Check if the first expression is less than the second                 | expression      | expression      |                 
  **LTQ**        | Check if the first expression is less than or equal the second        | expression      | expression      |                
+
+## Semantic Errors
+
+Semantic Errors         
+-------------------
+ **TYPE_MISMATCH** 
+ 
+ **UNDECLARED**    
+ 
+ **UNINITIALIZED** 
+ 
+ **UNUSED**        
+ 
+ **REDECLARED**    
+ 
+ **CONSTANT**      
+ 
+ **OUT_OF_SCOPE**
+ 
+ **Wrong Number of Parameters In Fumction Call**
+ 
+ **Wrong Parameters Types In Fumction Call**

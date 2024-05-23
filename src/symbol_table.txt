@@ -1,2 +1,0 @@
-Name: x, Type: BOOL, Const: false, Initialized: false, Used: false, Return Type: 
-

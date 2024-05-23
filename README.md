@@ -315,3 +315,58 @@ func_2(1, 2); // function call
     <br>
    <li>expr → | '(' expr ')'	| '-' expr | INCR expr | expr INCR | DECR expr | expr DECR | expr '+' expr | expr '-' expr | expr '*' expr | expr '/' expr | expr '^' expr | expr '%' expr | expr LOGICAL_AND expr | expr LOGICAL_OR expr | LOGICAL_NOT expr | expr EQUALS expr | expr NOT_EQUALS expr | | expr LESS_THAN_OR_EQUALS expr | expr GREATER_THAN expr | expr GREATER_THAN_OR_EQUALS expr</li>
 </ul>
+
+
+## Quadruples
+
+### Procedures
+
+ **Quadruples** | **Description**                                                   |    **ARG1**     |    **ARG2**     |
+----------------|-------------------------------------------------------------------|-----------------|-----------------|
+**START PROC**  | Declare of a procedure                                            | procedure name  |                 |
+ **ENDPROC**    | End of a procedure                                                | procedure name  |                 |                 
+ **CALL**       | Calls a procedure, handles all the stuff related to the PC        | procedure name  |                 |                 
+
+ ### Variables
+
+ **Quadruples** | **Description**                                                   |    **ARG1**               |    **ARG2**     |    **RES**      |
+----------------|-------------------------------------------------------------------|---------------------------|-----------------|-----------------|
+ **PUSH**       | Push to the stack frame                                           | Identifier/Expr/parameter |                 |                 |
+ **POP**        | Pop from the stack frame                                          | Identifier/Expr/parameter |                 |                 |
+
+ ### Branching & Jumps
+
+ **Quadruples** | **Description**                                                             |    **ARG1**     |    **ARG2**     | 
+----------------|-----------------------------------------------------------------------------|-----------------|-----------------|
+ **JMP**        | Unconditional jump to the label                                             |    label        |                 |                 
+ **JZ**         | Jumps to the label if the result of the last relational operation is true   |    label        |                 |                 
+ **JNZ**        | Jumps to the label if the result of the last relational operation is falze  |    label        |                 |                 
+
+ ### Arithmetic Operations
+
+ **Quadruples** | **Description**                                                       |    **ARG1**     |    **ARG2**     |
+----------------|-----------------------------------------------------------------------|-----------------|-----------------|
+ **NEG**        | Get the opposite sign of an expression                                | expression      |                 |                 
+ **ADD**        | Add two expressions                                                   | expression      | expression      |                 
+ **SUB**        | Subtract two expressions                                              | expression      | expression      |                
+ **MUL**        | Multiply two expressions                                              | expression      | expression      |                 
+ **DIV**        | Divide two expressions                                                | expression      | expression      |                 
+ **MOD**        | Modulus two expressions                                               | expression      | expression      |                 
+ **POST_INCR**  | Increment One expression after the operation                          | expression      |                 |                 
+ **PRE_INCR**   | Increment One expression before the operation                         | expression      |                 |                 
+ **POST_DECR**  | Decrement One expression after the operation                          | expression      |                 |                 
+ **PRE_DECR**   | Decrement One expression before the operation                         | expression      |                 |                 
+
+ ### Logical Operations
+    
+ **Quadruples** | **Description**                                                       |    **ARG1**     |    **ARG2**     |
+----------------|-----------------------------------------------------------------------|-----------------|-----------------|
+ **LOGICAL_OR** | Get the logical or of two expressions                                 | expression      | expression      |                
+ **LOGICAL_AND**| Get the logical or of two expressions                                 | expression      | expression      |                 
+ **LOGICAL_NOT**| Get the logical not of 1 expression                                   | expression      |                 |                 
+ **EQ**         | Check if two expressions are equal                                    | expression      | expression      |               
+ **NEQ**        | Check if two expressions are not equal                                | expression      | expression      |                 
+ **GT**         | Check if the first expression is greater than the second              | expression      | expression      |                
+ **GTQ**        | Check if the first expression is greater than or equal the second     | expression      | expression      |                
+ **LT**         | Check if the first expression is less than the second                 | expression      | expression      |                 
+ **LTQ**        | Check if the first expression is less than or equal the second        | expression      | expression      |                

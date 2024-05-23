@@ -119,3 +119,17 @@ Lex and Yacc are tools commonly used in the field of computer science for constr
       <td>Identifiers (variables and contants names).</td>
    </tr>
 </table>
+
+## Syntax
+
+### Data Types
+
+Tha language supports the following data types:
+
+- Integer
+- Float
+- Boolean
+- String
+- Character
+
+It supports modifiers like `const` as well.

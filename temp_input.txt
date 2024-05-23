@@ -1,6 +1,6 @@
-int a = 10;
-float b = 3.14;
-char c = 'A';
-bool d = true;
-string e = "Hello, world!";
-int x=10;
+void greet() {
+    print("Hello, world!");
+}
+
+int a = 5;
+greet(a);

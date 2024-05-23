@@ -36,6 +36,21 @@ else {
 Lex and Yacc are tools commonly used in the field of computer science for constructing compilers and interpreters. They are used to generate lexical analyzers and parsers, which are critical components in the process of translating high-level programming languages into machine-readable code.
 
 <ol>
-   <li>Lex:  is a tool for generating lexical analyzers, also known as lexers or scanners. A lexical analyzer processes an input stream of characters (such as source code) and divides it into a sequence of tokens. Tokens are meaningful sequences of characters, such as keywords, operators, identifiers, and literals..</li>
-   <li>Yacc: Yacc stands for "Yet Another Compiler Compiler." It is a tool used to generate parsers, which analyze the structure of the token sequence produced by the lexer to ensure it conforms to the grammatical rules of the programming language..</li>
+   <li>**Lex**:  is a tool for generating lexical analyzers, also known as lexers or scanners. A lexical analyzer processes an input stream of characters (such as source code) and divides it into a sequence of tokens. Tokens are meaningful sequences of characters, such as keywords, operators, identifiers, and literals..</li>
+   <li>**Yacc**: Yacc stands for "Yet Another Compiler Compiler." It is a tool used to generate parsers, which analyze the structure of the token sequence produced by the lexer to ensure it conforms to the grammatical rules of the programming language..</li>
+</ol>
+
+
+# Workflow
+
+<ol>
+ <li>
+     **Define Tokens with Lex**: Create a .l file specifying the tokens and their patterns.
+ </li>   
+<li>
+     **Define Grammar with Yacc**: Create a .y file specifying the grammar rules and associated actions.
+ </li> 
+<li>
+     **Compile and Link**: Use Lex to generate a C source file for the lexer, and Yacc to generate a C source file for the parser. Compile and link these with a C compiler.
+ </li>
 </ol>

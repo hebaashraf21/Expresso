@@ -133,3 +133,40 @@ Tha language supports the following data types:
 - Character
 
 It supports modifiers like `const` as well.
+
+```c
+const int a = 10;
+int b = 20;
+float c = 10.5;
+bool d = true;
+string e = "Hello World";
+char f = 'c';
+```
+
+### Operators
+
+The language supports the common operators.
+
+```c
+// Arithmetic operators
+a = b + c;
+a = b - c;
+a = b * c;
+a = b / c;
+a = b % c;
+a = b++;
+a = ++b;
+a = b--;
+a = --b;
+// Logical operators
+a = b && c;
+a = b || c;
+a = !b;
+// Relational operators
+a = b == c;
+a = b != c;
+a = b > c;
+a = b >= c;
+a = b < c;
+a = b <= c;
+```

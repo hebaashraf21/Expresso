@@ -58,3 +58,64 @@ Lex and Yacc are tools commonly used in the field of computer science for constr
       <b>Compile and Link</b> : Use Lex to generate a C source file for the lexer, and Yacc to generate a C source file for the parser. Compile and link these with a C compiler.
  </li>
 </ol>
+
+
+## Tokens
+
+<table>
+   <tr>
+      <th align="left">Token</th>
+      <th align="left">Regex</th>
+      <th align="left">Description</th>
+   </tr>
+   <tr>
+      <td>FLOAT_VAL</td>
+      <td>[0-9]*"."[0-9]+</td>
+      <td>Float Numbers.</td>
+   </tr>
+   <tr>
+      <td>INTEGER_VAL</td>
+      <td>0 | ([1-9][0-9]*)</td>
+      <td>Integer Numbers.</td>
+   </tr>
+   <tr>
+      <td>CHAR_VAL</td>
+      <td>'[^\\']'</td>
+      <td>One character inside sinqle quotes.</td>
+   </tr>
+   <tr>
+      <td>STRING_VAL</td>
+      <td>\"([^\"\\;]|\\.)*\"</td>
+      <td>string between double quotes.</td>
+   </tr>
+   <tr>
+      <td>TRUE_VAL</td>
+      <td>"true"</td>
+      <td>True value.</td>
+   </tr>
+   <tr>
+      <td>FALSE_VAL</td>
+      <td>"false"</td>
+      <td>False value.</td>
+   </tr>
+   <tr>
+      <td>skip this token</td>
+      <td>\/\*([^*]|\*+[^/])*\*+\/</td>
+      <td>Multi-line comment.</td>
+   </tr>
+   <tr>
+      <td>skip this token</td>
+      <td>\/\/.*</td>
+      <td>In-line comment.</td>
+   </tr>
+   <tr>
+      <td>NEW_LINE</td>
+      <td>"\n"</td>
+      <td>new line.</td>
+   </tr>
+   <tr>
+      <td>IDENTIFIER</td>
+      <td>[a-zA-Z_][a-zA-Z0-9_]*</td>
+      <td>Identifiers (variables and contants names).</td>
+   </tr>
+</table>

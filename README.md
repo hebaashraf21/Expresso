@@ -1,6 +1,8 @@
-# Expresso
+# Expresso  💻☕
 
-![logo](assets/logo_1.png)
+<table style="width:100%;"><tr><td align="center">
+  <img src="assets/logo_1.png" alt="Expresso Logo">
+</td></tr></table>
 
 ## Introduction
 
@@ -392,3 +394,23 @@ Semantic Errors
  **Wrong Number of Parameters In Fumction Call**
  
  **Wrong Parameters Types In Fumction Call**
+
+ ## Examples 
+
+**Variables**
+</br>
+ <img src="assets/variables.png" alt="" >
+ <img src="assets/uninitialized.png" alt="" >
+ </br>
+**Switch case**
+  <img src="assets/switch_case.png" alt="" >
+  </br>
+**For loop**
+</br>
+ <img src="assets/for_loop.png" alt="" >
+ </br>
+ **Functions**
+ <br>
+ <img src="assets/func_wrong_num_params.png" alt="" >
+ <img src="assets/function_wrong_param.png" alt="" >
+

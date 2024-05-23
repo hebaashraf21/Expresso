@@ -376,11 +376,19 @@ func_2(1, 2); // function call
 Semantic Errors         
 -------------------
  **TYPE_MISMATCH** 
+ 
  **UNDECLARED**    
+ 
  **UNINITIALIZED** 
+ 
  **UNUSED**        
+ 
  **REDECLARED**    
+ 
  **CONSTANT**      
+ 
  **OUT_OF_SCOPE**
+ 
  **Wrong Number of Parameters In Fumction Call**
+ 
  **Wrong Parameters Types In Fumction Call**

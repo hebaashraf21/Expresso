@@ -278,3 +278,40 @@ void func_2(int a, int b) {
 func_2(1, 2); // function call
 ```
 
+## Production Rules
+
+<ul>
+   <li>program → statements</li>
+   <br>
+   <li>statements → stmt | statements stmt</li>
+   <br>
+   <li>stmt → ';'  | datatype IDENTIFIER ';' | datatype IDENTIFIER '=' expr ';' | CONST datatype IDENTIFIER '=' expr ';' | IDENTIFIER '=' expr ';' | PRINT '(' expr ')' ';' | IF '(' expr ')' '{' statements '}' else_stmt | WHILE '(' expr ')' '{' statements '}' |  FOR '(' assignment ';' expr ';' IDENTIFIER '=' expr ')' '{' statements '}' | REPEAT '{' statements '}' UNTIL '(' expr ')' ';' | SWITCH '(' switch_identifier ')' '{' case_list '}' | '{' statements'}' | VOID IDENTIFIER  '(' parameters_list ')' '{' statements '}' | datatype IDENTIFIER'(' parameters_list ')' '{' statements '}'  | function_call | return_stmt</li>
+   <br>
+   <li>return_stmt → RETURN ';' | RETURN expr ';'</li>
+   <br>
+   <li>function_call → IDENTIFIER '(' parameters_list_call ')'</li>
+    <br>
+   <li>else_stmt → /*Empty production*/ | ELSE '{'  statements '}' </li>
+    <br>
+   <li>datatype → INTEGER | FLOAT | CHAR | STRING | BOOL </li>
+    <br>
+   <li>assignment → datatype IDENTIFIER '=' expr </li>
+    <br>
+   <li>var_declaration → datatype IDENTIFIER </li>
+    <br>
+   <li>parameters_list → /* Empty production */ | var_declaration | parameters_list ',' var_declaration </li>
+    <br>
+   <li>parameters_list_call → /* Empty production */ | IDENTIFIER | parameters_list_call ',' IDENTIFIER </li>
+    <br>
+   <li>case_list → case_stmt | case_list case_stmt | case_list default_case</li>
+    <br>
+   <li>case_stmt → CASE  expr':' statements BREAK ';'</li>
+    <br>
+   <li>default_case → DEFAULT ':' statements BREAK ';'</li>
+    <br>
+   <li>switch_identifier → IDENTIFIER</li>
+    <br>
+   <li>terminals → TRUE_VAL | FALSE_VAL | function_call | IDENTIFIER | INTEGER_VAL | FLOAT_VAL | CHAR_VAL | STRING_VAL</li>
+    <br>
+   <li>expr → | '(' expr ')'	| '-' expr | INCR expr | expr INCR | DECR expr | expr DECR | expr '+' expr | expr '-' expr | expr '*' expr | expr '/' expr | expr '^' expr | expr '%' expr | expr LOGICAL_AND expr | expr LOGICAL_OR expr | LOGICAL_NOT expr | expr EQUALS expr | expr NOT_EQUALS expr | | expr LESS_THAN_OR_EQUALS expr | expr GREATER_THAN expr | expr GREATER_THAN_OR_EQUALS expr</li>
+</ul>
